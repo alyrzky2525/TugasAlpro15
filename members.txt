@@ -1,0 +1,3 @@
+alice|Alice Wonderland|081234567890
+bob|Bob Builder|082345678901
+carol|Carol Singer|083456789012
