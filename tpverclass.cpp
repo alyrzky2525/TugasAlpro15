@@ -2130,16 +2130,49 @@ transaksi.simpanTransaksi(
 );
 
     // print simple receipt
-    cout << "\n--- Struk Pembayaran ---\n";
-    cout << "Tanggal: " << curDate << "\n";
-    for (int i = 0; i < cartCount; ++i) cout << cartCode[i] << " x" << cartQty[i] << " = Rp" << (int)cartSubtotal[i] << "\n";
-    cout << "Subtotal: Rp" << (int)total << "\n";
-    cout << "Diskon total: Rp" << (int)totalDiscount << "\n";
-    cout << "Total bayar: Rp" << (int)finalTotal << "\n";
-    cout << "Tunai: Rp" << (int)paid << " | Kembali: Rp" << (int)change << "\n";
-    if (!appliedPromoCode.empty()) cout << "Promo: " << appliedPromoCode << "\n";
-    if (!member.empty()) cout << "Member: " << member << "\n";
-    cout << "--- Terima kasih ---\n\n";
+  cout << "\n=========================================\n";
+cout << "               CFBEAUTY\n";
+cout << " Barang yang sudah dibeli tidak dapat\n";
+cout << "         dikembalikan\n";
+cout << "=========================================\n";
+
+cout << "Sleman, DI Yogyakarta\n";
+cout << "Indonesia\n";
+cout << "Telp : 081391391313\n";
+cout << "-----------------------------------------\n";
+
+cout << "Tanggal : " << curDate << endl;
+cout << "Kasir   : Admin" << endl;
+cout << "-----------------------------------------\n";
+
+cout << "Qty  Nama Barang             Subtotal\n";
+cout << "-----------------------------------------\n";
+
+for (int i = 0; i < cartCount; i++)
+{
+    cout << cartQty[i] << "    "
+         << cartName[i]
+         << "    Rp"
+         << (int)cartSubtotal[i]
+         << endl;
+}
+
+cout << "-----------------------------------------\n";
+cout << "Subtotal      : Rp" << (int)total << endl;
+cout << "Diskon        : Rp" << (int)totalDiscount << endl;
+cout << "Grand Total   : Rp" << (int)finalTotal << endl;
+cout << "Tunai         : Rp" << (int)paid << endl;
+cout << "Kembalian     : Rp" << (int)change << endl;
+
+if (!member.empty())
+    cout << "Member        : " << member << endl;
+
+if (!appliedPromoCode.empty())
+    cout << "Promo         : " << appliedPromoCode << endl;
+
+cout << "=========================================\n";
+cout << "      TERIMA KASIH TELAH BERBELANJA\n";
+cout << "=========================================\n";
 
     krj.kosongkanKeranjang();
     return true;
