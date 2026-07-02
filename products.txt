@@ -6,7 +6,7 @@ P0005|Face Cleanser|Wajah|45000|40|2028-12-31
 P0006|Moisturizer|Wajah|120000|22|2028-12-31
 P0007|Body Lotion|Bodycare|60000|35|2028-12-31
 P0008|Hand Cream|Bodycare|40000|50|2028-12-31
-P0009|Serum Vitamin C|Skincare|149997|12|2028-12-31
+P0009|Serum Vitamin C|Skincare|149995|12|2028-12-31
 P0010|Sunscreen SPF50|Skincare|95000|28|2028-12-31
 P0011|Blush Peach|Wajah|55000|20|2028-12-31
 P0012|BB Cream|Wajah|85000|14|2028-12-31
