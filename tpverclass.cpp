@@ -2131,7 +2131,7 @@ transaksi.simpanTransaksi(
 
     // print simple receipt
   cout << "\n=========================================\n";
-cout << "               CFBEAUTY\n";
+cout << "               TOKO KOSMETIK\n";
 cout << " Barang yang sudah dibeli tidak dapat\n";
 cout << "         dikembalikan\n";
 cout << "=========================================\n";
