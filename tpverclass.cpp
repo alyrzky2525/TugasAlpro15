@@ -100,7 +100,6 @@ const string SHIFTS_FILE = "shifts.txt";
 const string ATTENDANCE_FILE = "attendance.txt";
 
 
-
 // forward declarations
 string inputLine(const string& prompt);
 bool confirmAction(const string& prompt);
@@ -1449,20 +1448,10 @@ bool findProductByCode(const string& code, string& nama, string& kategori, strin
 }
 
 
-
-
-
 bool memberExists(const string& uname) {
     ifstream fin(MEMBERS_FILE.c_str()); if (!fin) return false;
     string line; while (getline(fin,line)) { if (line.empty()) continue; size_t p=line.find('|'); if (p==string::npos) continue; string u=line.substr(0,p); if (u==uname) return true; } return false;
 }
-
-
-
-
-
-
-
 
 
 int main() {
@@ -1538,7 +1527,6 @@ bool productCodeExists(const string& code) {
     }
     return false;
 }
-
 
 
 void addProduct() {
@@ -1892,18 +1880,7 @@ void categoryMenu() {
     }
 }
 
-
-
-
-
 // add product by code and qty; returns true if added/updated
-
-
-
-
-
-
-
 
 // --- Promo management and transaction persistence ---
 
@@ -1995,8 +1972,6 @@ void promoMenu() {
 }
 
 // Unified transaction persistence (detailed)
-
-
 // Checkout: validate expired and stock, then decrement stock and save transaction
 bool isValidDateFormat(const string& date) {
     if (date.size() != 10) return false;
@@ -2265,7 +2240,6 @@ void viewTransactionDetails(int id) {
     fin.close();
     if (!found) cout<<"Transaksi tidak ditemukan.\n";
 }
-
 
 
 void searchTransactions(const string& q) {
