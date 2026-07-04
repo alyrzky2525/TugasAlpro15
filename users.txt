@@ -1,1 +1,2 @@
 auli|123|kasir
+aulia|456|kasir

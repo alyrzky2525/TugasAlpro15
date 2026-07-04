@@ -1176,6 +1176,9 @@ class Transaksi{
             for (int i = 0; i < cartCount; ++i) total += cartSubtotal[i];
             return total;
         }
+    
+bool checkoutCart(const string& curDate);
+
         
 };
 
