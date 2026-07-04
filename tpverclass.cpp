@@ -441,7 +441,20 @@ class Admin{
             }
         }
         void tambahProduk() {
-            addProduct();
+         
+    string kode = inputLine("Kode produk: ");
+    if (kode.empty()) { cout << "Kode tidak boleh kosong.\n"; return; }
+    if (productCodeExists(kode)) { cout << "Kode sudah ada.\n"; return; }
+    string nama = inputLine("Nama produk: ");
+    string kategori = inputLine("Kategori: ");
+    string harga = inputLine("Harga: ");
+    string stok = inputLine("Stok: ");
+    string expired = inputLine("Expired (YYYY-MM-DD): ");
+    ofstream fout(PRODUCTS_FILE.c_str(), ios::app);
+    if (!fout) { cout << "Gagal menulis file produk.\n"; return; }
+    fout << kode << '|' << nama << '|' << kategori << '|' << harga << '|' << stok << '|' << expired << '\n';
+    cout << "Produk ditambahkan.\n";
+    
         }
         void editProduk() {
             editProduct();
