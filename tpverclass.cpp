@@ -735,6 +735,50 @@ class Produk{
             return found;
         }
 
+        bool productCodeExists(const string& code) {
+    ifstream fin(PRODUCTS_FILE.c_str());
+    if (!fin) return false;
+
+    string line;
+    while (getline(fin, line)) {
+        size_t p = line.find('|');
+        if (p == string::npos) continue;
+
+        string c = line.substr(0, p);
+
+        if (c == code)
+            return true;
+    }
+
+    return false;
+}   
+
+    bool findProductByCode(const string& code, string& nama, string& kategori, string& harga, string& stok, string& expired) {
+    ifstream fin(PRODUCTS_FILE.c_str());
+    if (!fin) return false;
+    string line;
+    while (getline(fin, line)) {
+        if (line.empty()) continue;
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1+1);
+        size_t p3 = line.find('|', p2+1);
+        size_t p4 = line.find('|', p3+1);
+        size_t p5 = line.find('|', p4+1);
+        if (p1==string::npos||p2==string::npos||p3==string::npos||p4==string::npos||p5==string::npos) continue;
+        string c = line.substr(0,p1);
+        if (c == code) {
+            nama = line.substr(p1+1, p2-p1-1);
+            kategori = line.substr(p2+1, p3-p2-1);
+            harga = line.substr(p3+1, p4-p3-1);
+            stok = line.substr(p4+1, p5-p4-1);
+            expired = line.substr(p5+1);
+            fin.close();
+            return true;
+        }
+    }
+    return false;
+}
+
         void tampilProdukExpired() {
             cekExpired();
         }
@@ -962,8 +1006,10 @@ class Keranjang{
 public:
    
     bool tambahBarang(const string& code, int qty) {
+        Produk produk;
         if (qty <= 0) return false;
-        if (!productCodeExists(code)) return false;
+        if (!produk.productCodeExists(code))
+            return false;
 
         ifstream fin(PRODUCTS_FILE.c_str());
         if (!fin) return false;
@@ -1549,7 +1595,9 @@ void addProduct() {
 
 void editProduct() {
     string kode = inputLine("Masukkan kode produk yang akan diedit: ");
-    if (!productCodeExists(kode)) { cout << "Kode tidak ditemukan.\n"; return; }
+    if (!productCodeExists(kode)) { 
+    cout << "Kode tidak ditemukan.\n"; 
+    return; }
     ifstream fin(PRODUCTS_FILE.c_str());
     string all;
     string line;
