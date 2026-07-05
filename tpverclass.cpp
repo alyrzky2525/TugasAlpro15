@@ -456,11 +456,60 @@ class Admin{
     cout << "Produk ditambahkan.\n";
     
         }
-        void editProduk() {
-            editProduct();
+    void editProduk() {
+    string kode = inputLine("Masukkan kode produk yang akan diedit: ");
+    if (!productCodeExists(kode)) { 
+    cout << "Kode tidak ditemukan.\n"; 
+    return; }
+    ifstream fin(PRODUCTS_FILE.c_str());
+    string all;
+    string line;
+    while (getline(fin, line)) {
+        if (line.empty()) continue;
+        size_t p = line.find('|');
+        if (p==string::npos) continue;
+        string c = line.substr(0,p);
+        if (c == kode) {
+            cout << "Mengedit produk: " << kode << "\n";
+            string nama = inputLine("Nama baru: ");
+            string kategori = inputLine("Kategori baru: ");
+            string harga = inputLine("Harga baru: ");
+            string stok = inputLine("Stok baru: ");
+            string expired = inputLine("Expired baru (YYYY-MM-DD): ");
+            all += kode + '|' + nama + '|' + kategori + '|' + harga + '|' + stok + '|' + expired + '\n';
+        } else {
+            all += line + '\n';
         }
-        void hapusProduk() {
-            deleteProduct();
+    
+    fin.close();
+    ofstream fout(PRODUCTS_FILE.c_str(), ios::trunc);
+    if (!fout) { cout << "Gagal menulis file produk.\n"; return; }
+    fout << all;
+    cout << "Produk diperbarui.\n";
+}
+        }
+        void hapusProduk() { 
+    string kode = inputLine("Masukkan kode produk yang akan dihapus: ");
+    ifstream fin(PRODUCTS_FILE.c_str());
+    if (!fin) { cout << "File produk tidak ditemukan.\n"; return; }
+    string all;
+    string line;
+    bool found = false;
+    while (getline(fin, line)) {
+        if (line.empty()) continue;
+        size_t p = line.find('|');
+        if (p==string::npos) continue;
+        string c = line.substr(0,p);
+        if (c == kode) { found = true; continue; }
+        all += line + '\n';
+    }
+    fin.close();
+    if (!found) { cout << "Kode tidak ditemukan.\n"; return; }
+    ofstream fout(PRODUCTS_FILE.c_str(), ios::trunc);
+    if (!fout) { cout << "Gagal menulis file produk.\n"; return; }
+    fout << all;
+    cout << "Produk dihapus.\n";
+
         }
         void kelolaKategori() {
             while (true) {
@@ -789,6 +838,41 @@ class Produk{
             return true;
         }
     }
+    return false;
+}
+
+    void addCategory() {
+    string cat = inputLine("Nama kategori: ");
+    if (cat.empty()) {
+        cout << "Kategori tidak boleh kosong.\n";
+        return;
+    }
+
+    if (categoryExists(cat)) {
+        cout << "Kategori sudah ada.\n";
+        return;
+    }
+
+    ofstream fout(CATEGORIES_FILE.c_str(), ios::app);
+    if (!fout) {
+        cout << "Gagal menulis file kategori.\n";
+        return;
+    }
+
+    fout << cat << '\n';
+    cout << "Kategori ditambahkan.\n";
+}
+
+bool categoryExists(const string& cat) {
+    ifstream fin(CATEGORIES_FILE.c_str());
+    if (!fin) return false;
+
+    string line;
+    while (getline(fin, line)) {
+        if (line == cat)
+            return true;
+    }
+
     return false;
 }
 
@@ -1590,22 +1674,6 @@ bool productCodeExists(const string& code) {
     return false;
 }
 
-
-void addProduct() {
-    string kode = inputLine("Kode produk: ");
-    if (kode.empty()) { cout << "Kode tidak boleh kosong.\n"; return; }
-    if (productCodeExists(kode)) { cout << "Kode sudah ada.\n"; return; }
-    string nama = inputLine("Nama produk: ");
-    string kategori = inputLine("Kategori: ");
-    string harga = inputLine("Harga: ");
-    string stok = inputLine("Stok: ");
-    string expired = inputLine("Expired (YYYY-MM-DD): ");
-    ofstream fout(PRODUCTS_FILE.c_str(), ios::app);
-    if (!fout) { cout << "Gagal menulis file produk.\n"; return; }
-    fout << kode << '|' << nama << '|' << kategori << '|' << harga << '|' << stok << '|' << expired << '\n';
-    cout << "Produk ditambahkan.\n";
-}
-
 void editProduct() {
     string kode = inputLine("Masukkan kode produk yang akan diedit: ");
     if (!productCodeExists(kode)) { 
@@ -1638,29 +1706,6 @@ void editProduct() {
     cout << "Produk diperbarui.\n";
 }
 
-void deleteProduct() {
-    string kode = inputLine("Masukkan kode produk yang akan dihapus: ");
-    ifstream fin(PRODUCTS_FILE.c_str());
-    if (!fin) { cout << "File produk tidak ditemukan.\n"; return; }
-    string all;
-    string line;
-    bool found = false;
-    while (getline(fin, line)) {
-        if (line.empty()) continue;
-        size_t p = line.find('|');
-        if (p==string::npos) continue;
-        string c = line.substr(0,p);
-        if (c == kode) { found = true; continue; }
-        all += line + '\n';
-    }
-    fin.close();
-    if (!found) { cout << "Kode tidak ditemukan.\n"; return; }
-    ofstream fout(PRODUCTS_FILE.c_str(), ios::trunc);
-    if (!fout) { cout << "Gagal menulis file produk.\n"; return; }
-    fout << all;
-    cout << "Produk dihapus.\n";
-}
-
 bool categoryExists(const string& cat) {
     ifstream fin(CATEGORIES_FILE.c_str());
     if (!fin) return false;
@@ -1687,7 +1732,7 @@ void listCategories() {
 void addCategory() {
     string cat = inputLine("Nama kategori: ");
     if (cat.empty()) { cout << "Kategori tidak boleh kosong.\n"; return; }
-    if (categoryExists(cat)) { cout << "Kategori sudah ada.\n"; return; }
+   if (categoryExists(cat)){ cout << "Kategori sudah ada.\n"; return; }
     ofstream fout(CATEGORIES_FILE.c_str(), ios::app);
     if (!fout) { cout << "Gagal menulis file kategori.\n"; return; }
     fout << cat << '\n';
