@@ -141,7 +141,7 @@ void bestSellingAnalysis();
 void hitungPenjualanHarian();
 void categorySalesAnalysis();
 void revenueByDateRange();
-void rekomendasiRestock();
+void analisisMarginKeuntungan();
 void memberSalesAnalysis();
 void financialDashboard();
 void ensureDefaultData();
@@ -1668,7 +1668,7 @@ class AnalisisProduk{
     public:
         void hitungBarangTerlaris() { bestSellingAnalysis(); }
         void rankingProduk() { bestSellingAnalysis(); }
-        void rekomendasiRestock(){
+        void analisisMarginKeuntungan(){
     ifstream fprod(PRODUCTS_FILE.c_str());
     ifstream fin(TRANSACTIONS_FILE.c_str());
     if (!fprod || !fin) { cout<<"\nFile tidak ditemukan.\n"; 
@@ -2869,7 +2869,7 @@ void financialDashboard() {
         else if (choice=="3") harian.hitungPenjualanHarian();
         else if (choice=="4") categorySalesAnalysis();
         else if (choice=="5") revenueByDateRange();
-        else if (choice=="6") analisis.rekomendasiRestock();
+        else if (choice=="6") analisis.analisisMarginKeuntungan();
         else if (choice=="7") memberSalesAnalysis();
         else if (choice=="8") break;
         else cout<<"Pilihan tidak dikenali.\n";
