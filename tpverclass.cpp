@@ -2506,7 +2506,7 @@ void listAttendanceForEmployee(const string& username) {
 
 // ======== FINANCIAL ANALYSIS FUNCTIONS ========
 
-void listAttendanceForEmployee() {
+void monthlySalesReport() {
     ifstream fin(TRANSACTIONS_FILE.c_str());
     if (!fin) { cout<<"\nBelum ada data transaksi.\n"; return; }
     string line; double totalRevenue=0; int txCount=0; double totalDiscount=0;
