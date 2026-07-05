@@ -353,9 +353,6 @@ double cartSubtotal[MAX_CART];
 
 int cartCount = 0;
 
-class Member;
-class Produk;
-
 class Admin{
     private:
         string username;
@@ -392,7 +389,8 @@ class Admin{
                 cout << "Pilih: ";
                 string choice;
                 getline(cin, choice);
-                if (choice == "1") break;
+                if (choice == "1") 
+                break;
                 else if (choice == "2") {
                     string np = inputLine("Password baru: ");
                     string nc = inputLine("Konfirmasi password baru: ");
@@ -405,22 +403,28 @@ class Admin{
                 } else if (choice == "4") {
                     string target = inputLine("Masukkan username yang akan dihapus: ");
                     if (target == username) { cout << "Tidak dapat menghapus akun sendiri dari dashboard.\n"; continue; }
-                    if (!usernameExists(target)) { cout << "Username tidak ditemukan.\n"; continue; }
+                    if (!usernameExists(target)) { cout << "Username tidak ditemukan.\n"; 
+                continue; }
                     if (deleteUser(target)) cout << "Pengguna dihapus.\n";
                     else cout << "Gagal menghapus pengguna.\n";
                 } else if (choice == "5") {
                     string u = inputLine("Pilih username: ");
-                    if (u.empty()) { cout << "Username tidak boleh kosong.\n"; continue; }
-                    if (usernameExists(u)) { cout << "Username sudah ada.\n"; continue; }
+                    if (u.empty()) { cout << "Username tidak boleh kosong.\n";
+                continue; }
+                    if (usernameExists(u)) { cout << "Username sudah ada.\n";
+                continue; }
                     string pw = inputLine("Password: ");
                     string conf = inputLine("Konfirmasi password: ");
-                    if (pw != conf) { cout << "Konfirmasi tidak sama.\n"; continue; }
+                    if (pw != conf) { cout << "Konfirmasi tidak sama.\n"; 
+                continue; }
                     string role = inputLine("Role (admin/kasir): ");
-                    if (role != "admin" && role != "kasir") { cout << "Role harus 'admin' atau 'kasir'.\n"; continue; }
+                    if (role != "admin" && role != "kasir") { cout << "Role harus 'admin' atau 'kasir'.\n"; 
+                continue; }
                     cout << "\nRingkasan pengguna baru:\n";
                     cout << " - Username: " << u << "\n";
                     cout << " - Role: " << role << "\n";
-                    if (!confirmAction("Konfirmasi buat pengguna?")) { cout << "Pembuatan pengguna dibatalkan.\n"; continue; }
+                    if (!confirmAction("Konfirmasi buat pengguna?")) { cout << "Pembuatan pengguna dibatalkan.\n";
+                continue; }
                     if (registerUser(u, pw, role)) cout << "Pengguna baru dibuat.\n";
                     else cout << "Gagal membuat pengguna.\n";
                 } else if (choice == "6") {
@@ -442,50 +446,54 @@ class Admin{
         }
         void tambahProduk() {
          
-    string kode = inputLine("Kode produk: ");
-    if (kode.empty()) { cout << "Kode tidak boleh kosong.\n"; return; }
-    if (productCodeExists(kode)) { cout << "Kode sudah ada.\n"; return; }
-    string nama = inputLine("Nama produk: ");
-    string kategori = inputLine("Kategori: ");
-    string harga = inputLine("Harga: ");
-    string stok = inputLine("Stok: ");
-    string expired = inputLine("Expired (YYYY-MM-DD): ");
-    ofstream fout(PRODUCTS_FILE.c_str(), ios::app);
-    if (!fout) { cout << "Gagal menulis file produk.\n"; return; }
-    fout << kode << '|' << nama << '|' << kategori << '|' << harga << '|' << stok << '|' << expired << '\n';
-    cout << "Produk ditambahkan.\n";
+            string kode = inputLine("Kode produk: ");
+            if (kode.empty()) { cout << "Kode tidak boleh kosong.\n"; 
+                return; }
+            if (productCodeExists(kode)) { cout << "Kode sudah ada.\n"; 
+                return; }
+            string nama = inputLine("Nama produk: ");
+            string kategori = inputLine("Kategori: ");
+            string harga = inputLine("Harga: ");
+            string stok = inputLine("Stok: ");
+            string expired = inputLine("Expired (YYYY-MM-DD): ");
+            ofstream fout(PRODUCTS_FILE.c_str(), ios::app);
+            if (!fout) { cout << "Gagal menulis file produk.\n"; 
+                return; }
+            fout << kode << '|' << nama << '|' << kategori << '|' << harga << '|' << stok << '|' << expired << '\n';
+            cout << "Produk ditambahkan.\n";
     
         }
-    void editProduk() {
-    string kode = inputLine("Masukkan kode produk yang akan diedit: ");
-    if (!productCodeExists(kode)) { 
-    cout << "Kode tidak ditemukan.\n"; 
-    return; }
-    ifstream fin(PRODUCTS_FILE.c_str());
-    string all;
-    string line;
-    while (getline(fin, line)) {
-        if (line.empty()) continue;
-        size_t p = line.find('|');
-        if (p==string::npos) continue;
-        string c = line.substr(0,p);
-        if (c == kode) {
-            cout << "Mengedit produk: " << kode << "\n";
-            string nama = inputLine("Nama baru: ");
-            string kategori = inputLine("Kategori baru: ");
-            string harga = inputLine("Harga baru: ");
-            string stok = inputLine("Stok baru: ");
-            string expired = inputLine("Expired baru (YYYY-MM-DD): ");
-            all += kode + '|' + nama + '|' + kategori + '|' + harga + '|' + stok + '|' + expired + '\n';
+        void editProduk() {
+            string kode = inputLine("Masukkan kode produk yang akan diedit: ");
+            if (!productCodeExists(kode)) { 
+            cout << "Kode tidak ditemukan.\n"; 
+        return; }
+    
+            ifstream fin(PRODUCTS_FILE.c_str());
+            string all;
+            string line;
+            while (getline(fin, line)) {
+                if (line.empty()) continue;
+                size_t p = line.find('|');
+                if (p==string::npos) continue;
+                string c = line.substr(0,p);
+                if (c == kode) {
+                cout << "Mengedit produk: " << kode << "\n";
+                string nama = inputLine("Nama baru: ");
+                string kategori = inputLine("Kategori baru: ");
+                string harga = inputLine("Harga baru: ");
+                string stok = inputLine("Stok baru: ");
+                string expired = inputLine("Expired baru (YYYY-MM-DD): ");
+                all += kode + '|' + nama + '|' + kategori + '|' + harga + '|' + stok + '|' + expired + '\n';
         } else {
             all += line + '\n';
         }
     
-    fin.close();
-    ofstream fout(PRODUCTS_FILE.c_str(), ios::trunc);
-    if (!fout) { cout << "Gagal menulis file produk.\n"; return; }
-    fout << all;
-    cout << "Produk diperbarui.\n";
+            fin.close();
+            ofstream fout(PRODUCTS_FILE.c_str(), ios::trunc);
+            if (!fout) { cout << "Gagal menulis file produk.\n"; return; }
+            fout << all;
+            cout << "Produk diperbarui.\n";
 }
         }
         void hapusProduk() { 
