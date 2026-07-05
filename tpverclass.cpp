@@ -120,7 +120,7 @@ void listCategories();
 // promos
 bool promoCodeExists(const string& code);
 void listPromos();
-void addPromo();
+void tambahPromo();
 void editPromo();
 void deletePromo();
 double applyPromo(const string& promoCode, const string& date, bool isMember, bool &valid, string &outPromoCode);
@@ -533,7 +533,7 @@ class Admin{
                 cout << "4. Lihat promo\n";
                 cout << "5. Kembali\n";
                 string c = inputLine("Pilih: ");
-                if (c == "1") addPromo();
+                if (c == "1") tambahPromo();
                 else if (c == "2") editPromo();
                 else if (c == "3") deletePromo();
                 else if (c == "4") listPromos();
@@ -689,6 +689,19 @@ class Produk{
             fout << all;
             cout << "Produk diperbarui.\n";
         }
+
+        void listCategories() {
+    ifstream fin(CATEGORIES_FILE.c_str());
+    if (!fin) { cout << "Belum ada kategori.\n"; return; }
+    string line;
+    int idx = 1;
+    cout << "\nDaftar kategori:\n";
+    while (getline(fin, line)) {
+        if (line.empty()) continue;
+        cout << idx++ << ". " << line << "\n";
+    }
+    if (idx==1) cout << "Belum ada kategori.\n";
+}
 
         void hapusProduk() {
             string kode = inputLine("Masukkan kode produk yang akan dihapus: ");
@@ -1071,8 +1084,19 @@ class Promo{
         string tanggalSelesai;
     public:
         void tambahPromo() {
-            addPromo();
-        }
+  
+    string code=inputLine("Kode promo: "); if (code.empty()) { cout<<"Kode kosong.\n"; return; }
+    if (promoCodeExists(code)) { cout<<"Kode promo sudah ada.\n"; return; }
+    string desc=inputLine("Deskripsi promo: ");
+    string pcts=inputLine("Persentase diskon (angka, contoh 10 untuk 10%): ");
+    string start=inputLine("Mulai (YYYY-MM-DD): ");
+    string end=inputLine("Selesai (YYYY-MM-DD): ");
+    string m=inputLine("Hanya untuk member? (y/n): "); string memberOnly=(m=="y"||m=="Y")?"1":"0";
+    ofstream fout(PROMOS_FILE.c_str(), ios::app); if (!fout) { cout<<"Gagal menulis file promo.\n"; return; }
+    fout<<code<<"|"<<desc<<"|"<<pcts<<"|"<<start<<"|"<<end<<"|"<<memberOnly<<"\n";
+    cout<<"Promo ditambahkan.\n";
+}
+        
         bool cekPromo() {
             string code = inputLine("Kode promo: ");
             string date = inputLine("Tanggal (YYYY-MM-DD): ");
@@ -1095,6 +1119,15 @@ class Promo{
             if (!valid) return 0.0;
             return totalBelanja * (pct / 100.0);
         }
+
+        bool promoCodeExists(const string& code) {
+            ifstream fin(PROMOS_FILE.c_str()); if (!fin) return false;
+            string line; while (getline(fin,line)) { if (line.empty()) continue; 
+                size_t p=line.find('|'); if (p==string::npos) continue;
+                string c=line.substr(0,p); if (c==code) return true;
+             } 
+             return false;
+}
 
 };
 
@@ -1716,29 +1749,6 @@ bool categoryExists(const string& cat) {
     return false;
 }
 
-void listCategories() {
-    ifstream fin(CATEGORIES_FILE.c_str());
-    if (!fin) { cout << "Belum ada kategori.\n"; return; }
-    string line;
-    int idx = 1;
-    cout << "\nDaftar kategori:\n";
-    while (getline(fin, line)) {
-        if (line.empty()) continue;
-        cout << idx++ << ". " << line << "\n";
-    }
-    if (idx==1) cout << "Belum ada kategori.\n";
-}
-
-void addCategory() {
-    string cat = inputLine("Nama kategori: ");
-    if (cat.empty()) { cout << "Kategori tidak boleh kosong.\n"; return; }
-   if (categoryExists(cat)){ cout << "Kategori sudah ada.\n"; return; }
-    ofstream fout(CATEGORIES_FILE.c_str(), ios::app);
-    if (!fout) { cout << "Gagal menulis file kategori.\n"; return; }
-    fout << cat << '\n';
-    cout << "Kategori ditambahkan.\n";
-}
-
 void ensureDefaultCategories() {
     ifstream fin(CATEGORIES_FILE.c_str());
     bool need = true;
@@ -1940,32 +1950,7 @@ void productMenu() {
             }
         }
         else if (c == "6") {
-            string d = inputLine("Tampilkan produk yang expired sebelum/tanggal (YYYY-MM-DD): ");
-            if (d.empty()) { cout << "Tanggal tidak boleh kosong.\n"; }
-            else {
-                ifstream fin(PRODUCTS_FILE.c_str());
-                if (!fin) { cout << "File produk tidak ditemukan.\n"; }
-                else {
-                    cout << "\nProduk expired/sebelum " << d << ":\n";
-                    string line;
-                    while (getline(fin, line)) {
-                        if (line.empty()) continue;
-                        size_t p5 = string::npos;
-                        // find fifth separator
-                        size_t p1 = line.find('|');
-                        size_t p2 = (p1==string::npos)?string::npos:line.find('|', p1+1);
-                        size_t p3 = (p2==string::npos)?string::npos:line.find('|', p2+1);
-                        size_t p4 = (p3==string::npos)?string::npos:line.find('|', p3+1);
-                        if (p4!=string::npos) p5 = line.find('|', p4+1);
-                        if (p5==string::npos) continue;
-                        string kode = line.substr(0,p1);
-                        string nama = line.substr(p1+1, p2-p1-1);
-                        string expired = line.substr(p5+1);
-                        if (expired <= d) cout << kode << " | " << nama << " | exp:" << expired << "\n";
-                    }
-                    fin.close();
-                }
-            }
+             produk.tampilProdukExpired();
         }
         else if (c == "7") {
             break;
@@ -1975,6 +1960,7 @@ void productMenu() {
 }
 
 void categoryMenu() {
+    Produk produk;
     while (true) {
         cout << "\n--- Menu Kategori ---\n";
         cout << "1. Tambah kategori\n";
@@ -1982,22 +1968,15 @@ void categoryMenu() {
         cout << "3. Kembali\n";
         cout << "Pilih: ";
         string c; getline(cin, c);
-        if (c == "1") addCategory();
-        else if (c == "2") listCategories();
+        if (c == "1") produk.addCategory();
+        else if (c == "2") produk.listCategories();
         else if (c == "3") break;
         else cout << "Pilihan tidak dikenali.\n";
     }
 }
 
 // add product by code and qty; returns true if added/updated
-
 // --- Promo management and transaction persistence ---
-
-bool promoCodeExists(const string& code) {
-    ifstream fin(PROMOS_FILE.c_str()); if (!fin) return false;
-    string line; while (getline(fin,line)) { if (line.empty()) continue; size_t p=line.find('|'); if (p==string::npos) continue; string c=line.substr(0,p); if (c==code) return true; } return false;
-}
-
 void listPromos() {
     ifstream fin(PROMOS_FILE.c_str()); if (!fin) { cout<<"Belum ada promo.\n"; return; }
     string line; int idx=1; cout<<"\nDaftar promo:\n";
@@ -2011,21 +1990,9 @@ void listPromos() {
     }
 }
 
-void addPromo() {
-    string code=inputLine("Kode promo: "); if (code.empty()) { cout<<"Kode kosong.\n"; return; }
-    if (promoCodeExists(code)) { cout<<"Kode promo sudah ada.\n"; return; }
-    string desc=inputLine("Deskripsi promo: ");
-    string pcts=inputLine("Persentase diskon (angka, contoh 10 untuk 10%): ");
-    string start=inputLine("Mulai (YYYY-MM-DD): ");
-    string end=inputLine("Selesai (YYYY-MM-DD): ");
-    string m=inputLine("Hanya untuk member? (y/n): "); string memberOnly=(m=="y"||m=="Y")?"1":"0";
-    ofstream fout(PROMOS_FILE.c_str(), ios::app); if (!fout) { cout<<"Gagal menulis file promo.\n"; return; }
-    fout<<code<<"|"<<desc<<"|"<<pcts<<"|"<<start<<"|"<<end<<"|"<<memberOnly<<"\n";
-    cout<<"Promo ditambahkan.\n";
-}
-
 void editPromo() {
-    string code=inputLine("Kode promo yang diedit: "); if (!promoCodeExists(code)) { cout<<"Kode tidak ditemukan.\n"; return; }
+    Promo promo;
+    string code=inputLine("Kode promo yang diedit: "); if (!promo.promoCodeExists(code)) { cout<<"Kode tidak ditemukan.\n"; return; }
     ifstream fin(PROMOS_FILE.c_str()); if (!fin) { cout<<"File promo tidak ditemukan.\n"; return; }
     string all; string line; while (getline(fin,line)) { if (line.empty()) continue; size_t p=line.find('|'); if (p==string::npos) { all+=line+'\n'; continue; } string c=line.substr(0,p); if (c==code) {
             cout<<"Mengedit promo: "<<code<<"\n";
@@ -2036,7 +2003,8 @@ void editPromo() {
 }
 
 void deletePromo() {
-    string code=inputLine("Kode promo yang dihapus: "); if (!promoCodeExists(code)) { cout<<"Kode tidak ditemukan.\n"; return; }
+    Promo promo;
+    string code=inputLine("Kode promo yang dihapus: "); if (!promo.promoCodeExists(code)) { cout<<"Kode tidak ditemukan.\n"; return; }
     if (!confirmAction(string("Hapus promo '") + code + "' ?")) return;
     ifstream fin(PROMOS_FILE.c_str()); string all; string line; while (getline(fin,line)) { if (line.empty()) continue; size_t p=line.find('|'); if (p==string::npos) { all+=line+'\n'; continue; } string c=line.substr(0,p); if (c==code) continue; all+=line+'\n'; } fin.close(); ofstream fout(PROMOS_FILE.c_str(), ios::trunc); if (!fout) { cout<<"Gagal menulis file promo.\n"; return; } fout<<all; cout<<"Promo dihapus.\n";
 }
@@ -2062,6 +2030,7 @@ double applyPromo(const string& promoCode, const string& date, bool isMember, bo
 }
 
 void promoMenu() {
+    Promo promo;
     while (true) {
         cout << "\n--- Menu Promo ---\n";
         cout << "1. Tambah promo\n";
@@ -2070,7 +2039,6 @@ void promoMenu() {
         cout << "4. Lihat promo\n";
         cout << "5. Kembali\n";
         string c = inputLine("Pilih: ");
-        Promo promo;
         if (c=="1") promo.tambahPromo();
         else if (c=="2") editPromo();
         else if (c=="3") deletePromo();
