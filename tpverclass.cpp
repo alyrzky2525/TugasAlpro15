@@ -364,26 +364,34 @@ bool confirmAction(const string& prompt) {
 
 void adminDashboard(const string& username) {
     while (true) {
-        cout << "\n--- Dashboard Admin ---\n";
-        cout << "Selamat datang, " << username << " (admin)\n";
-        cout << "1. Logout\n";
-        cout << "2. Ganti password\n";
-        cout << "3. Daftar pengguna\n";
-        cout << "4. Hapus pengguna\n";
-        cout << "5. Buat pengguna baru\n";
-        cout << "6. Kelola produk (CRUD)\n";
-        cout << "7. Kelola kategori\n";
-        cout << "8. Kelola promo\n";
-        cout << "9. Riwayat transaksi\n";
+        cout << "\n";
+        cout << "==================================================\n";
+        cout << "           SISTEM MANAJEMEN KOSMETIK\n";
+        cout << "==================================================\n";
+        cout << "                 DASHBOARD ADMIN\n";
+        cout << "==================================================\n";
+        cout << " Selamat Datang : " << username << " (Admin)\n";
+        cout << "--------------------------------------------------\n";
+        cout << " 1. Logout\n";
+        cout << " 2. Ganti Password\n";
+        cout << " 3. Daftar Pengguna\n";
+        cout << " 4. Hapus Pengguna\n";
+        cout << " 5. Buat Pengguna Baru\n";
+        cout << " 6. Kelola Produk (CRUD)\n";
+        cout << " 7. Kelola Kategori\n";
+        cout << " 8. Kelola Promo\n";
+        cout << " 9. Riwayat Transaksi\n";
         cout << "10. Jadwal Shift\n";
         cout << "11. Laporan & Analisis\n";
-        cout << "Pilih: ";
+        cout << "--------------------------------------------------\n";
+        cout << " Pilih Menu : ";
 
         string choice;
         getline(cin, choice);
 
         if (choice == "1") {
             break;
+
         } else if (choice == "2") {
             string newPassword = inputLine("Password baru: ");
             string confirmPassword = inputLine("Konfirmasi password baru: ");
@@ -455,8 +463,8 @@ void adminDashboard(const string& username) {
             }
 
             cout << "\nRingkasan pengguna baru:\n";
-            cout << " - Username: " << usernameBaru << '\n';
-            cout << " - Role: " << role << '\n';
+            cout << " - Username : " << usernameBaru << '\n';
+            cout << " - Role     : " << role << '\n';
 
             if (!confirmAction("Konfirmasi buat pengguna?")) {
                 cout << "Pembuatan pengguna dibatalkan.\n";
@@ -541,28 +549,36 @@ class Admin{
             }
             return false;
         }
-    void dashboardAdmin(const string& username) {
+void dashboardAdmin(const string& username) {
     while (true) {
-        cout << "\n--- Dashboard Admin ---\n";
-        cout << "Selamat datang, " << username << " (admin)\n";
-        cout << "1. Logout\n";
-        cout << "2. Ganti password\n";
-        cout << "3. Daftar pengguna\n";
-        cout << "4. Hapus pengguna\n";
-        cout << "5. Buat pengguna baru\n";
-        cout << "6. Kelola produk (CRUD)\n";
-        cout << "7. Kelola kategori\n";
-        cout << "8. Kelola promo\n";
-        cout << "9. Riwayat transaksi\n";
+        cout << "\n";
+        cout << "==================================================\n";
+        cout << "           SISTEM MANAJEMEN KOSMETIK\n";
+        cout << "==================================================\n";
+        cout << "                 DASHBOARD ADMIN\n";
+        cout << "==================================================\n";
+        cout << " Selamat Datang : " << username << " (Admin)\n";
+        cout << "--------------------------------------------------\n";
+        cout << " 1. Logout\n";
+        cout << " 2. Ganti Password\n";
+        cout << " 3. Daftar Pengguna\n";
+        cout << " 4. Hapus Pengguna\n";
+        cout << " 5. Buat Pengguna Baru\n";
+        cout << " 6. Kelola Produk (CRUD)\n";
+        cout << " 7. Kelola Kategori\n";
+        cout << " 8. Kelola Promo\n";
+        cout << " 9. Riwayat Transaksi\n";
         cout << "10. Jadwal Shift\n";
         cout << "11. Laporan & Analisis\n";
-        cout << "Pilih: ";
+        cout << "--------------------------------------------------\n";
+        cout << "Pilih Menu : ";
 
         string choice;
         getline(cin, choice);
 
         if (choice == "1") {
             break;
+
         } else if (choice == "2") {
             string np = inputLine("Password baru: ");
             string nc = inputLine("Konfirmasi password baru: ");
@@ -633,9 +649,11 @@ class Admin{
                 continue;
             }
 
-            cout << "\nRingkasan pengguna baru:\n";
-            cout << " - Username: " << u << "\n";
-            cout << " - Role: " << role << "\n";
+            cout << "\nRingkasan Pengguna Baru\n";
+            cout << "--------------------------------------------------\n";
+            cout << " Username : " << u << "\n";
+            cout << " Role     : " << role << "\n";
+            cout << "--------------------------------------------------\n";
 
             if (!confirmAction("Konfirmasi buat pengguna?")) {
                 cout << "Pembuatan pengguna dibatalkan.\n";
@@ -738,138 +756,287 @@ class Admin{
     cout << "Produk berhasil ditambahkan.\n";
 }
         void editProduk() {
-            string kode = inputLine("Masukkan kode produk yang akan diedit: ");
-            if (!productCodeExists(kode)) { 
-            cout << "Kode tidak ditemukan.\n"; 
-        return; }
-    
-            ifstream fin(PRODUCTS_FILE.c_str());
-            string all;
-            string line;
-            while (getline(fin, line)) {
-                if (line.empty()) continue;
-                size_t p = line.find('|');
-                if (p==string::npos) continue;
-                string c = line.substr(0,p);
-                if (c == kode) {
-                cout << "Mengedit produk: " << kode << "\n";
-                string nama = inputLine("Nama baru: ");
-                string kategori = inputLine("Kategori baru: ");
-                string harga = inputLine("Harga baru: ");
-                string stok = inputLine("Stok baru: ");
-                string expired = inputLine("Expired baru (YYYY-MM-DD): ");
-                all += kode + '|' + nama + '|' + kategori + '|' + harga + '|' + stok + '|' + expired + '\n';
+    string kode = inputLine("Masukkan kode produk yang akan diedit: ");
+
+    if (!productCodeExists(kode)) {
+        cout << "Kode tidak ditemukan.\n";
+        return;
+    }
+
+    ifstream fin(PRODUCTS_FILE.c_str());
+
+    string all;
+    string line;
+
+    while (getline(fin, line)) {
+        if (line.empty()) {
+            continue;
+        }
+
+        size_t p = line.find('|');
+
+        if (p == string::npos) {
+            continue;
+        }
+
+        string c = line.substr(0, p);
+
+        if (c == kode) {
+            cout << "Mengedit produk: " << kode << "\n";
+
+            string nama = inputLine("Nama baru: ");
+            string kategori = inputLine("Kategori baru: ");
+            string harga = inputLine("Harga baru: ");
+            string stok = inputLine("Stok baru: ");
+            string expired = inputLine("Expired baru (YYYY-MM-DD): ");
+
+            all += kode + '|' + nama + '|' + kategori + '|' + harga + '|' + stok + '|' + expired + '\n';
         } else {
             all += line + '\n';
         }
-    
-            fin.close();
-            ofstream fout(PRODUCTS_FILE.c_str(), ios::trunc);
-            if (!fout) { cout << "Gagal menulis file produk.\n"; return; }
-            fout << all;
-            cout << "Produk diperbarui.\n";
+    }
+
+    fin.close();
+
+    ofstream fout(PRODUCTS_FILE.c_str(), ios::trunc);
+
+    if (!fout) {
+        cout << "Gagal menulis file produk.\n";
+        return;
+    }
+
+    fout << all;
+
+    cout << "Produk diperbarui.\n";
 }
-        }
-        void hapusProduk() { 
+        void hapusProduk() {
     string kode = inputLine("Masukkan kode produk yang akan dihapus: ");
+
     ifstream fin(PRODUCTS_FILE.c_str());
-    if (!fin) { cout << "File produk tidak ditemukan.\n"; return; }
+
+    if (!fin) {
+        cout << "File produk tidak ditemukan.\n";
+        return;
+    }
+
     string all;
     string line;
     bool found = false;
+
     while (getline(fin, line)) {
-        if (line.empty()) continue;
+        if (line.empty()) {
+            continue;
+        }
+
         size_t p = line.find('|');
-        if (p==string::npos) continue;
-        string c = line.substr(0,p);
-        if (c == kode) { found = true; continue; }
+
+        if (p == string::npos) {
+            continue;
+        }
+
+        string c = line.substr(0, p);
+
+        if (c == kode) {
+            found = true;
+            continue;
+        }
+
         all += line + '\n';
     }
-    fin.close();
-    if (!found) { cout << "Kode tidak ditemukan.\n"; return; }
-    ofstream fout(PRODUCTS_FILE.c_str(), ios::trunc);
-    if (!fout) { cout << "Gagal menulis file produk.\n"; return; }
-    fout << all;
-    cout << "Produk dihapus.\n";
 
+    fin.close();
+
+    if (!found) {
+        cout << "Kode tidak ditemukan.\n";
+        return;
+    }
+
+    ofstream fout(PRODUCTS_FILE.c_str(), ios::trunc);
+
+    if (!fout) {
+        cout << "Gagal menulis file produk.\n";
+        return;
+    }
+
+    fout << all;
+
+    cout << "Produk dihapus.\n";
+}
+void kelolaKategori() {
+    while (true) {
+        cout << "\n";
+        cout << "==================================================\n";
+        cout << "           SISTEM MANAJEMEN KOSMETIK\n";
+        cout << "==================================================\n";
+        cout << "                MENU KATEGORI\n";
+        cout << "==================================================\n";
+        cout << " 1. Tambah Kategori\n";
+        cout << " 2. Lihat Kategori\n";
+        cout << " 3. Kembali\n";
+        cout << "--------------------------------------------------\n";
+
+        string c = inputLine("Pilih Menu : ");
+
+        if (c == "1") {
+            addCategory();
+        } else if (c == "2") {
+            daftarKategori();
+        } else if (c == "3") {
+            break;
+        } else {
+            cout << "Pilihan tidak dikenali.\n";
         }
-        void kelolaKategori() {
-            while (true) {
-                cout << "\n--- Menu Kategori ---\n";
-                cout << "1. Tambah kategori\n";
-                cout << "2. Lihat kategori\n";
-                cout << "3. Kembali\n";
-                string c = inputLine("Pilih: ");
-                if (c == "1") addCategory();
-                else if (c == "2") daftarKategori();
-                else if (c == "3") break;
-                else cout << "Pilihan tidak dikenali.\n";
-            }
+    }
+}
+void kelolaPromo() {
+    while (true) {
+        cout << "\n";
+        cout << "==================================================\n";
+        cout << "           SISTEM MANAJEMEN KOSMETIK\n";
+        cout << "==================================================\n";
+        cout << "                  MENU PROMO\n";
+        cout << "==================================================\n";
+        cout << " 1. Tambah Promo\n";
+        cout << " 2. Edit Promo\n";
+        cout << " 3. Hapus Promo\n";
+        cout << " 4. Lihat Promo\n";
+        cout << " 5. Kembali\n";
+        cout << "--------------------------------------------------\n";
+
+        string c = inputLine("Pilih Menu : ");
+
+        if (c == "1") {
+            tambahPromo();
+        } else if (c == "2") {
+            editPromo();
+        } else if (c == "3") {
+            hapusPromo();
+        } else if (c == "4") {
+            tampilPromo();
+        } else if (c == "5") {
+            break;
+        } else {
+            cout << "Pilihan tidak dikenali.\n";
         }
-        void kelolaPromo() {
-            while (true) {
-                cout << "\n--- Menu Promo ---\n";
-                cout << "1. Tambah promo\n";
-                cout << "2. Edit promo\n";
-                cout << "3. Hapus promo\n";
-                cout << "4. Lihat promo\n";
-                cout << "5. Kembali\n";
-                string c = inputLine("Pilih: ");
-                if (c == "1") tambahPromo();
-                else if (c == "2") editPromo();
-                else if (c == "3") hapusPromo();
-                else if (c == "4") tampilPromo();
-                else if (c == "5") break;
-                else cout << "Pilihan tidak dikenali.\n";
-            }
+    }
+}
+      void kelolaShift() {
+    while (true) {
+        cout << "\n";
+        cout << "==================================================\n";
+        cout << "           SISTEM MANAJEMEN KOSMETIK\n";
+        cout << "==================================================\n";
+        cout << "              MENU JADWAL SHIFT\n";
+        cout << "==================================================\n";
+        cout << " 1. Tambah Jadwal Shift\n";
+        cout << " 2. Lihat Jadwal Shift\n";
+        cout << " 3. Ubah Jadwal Shift\n";
+        cout << " 4. Hapus Jadwal Shift\n";
+        cout << " 5. Kembali\n";
+        cout << "--------------------------------------------------\n";
+
+        string c = inputLine("Pilih Menu : ");
+
+        if (c == "1") {
+            addShift();
+        } else if (c == "2") {
+            listShifts();
+        } else if (c == "3") {
+            editShift();
+        } else if (c == "4") {
+            deleteShift();
+        } else if (c == "5") {
+            break;
+        } else {
+            cout << "Pilihan tidak dikenali.\n";
         }
-        void kelolaShift() {
-            while (true) {
-                cout << "\n--- Menu Jadwal Shift ---\n";
-                cout << "1. Tambah jadwal shift\n";
-                cout << "2. Lihat jadwal shift\n";
-                cout << "3. Ubah jadwal shift\n";
-                cout << "4. Hapus jadwal shift\n";
-                cout << "5. Kembali\n";
-                string c = inputLine("Pilih: ");
-                if (c == "1") addShift();
-                else if (c == "2") listShifts();
-                else if (c == "3") editShift();
-                else if (c == "4") deleteShift();
-                else if (c == "5") break;
-                else cout << "Pilihan tidak dikenali.\n";
-            }
-        }
+    }
+}
         void lihatLaporan() {
             menuDashboardKeuangan();
         }
-        void buatPengguna() {
-            string u = inputLine("Pilih username: ");
-            if (u.empty()) { cout << "Username tidak boleh kosong.\n"; return; }
-            if (usernameExists(u)) { cout << "Username sudah ada.\n"; return; }
-            string pw = inputLine("Password: ");
-            if (pw.length() < 8) {
-            cout << "Password minimal 8 karakter.\n";
-            return;
-        }
-            string conf = inputLine("Konfirmasi password: ");
-            if (pw != conf) { cout << "Konfirmasi tidak sama.\n"; return; }
-            string role = inputLine("Role (admin/kasir): ");
-            if (role != "admin" && role != "kasir") { cout << "Role harus 'admin' atau 'kasir'.\n"; return; }
-            cout << "\nRingkasan pengguna baru:\n";
-            cout << " - Username: " << u << "\n";
-            cout << " - Role: " << role << "\n";
-            if (!confirmAction("Konfirmasi buat pengguna?")) { cout << "Pembuatan pengguna dibatalkan.\n"; return; }
-            if (registerUser(u, pw, role)) cout << "Pengguna baru dibuat.\n";
-            else cout << "Gagal membuat pengguna.\n";
-        }
-        void hapusPengguna() {
-            string target = inputLine("Masukkan username yang akan dihapus: ");
-            if (target.empty()) { cout << "Username kosong.\n"; return; }
-            if (!usernameExists(target)) { cout << "Username tidak ditemukan.\n"; return; }
-            if (deleteUser(target)) cout << "Pengguna dihapus.\n";
-            else cout << "Gagal menghapus pengguna.\n";
-        }
+      void buatPengguna() {
+    cout << "\n";
+    cout << "==================================================\n";
+    cout << "              BUAT PENGGUNA BARU\n";
+    cout << "==================================================\n";
+
+    string u = inputLine("Username             : ");
+
+    if (u.empty()) {
+        cout << "Username tidak boleh kosong.\n";
+        return;
+    }
+
+    if (usernameExists(u)) {
+        cout << "Username sudah ada.\n";
+        return;
+    }
+
+    string pw = inputLine("Password             : ");
+
+    if (pw.length() < 8) {
+        cout << "Password minimal 8 karakter.\n";
+        return;
+    }
+
+    string conf = inputLine("Konfirmasi Password  : ");
+
+    if (pw != conf) {
+        cout << "Konfirmasi tidak sama.\n";
+        return;
+    }
+
+    string role = inputLine("Role (admin/kasir)   : ");
+
+    if (role != "admin" && role != "kasir") {
+        cout << "Role harus 'admin' atau 'kasir'.\n";
+        return;
+    }
+
+    cout << "\n";
+    cout << "--------------------------------------------------\n";
+    cout << "             RINGKASAN PENGGUNA BARU\n";
+    cout << "--------------------------------------------------\n";
+    cout << " Username : " << u << "\n";
+    cout << " Role     : " << role << "\n";
+    cout << "--------------------------------------------------\n";
+
+    if (!confirmAction("Konfirmasi buat pengguna?")) {
+        cout << "Pembuatan pengguna dibatalkan.\n";
+        return;
+    }
+
+    if (registerUser(u, pw, role)) {
+        cout << "Pengguna baru dibuat.\n";
+    } else {
+        cout << "Gagal membuat pengguna.\n";
+    }
+}
+       void hapusPengguna() {
+    cout << "\n";
+    cout << "==================================================\n";
+    cout << "               HAPUS PENGGUNA\n";
+    cout << "==================================================\n";
+
+    string target = inputLine("Masukkan Username : ");
+
+    if (target.empty()) {
+        cout << "Username kosong.\n";
+        return;
+    }
+
+    if (!usernameExists(target)) {
+        cout << "Username tidak ditemukan.\n";
+        return;
+    }
+
+    if (deleteUser(target)) {
+        cout << "Pengguna dihapus.\n";
+    } else {
+        cout << "Gagal menghapus pengguna.\n";
+    }
+}
 };
 
 class Produk{
