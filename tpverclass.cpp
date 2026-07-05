@@ -116,7 +116,7 @@ void addProduct();
 void editProduct();
 void deleteProduct();
 void addCategory();
-void listCategories();
+void daftarKategori();
 // promos
 bool promoCodeExists(const string& code);
 void tampilPromo();
@@ -136,14 +136,14 @@ void recordAttendance(const string& username);
 void listAttendance();
 void listAttendanceForEmployee(const string& username);
 // reports & analytics / financial analysis
-void monthlySalesReport();
-void bestSellingAnalysis();
+void laporanPenjualanBulanan();
+void analisisProdukTerlaris();
 void hitungPenjualanHarian();
-void categorySalesAnalysis();
-void revenueByDateRange();
+void analisisPenjualanPerKategori();
+void laporanPendapatanPerPeriode();
 void analisisMarginKeuntungan();
-void memberSalesAnalysis();
-void financialDashboard();
+void analisisPenjualanMember();
+void menuDashboardKeuangan();
 void ensureDefaultData();
 // transaction history / receipt
 void listTransactions();
@@ -334,7 +334,7 @@ void adminDashboard(const string& username) {
         } else if (choice == "10") {
             shiftMenu();
         } else if (choice == "11") {
-            financialDashboard();
+            menuDashboardKeuangan();
         } else {
             cout << "Pilihan tidak dikenali.\n";
         }
@@ -438,7 +438,7 @@ class Admin{
                 } else if (choice == "10") {
                     shiftMenu();
                 } else if (choice == "11") {
-                    financialDashboard();
+                    menuDashboardKeuangan();
                 } else {
                     cout << "Pilihan tidak dikenali.\n";
                 }
@@ -527,7 +527,7 @@ class Admin{
                 cout << "3. Kembali\n";
                 string c = inputLine("Pilih: ");
                 if (c == "1") addCategory();
-                else if (c == "2") listCategories();
+                else if (c == "2") daftarKategori();
                 else if (c == "3") break;
                 else cout << "Pilihan tidak dikenali.\n";
             }
@@ -567,7 +567,7 @@ class Admin{
             }
         }
         void lihatLaporan() {
-            financialDashboard();
+            menuDashboardKeuangan();
         }
         void buatPengguna() {
             string u = inputLine("Pilih username: ");
@@ -698,17 +698,17 @@ class Produk{
             cout << "Produk diperbarui.\n";
         }
 
-        void listCategories() {
-    ifstream fin(CATEGORIES_FILE.c_str());
-    if (!fin) { cout << "Belum ada kategori.\n"; return; }
-    string line;
-    int idx = 1;
-    cout << "\nDaftar kategori:\n";
-    while (getline(fin, line)) {
-        if (line.empty()) continue;
-        cout << idx++ << ". " << line << "\n";
-    }
-    if (idx==1) cout << "Belum ada kategori.\n";
+        void daftarKategori() {
+            ifstream fin(CATEGORIES_FILE.c_str());
+            if (!fin) { cout << "Belum ada kategori.\n"; return; }
+            string line;
+            int idx = 1;
+            cout << "\nDaftar kategori:\n";
+            while (getline(fin, line)) {
+            if (line.empty()) continue;
+            cout << idx++ << ". " << line << "\n";
+        }
+            if (idx==1) cout << "Belum ada kategori.\n";
 }
 
         void hapusProduk() {
@@ -1659,11 +1659,11 @@ class LaporanPenjualan{
     cout<<"Total Keseluruhan: Rp"<<(int)totalAll<<"\n";
     cout<<"========================================\n";
 }
-        void hitungPenjualanMingguan() { monthlySalesReport(); }
-        void hitungPenjualanBulanan() { monthlySalesReport(); }
-        void hitungPenjualanTahunan() { monthlySalesReport(); }
-        void tampilLaporan() { monthlySalesReport(); }
-        void simpanLaporan() { monthlySalesReport(); }
+        void hitungPenjualanMingguan() { laporanPenjualanBulanan(); }
+        void hitungPenjualanBulanan() { laporanPenjualanBulanan(); }
+        void hitungPenjualanTahunan() { laporanPenjualanBulanan(); }
+        void tampilLaporan() { laporanPenjualanBulanan(); }
+        void simpanLaporan() { laporanPenjualanBulanan(); }
 
 };
 
@@ -1674,8 +1674,8 @@ class AnalisisProduk{
         int jumlahTerjual;
         int stokProduk;
     public:
-        void hitungBarangTerlaris() { bestSellingAnalysis(); }
-        void rankingProduk() { bestSellingAnalysis(); }
+        void hitungBarangTerlaris() { analisisProdukTerlaris(); }
+        void rankingProduk() { analisisProdukTerlaris(); }
         void analisisMarginKeuntungan(){
     ifstream fprod(PRODUCTS_FILE.c_str());
     ifstream fin(TRANSACTIONS_FILE.c_str());
@@ -1763,7 +1763,7 @@ void kasirDashboard(const string& username) {
         } else if (choice == "6") {
             listTransactions();
         } else if (choice == "7") {
-            financialDashboard();
+            menuDashboardKeuangan();
         } else {
             cout << "Pilihan tidak dikenali.\n";
         }
@@ -2087,7 +2087,7 @@ void categoryMenu() {
         cout << "Pilih: ";
         string c; getline(cin, c);
         if (c == "1") produk.addCategory();
-        else if (c == "2") produk.listCategories();
+        else if (c == "2") produk.daftarKategori();
         else if (c == "3") break;
         else cout << "Pilihan tidak dikenali.\n";
     }
@@ -2236,7 +2236,7 @@ bool checkoutCart(const string& curDate) {
 
     // persist transaction with details to the shared analytics file
     Transaksi transaksi;
-transaksi.simpanTransaksi(
+    transaksi.simpanTransaksi(
     curDate,
     total,
     itemsDesc,
@@ -2248,56 +2248,56 @@ transaksi.simpanTransaksi(
 );
 
     // print simple receipt
-  cout << "\n=========================================\n";
-cout << "               TOKO KOSMETIK\n";
-cout << " Barang yang sudah dibeli tidak dapat\n";
-cout << "         dikembalikan\n";
-cout << "=========================================\n";
+    cout << "\n=========================================\n";
+    cout << "               TOKO KOSMETIK\n";
+    cout << " Barang yang sudah dibeli tidak dapat\n";
+    cout << "         dikembalikan\n";
+    cout << "=========================================\n";
 
-cout << "Sleman, DI Yogyakarta\n";
-cout << "Indonesia\n";
-cout << "Telp : 081391391313\n";
-cout << "-----------------------------------------\n";
+    cout << "Sleman, DI Yogyakarta\n";
+    cout << "Indonesia\n";
+    cout << "Telp : 081391391313\n";
+    cout << "-----------------------------------------\n";
 
-cout << "Tanggal : " << curDate << endl;
-cout << "Kasir   : Admin" << endl;
-cout << "-----------------------------------------\n";
+    cout << "Tanggal : " << curDate << endl;
+    cout << "Kasir   : Admin" << endl;
+    cout << "-----------------------------------------\n";
 
-cout << "Qty  Nama Barang             Subtotal\n";
-cout << "-----------------------------------------\n";
+    cout << "Qty  Nama Barang             Subtotal\n";
+    cout << "-----------------------------------------\n";
 
-for (int i = 0; i < cartCount; i++)
+    for (int i = 0; i < cartCount; i++)
 {
-    cout << cartQty[i] << "    "
+        cout << cartQty[i] << "    "
          << cartName[i]
          << "    Rp"
          << (int)cartSubtotal[i]
          << endl;
 }
 
-cout << "-----------------------------------------\n";
-cout << "Subtotal      : Rp" << (int)total << endl;
-cout << "Diskon        : Rp" << (int)totalDiscount << endl;
-cout << "Grand Total   : Rp" << (int)finalTotal << endl;
-cout << "Tunai         : Rp" << (int)paid << endl;
-cout << "Kembalian     : Rp" << (int)change << endl;
+    cout << "-----------------------------------------\n";
+    cout << "Subtotal      : Rp" << (int)total << endl;
+    cout << "Diskon        : Rp" << (int)totalDiscount << endl;
+    cout << "Grand Total   : Rp" << (int)finalTotal << endl;
+    cout << "Tunai         : Rp" << (int)paid << endl;
+    cout << "Kembalian     : Rp" << (int)change << endl;
 
-if (!member.empty())
+    if (!member.empty())
     cout << "Member        : " << member << endl;
 
-if (!appliedPromoCode.empty())
+    if (!appliedPromoCode.empty())
     cout << "Promo         : " << appliedPromoCode << endl;
 
-cout << "=========================================\n";
-cout << "      TERIMA KASIH TELAH BERBELANJA\n";
-cout << "=========================================\n";
+    cout << "=========================================\n";
+    cout << "      TERIMA KASIH TELAH BERBELANJA\n";
+    cout << "=========================================\n";
 
     krj.kosongkanKeranjang();
     return true;
 }
 
 // Transaction history and receipt printing
-void listTransactions() {
+    void listTransactions() {
     ifstream fin(TRANSACTIONS_FILE.c_str()); if (!fin) { cout<<"Belum ada transaksi.\n"; return; }
     string line; cout<<"\nDaftar transaksi:\n";
     while (getline(fin,line)) {
@@ -2581,7 +2581,7 @@ void listAttendanceForEmployee(const string& username) {
 
 // ======== FINANCIAL ANALYSIS FUNCTIONS ========
 
-void monthlySalesReport() {
+void laporanPenjualanBulanan() {
     ifstream fin(TRANSACTIONS_FILE.c_str());
     if (!fin) { cout<<"\nBelum ada data transaksi.\n"; return; }
     string line; double totalRevenue=0; int txCount=0; double totalDiscount=0;
@@ -2615,7 +2615,7 @@ void monthlySalesReport() {
     cout<<"=================================================\n";
 }
 
-void bestSellingAnalysis() {
+void analisisProdukTerlaris() {
     ifstream fin(TRANSACTIONS_FILE.c_str());
     if (!fin) { cout<<"\nBelum ada data transaksi.\n"; return; }
     string line; 
@@ -2684,7 +2684,7 @@ void bestSellingAnalysis() {
     cout<<"======================================\n";
 }
 
-void categorySalesAnalysis() {
+void analisisPenjualanPerKategori() {
     ifstream fprod(PRODUCTS_FILE.c_str());
     if (!fprod) { cout<<"\nFile produk tidak ditemukan.\n"; return; }
     ifstream fin(TRANSACTIONS_FILE.c_str());
@@ -2756,7 +2756,7 @@ void categorySalesAnalysis() {
     cout<<"==================================================\n";
 }
 
-void revenueByDateRange() {
+void laporanPendapatanPerPeriode() {
     string startDate=inputLine("Masukkan tanggal mulai (YYYY-MM-DD): ");
     string endDate=inputLine("Masukkan tanggal akhir (YYYY-MM-DD): ");
     
@@ -2797,7 +2797,7 @@ void revenueByDateRange() {
     cout<<"====================================================\n";
 }
 
-void memberSalesAnalysis() {
+void analisisPenjualanMember() {
     ifstream fin(TRANSACTIONS_FILE.c_str());
     if (!fin) { cout<<"\nBelum ada data transaksi.\n"; return; }
     
@@ -2856,7 +2856,7 @@ void memberSalesAnalysis() {
     cout<<"====================================================\n";
 }
 
-void financialDashboard() {
+void menuDashboardKeuangan() {
     LaporanPenjualan harian;
     AnalisisProduk analisis;
     while (true) {
@@ -2872,13 +2872,13 @@ void financialDashboard() {
         cout<<"==================================================\n";
         string choice=inputLine("Pilih menu (1-8): ");
         
-        if (choice=="1") monthlySalesReport();
-        else if (choice=="2") bestSellingAnalysis();
+        if (choice=="1") laporanPenjualanBulanan();
+        else if (choice=="2") analisisProdukTerlaris();
         else if (choice=="3") harian.hitungPenjualanHarian();
-        else if (choice=="4") categorySalesAnalysis();
-        else if (choice=="5") revenueByDateRange();
+        else if (choice=="4") analisisPenjualanPerKategori();
+        else if (choice=="5") laporanPendapatanPerPeriode();
         else if (choice=="6") analisis.analisisMarginKeuntungan();
-        else if (choice=="7") memberSalesAnalysis();
+        else if (choice=="7") analisisPenjualanMember();
         else if (choice=="8") break;
         else cout<<"Pilihan tidak dikenali.\n";
     }
