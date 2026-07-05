@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <iomanip>
+#include <sstream>
 
 using namespace std;
 
@@ -343,6 +345,24 @@ void adminDashboard(const string& username) {
             cout << "Pilihan tidak dikenali.\n";
         }
     }
+}
+
+string formatRupiah(int angka) {
+    string s = to_string(angka);
+    string hasil = "";
+    int hitung = 0;
+
+    for (int i = s.length() - 1; i >= 0; i--) {
+        hasil = s[i] + hasil;
+        hitung++;
+
+        if (hitung == 3 && i != 0) {
+            hasil = "." + hasil;
+            hitung = 0;
+        }
+    }
+
+    return "Rp" + hasil;
 }
 
 // --- Cart & Transactions implementation ---
@@ -1773,58 +1793,129 @@ class AnalisisProduk{
     public:
         void hitungBarangTerlaris() { analisisProdukTerlaris(); }
         void rankingProduk() { analisisProdukTerlaris(); }
-        void analisisMarginKeuntungan(){
+        void analisisMarginKeuntungan() {
+
     ifstream fprod(PRODUCTS_FILE.c_str());
-    ifstream fin(TRANSACTIONS_FILE.c_str());
-    if (!fprod || !fin) { cout<<"\nFile tidak ditemukan.\n"; 
-    return; 
-}
-    
-    string line;
-    cout<<"\n========== ANALISIS MARGIN KEUNTUNGAN ==========\n";
-    cout<<"Catatan: Perhitungan berdasarkan harga jual produk\n";
-    cout<<"-----------------------------------------------\n";
-    cout<<"ID Produk | Nama Produk | Harga Jual | Margin\n";
-    cout<<"-----------------------------------------------\n";
-    
-   while (getline(fprod, line)) {
-    if (line.empty()) continue;
 
-    size_t p1 = line.find('|');
-    size_t p2 = line.find('|', p1 + 1);
-    size_t p3 = line.find('|', p2 + 1);
-    size_t p4 = line.find('|', p3 + 1);
-    size_t p5 = line.find('|', p4 + 1);
-
-    if (p1 == string::npos ||
-        p2 == string::npos ||
-        p3 == string::npos ||
-        p4 == string::npos ||
-        p5 == string::npos)
-        continue;
-
-    string pid = line.substr(0, p1);
-    string pname = line.substr(p1 + 1, p2 - p1 - 1);
-
-    int price = 0;
-    for (size_t i = p3 + 1; i < p4; ++i) {
-        if (line[i] >= '0' && line[i] <= '9')
-            price = price * 10 + (line[i] - '0');
+    if (!fprod) {
+        cout << "\nFile produk tidak ditemukan.\n";
+        return;
     }
 
-    // Estimasi margin 40%
-    int margin = (price * 40) / 100;
+    string line;
 
-    cout << pid << " | " << pname
-         << " | Rp" << price
-         << " | Rp" << margin
-         << " (40%)\n";
-}
-    fprod.close();
-    fin.close();
-    cout<<"-----------------------------------------------\n";
-    cout<<"=============================================\n";
+    int totalProduk = 0;
+    double totalMarginPersen = 0;
+    int totalKeuntungan = 0;
+
+    int marginTerbesar = -1;
+    int marginTerkecil = 999999999;
+
+    string produkTerbesar = "-";
+    string produkTerkecil = "-";
+
+    cout << "\n=====================================================================================================\n";
+    cout << "                                ANALISIS MARGIN KEUNTUNGAN PRODUK\n";
+    cout << "=====================================================================================================\n";
+
+    cout << left
+         << setw(10) << "Kode"
+         << setw(25) << "Nama Produk"
+         << right
+         << setw(18) << "Harga Modal"
+         << setw(18) << "Harga Jual"
+         << setw(18) << "Margin"
+         << setw(12) << "Margin %"
+         << endl;
+
+    cout << "-----------------------------------------------------------------------------------------------------\n";
+
+    while (getline(fprod, line)) {
+
+        if (line.empty())
+            continue;
+
+        stringstream ss(line);
+
+        string kode, nama, kategori;
+        string hargaModalStr, hargaJualStr, stok, expired;
+
+        getline(ss, kode, '|');
+        getline(ss, nama, '|');
+        getline(ss, kategori, '|');
+        getline(ss, hargaModalStr, '|');
+        getline(ss, hargaJualStr, '|');
+        getline(ss, stok, '|');
+        getline(ss, expired, '|');
+
+        int hargaModal = stoi(hargaModalStr);
+        int hargaJual = stoi(hargaJualStr);
+
+        int margin = hargaJual - hargaModal;
+
+        double marginPersen = 0;
+
+        if (hargaJual != 0)
+            marginPersen = (margin * 100.0) / hargaJual;
+
+        totalProduk++;
+        totalMarginPersen += marginPersen;
+        totalKeuntungan += margin;
+
+        if (margin > marginTerbesar) {
+            marginTerbesar = margin;
+            produkTerbesar = nama;
         }
+
+        if (margin < marginTerkecil) {
+            marginTerkecil = margin;
+            produkTerkecil = nama;
+        }
+
+        cout << left
+             << setw(10) << kode
+             << setw(25) << nama
+             << right
+             << setw(18) << formatRupiah(hargaModal)
+             << setw(18) << formatRupiah(hargaJual)
+             << setw(18) << formatRupiah(margin)
+             << setw(11) << fixed << setprecision(2)
+             << marginPersen << "%"
+             << endl;
+    }
+
+    cout << "=====================================================================================================\n";
+
+    if (totalProduk > 0) {
+
+        cout << "\n============================== RINGKASAN ANALISIS ==============================\n";
+
+        cout << "Total Produk             : " << totalProduk << endl;
+
+        cout << "Rata-rata Margin         : "
+             << fixed << setprecision(2)
+             << (totalMarginPersen / totalProduk)
+             << "%" << endl;
+
+        cout << "Total Potensi Keuntungan : "
+             << formatRupiah(totalKeuntungan)
+             << endl;
+
+        cout << "Produk Margin Terbesar   : "
+             << produkTerbesar
+             << " (" << formatRupiah(marginTerbesar) << ")"
+             << endl;
+
+        cout << "Produk Margin Terkecil   : "
+             << produkTerkecil
+             << " (" << formatRupiah(marginTerkecil) << ")"
+             << endl;
+
+        cout << "===============================================================================\n";
+    }
+
+    fprod.close();
+}
 
 };
 
