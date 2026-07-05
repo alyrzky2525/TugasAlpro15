@@ -170,97 +170,183 @@ bool usernameExists(const string& username) {
     return false;
 }
 
-bool validateCredentials(const string& username, const string& password, string& outRole) {
+bool validateCredentials(const string& username,
+                         const string& password,
+                         string& outRole) {
     ifstream fin(USER_FILE.c_str());
-    if (!fin) return false;
+
+    if (!fin) {
+        return false;
+    }
+
     string line;
+
     while (getline(fin, line)) {
         size_t p1 = line.find('|');
         size_t p2 = line.find('|', p1 + 1);
-        if (p1 == string::npos || p2 == string::npos) continue;
-        string u = line.substr(0, p1);
-        string pw = line.substr(p1 + 1, p2 - p1 - 1);
-        string role = line.substr(p2 + 1);
-        if (u == username && pw == password) {
-            outRole = role;
+
+        if (p1 == string::npos || p2 == string::npos) {
+            continue;
+        }
+
+        string usernameInFile = line.substr(0, p1);
+        string passwordInFile = line.substr(p1 + 1, p2 - p1 - 1);
+        string roleInFile = line.substr(p2 + 1);
+
+        if (usernameInFile == username &&
+            passwordInFile == password) {
+            outRole = roleInFile;
             return true;
         }
     }
+
     return false;
 }
 
-bool registerUser(const string& username, const string& password, const string& role) {
+bool registerUser(const string& username,
+                  const string& password,
+                  const string& role) {
     ofstream fout(USER_FILE.c_str(), ios::app);
-    if (!fout) return false;
+
+    if (!fout) {
+        return false;
+    }
+
     fout << username << '|' << password << '|' << role << '\n';
+
     return true;
 }
-
-bool changePassword(const string& username, const string& newPassword) {
+bool changePassword(const string& username,
+                    const string& newPassword) {
     ifstream fin(USER_FILE.c_str());
+
+    if (!fin) {
+        return false;
+    }
+
     string all;
     bool found = false;
-    if (fin) {
-        string line;
-        while (getline(fin, line)) {
-            size_t p1 = line.find('|');
-            size_t p2 = line.find('|', p1 + 1);
-            if (p1 == string::npos || p2 == string::npos) continue;
-            string u = line.substr(0, p1);
-            string role = line.substr(p2 + 1);
-            if (u == username) {
-                all += u + '|' + newPassword + '|' + role + '\n';
-                found = true;
-            } else {
-                all += line + '\n';
-            }
+    string line;
+
+    while (getline(fin, line)) {
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1 + 1);
+
+        if (p1 == string::npos || p2 == string::npos) {
+            continue;
         }
-        fin.close();
+
+        string usernameInFile = line.substr(0, p1);
+        string roleInFile = line.substr(p2 + 1);
+
+        if (usernameInFile == username) {
+            all += usernameInFile + '|' + newPassword + '|' + roleInFile + '\n';
+            found = true;
+        } else {
+            all += line + '\n';
+        }
     }
-    if (!found) return false;
+
+    fin.close();
+
+    if (!found) {
+        return false;
+    }
+
     ofstream fout(USER_FILE.c_str(), ios::trunc);
-    if (!fout) return false;
+
+    if (!fout) {
+        return false;
+    }
+
     fout << all;
+
     return true;
 }
 
 void listUsers() {
     ifstream fin(USER_FILE.c_str());
-    if (!fin) { cout << "Belum ada pengguna atau file tidak tersedia.\n"; return; }
+
+    if (!fin) {
+        cout << "Belum ada pengguna atau file tidak tersedia.\n";
+        return;
+    }
+
     string line;
     int idx = 1;
+
     cout << "\nDaftar pengguna:\n";
+
     while (getline(fin, line)) {
         size_t p1 = line.find('|');
         size_t p2 = line.find('|', p1 + 1);
-        if (p1 == string::npos || p2 == string::npos) continue;
-        string u = line.substr(0, p1);
-        string role = line.substr(p2 + 1);
-        cout << idx++ << ". " << u << " (" << role << ")\n";
+
+        if (p1 == string::npos || p2 == string::npos) {
+            continue;
+        }
+
+        string usernameInFile = line.substr(0, p1);
+        string roleInFile = line.substr(p2 + 1);
+
+        cout << idx++ << ". "
+             << usernameInFile
+             << " ("
+             << roleInFile
+             << ")\n";
     }
-    if (idx == 1) cout << "Belum ada pengguna.\n";
+
+    if (idx == 1) {
+        cout << "Belum ada pengguna.\n";
+    }
 }
 
 bool deleteUser(const string& username) {
     ifstream fin(USER_FILE.c_str());
-    if (!fin) return false;
+
+    if (!fin) {
+        return false;
+    }
+
     string all;
     string line;
     bool found = false;
+
     while (getline(fin, line)) {
         size_t p1 = line.find('|');
-        if (p1 == string::npos) continue;
-        string u = line.substr(0, p1);
-        if (u == username) { found = true; continue; }
+
+        if (p1 == string::npos) {
+            continue;
+        }
+
+        string usernameInFile = line.substr(0, p1);
+
+        if (usernameInFile == username) {
+            found = true;
+            continue;
+        }
+
         all += line + '\n';
     }
+
     fin.close();
-    if (!found) return false;
-    // konfirmasi sebelum hapus
-    if (!confirmAction(string("Konfirmasi hapus pengguna '") + username + "'?")) return false;
+
+    if (!found) {
+        return false;
+    }
+
+    // Konfirmasi sebelum menghapus pengguna
+    if (!confirmAction("Konfirmasi hapus pengguna '" + username + "'?")) {
+        return false;
+    }
+
     ofstream fout(USER_FILE.c_str(), ios::trunc);
-    if (!fout) return false;
+
+    if (!fout) {
+        return false;
+    }
+
     fout << all;
+
     return true;
 }
 
@@ -292,55 +378,115 @@ void adminDashboard(const string& username) {
         cout << "10. Jadwal Shift\n";
         cout << "11. Laporan & Analisis\n";
         cout << "Pilih: ";
+
         string choice;
         getline(cin, choice);
-        if (choice == "1") break;
-        else if (choice == "2") {
-            string np = inputLine("Password baru: ");
-            string nc = inputLine("Konfirmasi password baru: ");
-            if (np == nc) {
-                if (changePassword(username, np)) cout << "Password berhasil diubah.\n";
-                else cout << "Gagal mengubah password.\n";
-            } else cout << "Konfirmasi tidak sama.\n";
+
+        if (choice == "1") {
+            break;
+        } else if (choice == "2") {
+            string newPassword = inputLine("Password baru: ");
+            string confirmPassword = inputLine("Konfirmasi password baru: ");
+
+            if (newPassword == confirmPassword) {
+                if (changePassword(username, newPassword)) {
+                    cout << "Password berhasil diubah.\n";
+                } else {
+                    cout << "Gagal mengubah password.\n";
+                }
+            } else {
+                cout << "Konfirmasi tidak sama.\n";
+            }
+
         } else if (choice == "3") {
             listUsers();
+
         } else if (choice == "4") {
             string target = inputLine("Masukkan username yang akan dihapus: ");
-            if (target == username) { cout << "Tidak dapat menghapus akun sendiri dari dashboard.\n"; continue; }
-            if (!usernameExists(target)) { cout << "Username tidak ditemukan.\n"; continue; }
-            if (deleteUser(target)) cout << "Pengguna dihapus.\n";
-            else cout << "Gagal menghapus pengguna.\n";
+
+            if (target == username) {
+                cout << "Tidak dapat menghapus akun sendiri dari dashboard.\n";
+                continue;
+            }
+
+            if (!usernameExists(target)) {
+                cout << "Username tidak ditemukan.\n";
+                continue;
+            }
+
+            if (deleteUser(target)) {
+                cout << "Pengguna dihapus.\n";
+            } else {
+                cout << "Gagal menghapus pengguna.\n";
+            }
+
         } else if (choice == "5") {
-            string u = inputLine("Pilih username: ");
-            if (u.empty()) { cout << "Username tidak boleh kosong.\n"; continue; }
-            if (usernameExists(u)) { cout << "Username sudah ada.\n"; continue; }
-            string pw = inputLine("Password: ");
-              if (pw.length() < 8) {
-             cout << "Password minimal 8 karakter.\n";
-            return;
-}
-            string conf = inputLine("Konfirmasi password: ");
-            if (pw != conf) { cout << "Konfirmasi tidak sama.\n"; continue; }
+            string usernameBaru = inputLine("Pilih username: ");
+
+            if (usernameBaru.empty()) {
+                cout << "Username tidak boleh kosong.\n";
+                continue;
+            }
+
+            if (usernameExists(usernameBaru)) {
+                cout << "Username sudah ada.\n";
+                continue;
+            }
+
+            string password = inputLine("Password: ");
+
+            if (password.length() < 8) {
+                cout << "Password minimal 8 karakter.\n";
+                continue;
+            }
+
+            string confirmPassword = inputLine("Konfirmasi password: ");
+
+            if (password != confirmPassword) {
+                cout << "Konfirmasi tidak sama.\n";
+                continue;
+            }
+
             string role = inputLine("Role (admin/kasir): ");
-            if (role != "admin" && role != "kasir") { cout << "Role harus 'admin' atau 'kasir'.\n"; continue; }
+
+            if (role != "admin" && role != "kasir") {
+                cout << "Role harus 'admin' atau 'kasir'.\n";
+                continue;
+            }
+
             cout << "\nRingkasan pengguna baru:\n";
-            cout << " - Username: " << u << "\n";
-            cout << " - Role: " << role << "\n";
-            if (!confirmAction("Konfirmasi buat pengguna?")) { cout << "Pembuatan pengguna dibatalkan.\n"; continue; }
-            if (registerUser(u, pw, role)) cout << "Pengguna baru dibuat.\n";
-            else cout << "Gagal membuat pengguna.\n";
+            cout << " - Username: " << usernameBaru << '\n';
+            cout << " - Role: " << role << '\n';
+
+            if (!confirmAction("Konfirmasi buat pengguna?")) {
+                cout << "Pembuatan pengguna dibatalkan.\n";
+                continue;
+            }
+
+            if (registerUser(usernameBaru, password, role)) {
+                cout << "Pengguna baru dibuat.\n";
+            } else {
+                cout << "Gagal membuat pengguna.\n";
+            }
+
         } else if (choice == "6") {
             productMenu();
+
         } else if (choice == "7") {
             categoryMenu();
+
         } else if (choice == "8") {
             promoMenu();
+
         } else if (choice == "9") {
             listTransactions();
+
         } else if (choice == "10") {
             shiftMenu();
+
         } else if (choice == "11") {
             menuDashboardKeuangan();
+
         } else {
             cout << "Pilihan tidak dikenali.\n";
         }
@@ -395,83 +541,136 @@ class Admin{
             }
             return false;
         }
-        void dashboardAdmin(const string& username) {
-            while (true) {
-                cout << "\n--- Dashboard Admin ---\n";
-                cout << "Selamat datang, " << username << " (admin)\n";
-                cout << "1. Logout\n";
-                cout << "2. Ganti password\n";
-                cout << "3. Daftar pengguna\n";
-                cout << "4. Hapus pengguna\n";
-                cout << "5. Buat pengguna baru\n";
-                cout << "6. Kelola produk (CRUD)\n";
-                cout << "7. Kelola kategori\n";
-                cout << "8. Kelola promo\n";
-                cout << "9. Riwayat transaksi\n";
-                cout << "10. Jadwal Shift\n";
-                cout << "11. Laporan & Analisis\n";
-                cout << "Pilih: ";
-                string choice;
-                getline(cin, choice);
-                if (choice == "1") 
-                break;
-                else if (choice == "2") {
-                    string np = inputLine("Password baru: ");
-                    string nc = inputLine("Konfirmasi password baru: ");
-                    if (np == nc) {
-                        if (changePassword(username, np)) cout << "Password berhasil diubah.\n";
-                        else cout << "Gagal mengubah password.\n";
-                    } else cout << "Konfirmasi tidak sama.\n";
-                } else if (choice == "3") {
-                    listUsers();
-                } else if (choice == "4") {
-                    string target = inputLine("Masukkan username yang akan dihapus: ");
-                    if (target == username) { cout << "Tidak dapat menghapus akun sendiri dari dashboard.\n"; continue; }
-                    if (!usernameExists(target)) { cout << "Username tidak ditemukan.\n"; 
-                continue; }
-                    if (deleteUser(target)) cout << "Pengguna dihapus.\n";
-                    else cout << "Gagal menghapus pengguna.\n";
-                } else if (choice == "5") {
-                    string u = inputLine("Pilih username: ");
-                    if (u.empty()) { cout << "Username tidak boleh kosong.\n";
-                continue; }
-                    if (usernameExists(u)) { cout << "Username sudah ada.\n";
-                continue; }
-                    string pw = inputLine("Password: ");
-                    if (pw.length() < 8) {
-                    cout << "Password minimal 8 karakter.\n";
-                    return;
-                    }
-                    string conf = inputLine("Konfirmasi password: ");
-                    if (pw != conf) { cout << "Konfirmasi tidak sama.\n"; 
-                continue; }
-                    string role = inputLine("Role (admin/kasir): ");
-                    if (role != "admin" && role != "kasir") { cout << "Role harus 'admin' atau 'kasir'.\n"; 
-                continue; }
-                    cout << "\nRingkasan pengguna baru:\n";
-                    cout << " - Username: " << u << "\n";
-                    cout << " - Role: " << role << "\n";
-                    if (!confirmAction("Konfirmasi buat pengguna?")) { cout << "Pembuatan pengguna dibatalkan.\n";
-                continue; }
-                    if (registerUser(u, pw, role)) cout << "Pengguna baru dibuat.\n";
-                    else cout << "Gagal membuat pengguna.\n";
-                } else if (choice == "6") {
-                    productMenu();
-                } else if (choice == "7") {
-                    categoryMenu();
-                } else if (choice == "8") {
-                    promoMenu();
-                } else if (choice == "9") {
-                    listTransactions();
-                } else if (choice == "10") {
-                    shiftMenu();
-                } else if (choice == "11") {
-                    menuDashboardKeuangan();
+    void dashboardAdmin(const string& username) {
+    while (true) {
+        cout << "\n--- Dashboard Admin ---\n";
+        cout << "Selamat datang, " << username << " (admin)\n";
+        cout << "1. Logout\n";
+        cout << "2. Ganti password\n";
+        cout << "3. Daftar pengguna\n";
+        cout << "4. Hapus pengguna\n";
+        cout << "5. Buat pengguna baru\n";
+        cout << "6. Kelola produk (CRUD)\n";
+        cout << "7. Kelola kategori\n";
+        cout << "8. Kelola promo\n";
+        cout << "9. Riwayat transaksi\n";
+        cout << "10. Jadwal Shift\n";
+        cout << "11. Laporan & Analisis\n";
+        cout << "Pilih: ";
+
+        string choice;
+        getline(cin, choice);
+
+        if (choice == "1") {
+            break;
+        } else if (choice == "2") {
+            string np = inputLine("Password baru: ");
+            string nc = inputLine("Konfirmasi password baru: ");
+
+            if (np == nc) {
+                if (changePassword(username, np)) {
+                    cout << "Password berhasil diubah.\n";
                 } else {
-                    cout << "Pilihan tidak dikenali.\n";
+                    cout << "Gagal mengubah password.\n";
                 }
+            } else {
+                cout << "Konfirmasi tidak sama.\n";
             }
+
+        } else if (choice == "3") {
+            listUsers();
+
+        } else if (choice == "4") {
+            string target = inputLine("Masukkan username yang akan dihapus: ");
+
+            if (target == username) {
+                cout << "Tidak dapat menghapus akun sendiri dari dashboard.\n";
+                continue;
+            }
+
+            if (!usernameExists(target)) {
+                cout << "Username tidak ditemukan.\n";
+                continue;
+            }
+
+            if (deleteUser(target)) {
+                cout << "Pengguna dihapus.\n";
+            } else {
+                cout << "Gagal menghapus pengguna.\n";
+            }
+
+        } else if (choice == "5") {
+            string u = inputLine("Pilih username: ");
+
+            if (u.empty()) {
+                cout << "Username tidak boleh kosong.\n";
+                continue;
+            }
+
+            if (usernameExists(u)) {
+                cout << "Username sudah ada.\n";
+                continue;
+            }
+
+            string pw = inputLine("Password: ");
+
+            if (pw.length() < 8) {
+                cout << "Password minimal 8 karakter.\n";
+                return;
+            }
+
+            string conf = inputLine("Konfirmasi password: ");
+
+            if (pw != conf) {
+                cout << "Konfirmasi tidak sama.\n";
+                continue;
+            }
+
+            string role = inputLine("Role (admin/kasir): ");
+
+            if (role != "admin" && role != "kasir") {
+                cout << "Role harus 'admin' atau 'kasir'.\n";
+                continue;
+            }
+
+            cout << "\nRingkasan pengguna baru:\n";
+            cout << " - Username: " << u << "\n";
+            cout << " - Role: " << role << "\n";
+
+            if (!confirmAction("Konfirmasi buat pengguna?")) {
+                cout << "Pembuatan pengguna dibatalkan.\n";
+                continue;
+            }
+
+            if (registerUser(u, pw, role)) {
+                cout << "Pengguna baru dibuat.\n";
+            } else {
+                cout << "Gagal membuat pengguna.\n";
+            }
+
+        } else if (choice == "6") {
+            productMenu();
+
+        } else if (choice == "7") {
+            categoryMenu();
+
+        } else if (choice == "8") {
+            promoMenu();
+
+        } else if (choice == "9") {
+            listTransactions();
+
+        } else if (choice == "10") {
+            shiftMenu();
+
+        } else if (choice == "11") {
+            menuDashboardKeuangan();
+
+        } else {
+            cout << "Pilihan tidak dikenali.\n";
         }
+    }
+}
         void tambahProduk() {
 
     string kode = inputLine("Kode produk: ");
@@ -2335,7 +2534,6 @@ void promoMenu() {
     }
 }
 
-// Unified transaction persistence (detailed)
 // Checkout: validate expired and stock, then decrement stock and save transaction
 bool isValidDateFormat(const string& date) {
     if (date.size() != 10) return false;
