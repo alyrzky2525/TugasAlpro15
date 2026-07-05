@@ -119,10 +119,10 @@ void addCategory();
 void listCategories();
 // promos
 bool promoCodeExists(const string& code);
-void listPromos();
+void tampilPromo();
 void tambahPromo();
 void editPromo();
-void deletePromo();
+void hapusPromo();
 double applyPromo(const string& promoCode, const string& date, bool isMember, bool &valid, string &outPromoCode);
 void promoMenu();
 // shift & attendance forward declarations
@@ -535,8 +535,8 @@ class Admin{
                 string c = inputLine("Pilih: ");
                 if (c == "1") tambahPromo();
                 else if (c == "2") editPromo();
-                else if (c == "3") deletePromo();
-                else if (c == "4") listPromos();
+                else if (c == "3") hapusPromo();
+                else if (c == "4") tampilPromo();
                 else if (c == "5") break;
                 else cout << "Pilihan tidak dikenali.\n";
             }
@@ -811,10 +811,10 @@ class Produk{
         }
 
         bool productCodeExists(const string& code) {
-    ifstream fin(PRODUCTS_FILE.c_str());
-    if (!fin) return false;
+        ifstream fin(PRODUCTS_FILE.c_str());
+        if (!fin) return false;
 
-    string line;
+        string line;
     while (getline(fin, line)) {
         size_t p = line.find('|');
         if (p == string::npos) continue;
@@ -887,6 +887,38 @@ bool categoryExists(const string& cat) {
     }
 
     return false;
+}
+
+void editProduct() {
+    string kode = inputLine("Masukkan kode produk yang akan diedit: ");
+    if (!productCodeExists(kode)) { 
+    cout << "Kode tidak ditemukan.\n"; 
+    return; }
+    ifstream fin(PRODUCTS_FILE.c_str());
+    string all;
+    string line;
+    while (getline(fin, line)) {
+        if (line.empty()) continue;
+        size_t p = line.find('|');
+        if (p==string::npos) continue;
+        string c = line.substr(0,p);
+        if (c == kode) {
+            cout << "Mengedit produk: " << kode << "\n";
+            string nama = inputLine("Nama baru: ");
+            string kategori = inputLine("Kategori baru: ");
+            string harga = inputLine("Harga baru: ");
+            string stok = inputLine("Stok baru: ");
+            string expired = inputLine("Expired baru (YYYY-MM-DD): ");
+            all += kode + '|' + nama + '|' + kategori + '|' + harga + '|' + stok + '|' + expired + '\n';
+        } else {
+            all += line + '\n';
+        }
+    }
+    fin.close();
+    ofstream fout(PRODUCTS_FILE.c_str(), ios::trunc);
+    if (!fout) { cout << "Gagal menulis file produk.\n"; return; }
+    fout << all;
+    cout << "Produk diperbarui.\n";
 }
 
         void tampilProdukExpired() {
@@ -1128,6 +1160,59 @@ class Promo{
              } 
              return false;
 }
+
+        void tampilPromo() {
+    ifstream fin(PROMOS_FILE.c_str()); if (!fin) { cout<<"Belum ada promo.\n"; return; }
+    string line; int idx=1; cout<<"\nDaftar promo:\n";
+    while (getline(fin,line)) {
+        if (line.empty()) continue;
+        // format: code|desc|percent|start|end|memberOnly
+        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1); size_t p4=line.find('|',p3+1); size_t p5=line.find('|',p4+1);
+        if (p1==string::npos||p2==string::npos||p3==string::npos||p4==string::npos||p5==string::npos) continue;
+        string code=line.substr(0,p1); string desc=line.substr(p1+1,p2-p1-1); string pct=line.substr(p2+1,p3-p2-1); string start=line.substr(p3+1,p4-p3-1); string end=line.substr(p4+1,p5-p4-1); string memberOnly=line.substr(p5+1);
+        cout<<idx++<<". "<<code<<" | "<<desc<<" | "<<pct<<"% | "<<start<<" - "<<end<<" | memberOnly:"<<memberOnly<<"\n";
+    }
+}
+
+void editPromo() {
+    Promo promo;
+    string code=inputLine("Kode promo yang diedit: "); if (!promo.promoCodeExists(code)) { cout<<"Kode tidak ditemukan.\n"; return; }
+    ifstream fin(PROMOS_FILE.c_str()); if (!fin) { cout<<"File promo tidak ditemukan.\n"; return; }
+    string all; string line; while (getline(fin,line)) { if (line.empty()) continue; size_t p=line.find('|'); if (p==string::npos) { all+=line+'\n'; continue; } string c=line.substr(0,p); if (c==code) {
+            cout<<"Mengedit promo: "<<code<<"\n";
+            string desc=inputLine("Deskripsi baru: "); string pcts=inputLine("Persentase baru: "); string start=inputLine("Mulai baru (YYYY-MM-DD): "); string end=inputLine("Selesai baru (YYYY-MM-DD): "); string m=inputLine("Hanya untuk member? (y/n): "); string memberOnly=(m=="y"||m=="Y")?"1":"0";
+            all += code + '|' + desc + '|' + pcts + '|' + start + '|' + end + '|' + memberOnly + '\n';
+        } else all += line + '\n'; }
+    fin.close(); ofstream fout(PROMOS_FILE.c_str(), ios::trunc); if (!fout) { cout<<"Gagal menulis file promo.\n"; return; } fout<<all; cout<<"Promo diperbarui.\n";
+}
+
+void hapusPromo() {
+    Promo promo;
+    string code=inputLine("Kode promo yang dihapus: "); if (!promo.promoCodeExists(code)) { cout<<"Kode tidak ditemukan.\n"; return; }
+    if (!confirmAction(string("Hapus promo '") + code + "' ?")) return;
+    ifstream fin(PROMOS_FILE.c_str()); string all; string line; while (getline(fin,line)) { if (line.empty()) continue; size_t p=line.find('|'); if (p==string::npos) { all+=line+'\n'; continue; } string c=line.substr(0,p); if (c==code) continue; all+=line+'\n'; } fin.close(); ofstream fout(PROMOS_FILE.c_str(), ios::trunc); if (!fout) { cout<<"Gagal menulis file promo.\n"; return; } fout<<all; cout<<"Promo dihapus.\n";
+}
+
+double applyPromo(const string& promoCode, const string& date, bool isMember, bool &valid, string &outPromoCode) {
+    valid = false; outPromoCode.clear(); if (promoCode.empty()) return 0.0;
+    ifstream fin(PROMOS_FILE.c_str()); if (!fin) return 0.0;
+    string line; while (getline(fin,line)) {
+        if (line.empty()) continue;
+        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1); size_t p4=line.find('|',p3+1); size_t p5=line.find('|',p4+1);
+        if (p1==string::npos||p2==string::npos||p3==string::npos||p4==string::npos||p5==string::npos) continue;
+        string code=line.substr(0,p1); string desc=line.substr(p1+1,p2-p1-1); string pcts=line.substr(p2+1,p3-p2-1); string start=line.substr(p3+1,p4-p3-1); string end=line.substr(p4+1,p5-p4-1); string memberOnly=line.substr(p5+1);
+        if (code != promoCode) continue;
+        // check date range
+        if (!start.empty() && date < start) { valid = false; return 0.0; }
+        if (!end.empty() && date > end) { valid = false; return 0.0; }
+        if (memberOnly == "1" && !isMember) { valid = false; return 0.0; }
+        double pct = 0.0; try { pct = stod(pcts); } catch(...) { pct = 0.0; }
+        valid = true; outPromoCode = code; return pct;
+    }
+    return 0.0;
+}
+
+
 
 };
 
@@ -1694,60 +1779,6 @@ int main() {
 
 // --- Product & Category management ---
 
-bool productCodeExists(const string& code) {
-    ifstream fin(PRODUCTS_FILE.c_str());
-    if (!fin) return false;
-    string line;
-    while (getline(fin, line)) {
-        size_t p = line.find('|');
-        if (p == string::npos) continue;
-        string c = line.substr(0, p);
-        if (c == code) return true;
-    }
-    return false;
-}
-
-void editProduct() {
-    string kode = inputLine("Masukkan kode produk yang akan diedit: ");
-    if (!productCodeExists(kode)) { 
-    cout << "Kode tidak ditemukan.\n"; 
-    return; }
-    ifstream fin(PRODUCTS_FILE.c_str());
-    string all;
-    string line;
-    while (getline(fin, line)) {
-        if (line.empty()) continue;
-        size_t p = line.find('|');
-        if (p==string::npos) continue;
-        string c = line.substr(0,p);
-        if (c == kode) {
-            cout << "Mengedit produk: " << kode << "\n";
-            string nama = inputLine("Nama baru: ");
-            string kategori = inputLine("Kategori baru: ");
-            string harga = inputLine("Harga baru: ");
-            string stok = inputLine("Stok baru: ");
-            string expired = inputLine("Expired baru (YYYY-MM-DD): ");
-            all += kode + '|' + nama + '|' + kategori + '|' + harga + '|' + stok + '|' + expired + '\n';
-        } else {
-            all += line + '\n';
-        }
-    }
-    fin.close();
-    ofstream fout(PRODUCTS_FILE.c_str(), ios::trunc);
-    if (!fout) { cout << "Gagal menulis file produk.\n"; return; }
-    fout << all;
-    cout << "Produk diperbarui.\n";
-}
-
-bool categoryExists(const string& cat) {
-    ifstream fin(CATEGORIES_FILE.c_str());
-    if (!fin) return false;
-    string line;
-    while (getline(fin, line)) {
-        if (line == cat) return true;
-    }
-    return false;
-}
 
 void ensureDefaultCategories() {
     ifstream fin(CATEGORIES_FILE.c_str());
@@ -1975,60 +2006,6 @@ void categoryMenu() {
     }
 }
 
-// add product by code and qty; returns true if added/updated
-// --- Promo management and transaction persistence ---
-void listPromos() {
-    ifstream fin(PROMOS_FILE.c_str()); if (!fin) { cout<<"Belum ada promo.\n"; return; }
-    string line; int idx=1; cout<<"\nDaftar promo:\n";
-    while (getline(fin,line)) {
-        if (line.empty()) continue;
-        // format: code|desc|percent|start|end|memberOnly
-        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1); size_t p4=line.find('|',p3+1); size_t p5=line.find('|',p4+1);
-        if (p1==string::npos||p2==string::npos||p3==string::npos||p4==string::npos||p5==string::npos) continue;
-        string code=line.substr(0,p1); string desc=line.substr(p1+1,p2-p1-1); string pct=line.substr(p2+1,p3-p2-1); string start=line.substr(p3+1,p4-p3-1); string end=line.substr(p4+1,p5-p4-1); string memberOnly=line.substr(p5+1);
-        cout<<idx++<<". "<<code<<" | "<<desc<<" | "<<pct<<"% | "<<start<<" - "<<end<<" | memberOnly:"<<memberOnly<<"\n";
-    }
-}
-
-void editPromo() {
-    Promo promo;
-    string code=inputLine("Kode promo yang diedit: "); if (!promo.promoCodeExists(code)) { cout<<"Kode tidak ditemukan.\n"; return; }
-    ifstream fin(PROMOS_FILE.c_str()); if (!fin) { cout<<"File promo tidak ditemukan.\n"; return; }
-    string all; string line; while (getline(fin,line)) { if (line.empty()) continue; size_t p=line.find('|'); if (p==string::npos) { all+=line+'\n'; continue; } string c=line.substr(0,p); if (c==code) {
-            cout<<"Mengedit promo: "<<code<<"\n";
-            string desc=inputLine("Deskripsi baru: "); string pcts=inputLine("Persentase baru: "); string start=inputLine("Mulai baru (YYYY-MM-DD): "); string end=inputLine("Selesai baru (YYYY-MM-DD): "); string m=inputLine("Hanya untuk member? (y/n): "); string memberOnly=(m=="y"||m=="Y")?"1":"0";
-            all += code + '|' + desc + '|' + pcts + '|' + start + '|' + end + '|' + memberOnly + '\n';
-        } else all += line + '\n'; }
-    fin.close(); ofstream fout(PROMOS_FILE.c_str(), ios::trunc); if (!fout) { cout<<"Gagal menulis file promo.\n"; return; } fout<<all; cout<<"Promo diperbarui.\n";
-}
-
-void deletePromo() {
-    Promo promo;
-    string code=inputLine("Kode promo yang dihapus: "); if (!promo.promoCodeExists(code)) { cout<<"Kode tidak ditemukan.\n"; return; }
-    if (!confirmAction(string("Hapus promo '") + code + "' ?")) return;
-    ifstream fin(PROMOS_FILE.c_str()); string all; string line; while (getline(fin,line)) { if (line.empty()) continue; size_t p=line.find('|'); if (p==string::npos) { all+=line+'\n'; continue; } string c=line.substr(0,p); if (c==code) continue; all+=line+'\n'; } fin.close(); ofstream fout(PROMOS_FILE.c_str(), ios::trunc); if (!fout) { cout<<"Gagal menulis file promo.\n"; return; } fout<<all; cout<<"Promo dihapus.\n";
-}
-
-// applyPromo: returns percent (0.0..100.0). valid set to true when applicable.
-double applyPromo(const string& promoCode, const string& date, bool isMember, bool &valid, string &outPromoCode) {
-    valid = false; outPromoCode.clear(); if (promoCode.empty()) return 0.0;
-    ifstream fin(PROMOS_FILE.c_str()); if (!fin) return 0.0;
-    string line; while (getline(fin,line)) {
-        if (line.empty()) continue;
-        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1); size_t p4=line.find('|',p3+1); size_t p5=line.find('|',p4+1);
-        if (p1==string::npos||p2==string::npos||p3==string::npos||p4==string::npos||p5==string::npos) continue;
-        string code=line.substr(0,p1); string desc=line.substr(p1+1,p2-p1-1); string pcts=line.substr(p2+1,p3-p2-1); string start=line.substr(p3+1,p4-p3-1); string end=line.substr(p4+1,p5-p4-1); string memberOnly=line.substr(p5+1);
-        if (code != promoCode) continue;
-        // check date range
-        if (!start.empty() && date < start) { valid = false; return 0.0; }
-        if (!end.empty() && date > end) { valid = false; return 0.0; }
-        if (memberOnly == "1" && !isMember) { valid = false; return 0.0; }
-        double pct = 0.0; try { pct = stod(pcts); } catch(...) { pct = 0.0; }
-        valid = true; outPromoCode = code; return pct;
-    }
-    return 0.0;
-}
-
 void promoMenu() {
     Promo promo;
     while (true) {
@@ -2040,9 +2017,9 @@ void promoMenu() {
         cout << "5. Kembali\n";
         string c = inputLine("Pilih: ");
         if (c=="1") promo.tambahPromo();
-        else if (c=="2") editPromo();
-        else if (c=="3") deletePromo();
-        else if (c=="4") listPromos();
+        else if (c=="2") promo.editPromo();
+        else if (c=="3") promo.hapusPromo();
+        else if (c=="4") promo.tampilPromo();
         else if (c=="5") break;
         else cout<<"Pilihan tidak dikenali.\n";
     }
@@ -2137,10 +2114,12 @@ bool checkoutCart(const string& curDate) {
 
     // ask for promo code (optional)
     string promoIn = inputLine("Kode promo (kosong jika tidak ada): ");
-    bool promoValid = false; string appliedPromoCode;
+    bool promoValid = false; 
+    string appliedPromoCode;
+    Promo promo;
     double promoPct = 0.0;
     if (!promoIn.empty()) {
-        promoPct = applyPromo(promoIn, curDate, isMember, promoValid, appliedPromoCode);
+        promoPct = promo.applyPromo(promoIn, curDate, isMember, promoValid, appliedPromoCode);
         if (!promoValid) { cout << "Promo tidak valid atau tidak dapat digunakan.\n"; promoIn.clear(); appliedPromoCode.clear(); promoPct = 0.0; }
         else cout << "Promo "<<appliedPromoCode<<" diterapkan: "<<promoPct<<"%\n";
     }
@@ -2527,7 +2506,7 @@ void listAttendanceForEmployee(const string& username) {
 
 // ======== FINANCIAL ANALYSIS FUNCTIONS ========
 
-void monthlySalesReport() {
+void listAttendanceForEmployee() {
     ifstream fin(TRANSACTIONS_FILE.c_str());
     if (!fin) { cout<<"\nBelum ada data transaksi.\n"; return; }
     string line; double totalRevenue=0; int txCount=0; double totalDiscount=0;
