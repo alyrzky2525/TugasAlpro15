@@ -138,10 +138,10 @@ void listAttendanceForEmployee(const string& username);
 // reports & analytics / financial analysis
 void monthlySalesReport();
 void bestSellingAnalysis();
-void dailySalesReport();
+void hitungPenjualanHarian();
 void categorySalesAnalysis();
 void revenueByDateRange();
-void profitMarginAnalysis();
+void rekomendasiRestock();
 void memberSalesAnalysis();
 void financialDashboard();
 void ensureDefaultData();
@@ -1614,7 +1614,43 @@ class LaporanPenjualan{
         int totalTransaksi;
         double totalPendapatan;
     public:
-        void hitungPenjualanHarian() { dailySalesReport(); }
+        void hitungPenjualanHarian() {
+    ifstream fin(TRANSACTIONS_FILE.c_str());
+    if (!fin) { cout<<"\nBelum ada data transaksi.\n"; return; }
+    string line;
+    cout<<"\n========== LAPORAN PENJUALAN HARIAN ==========\n";
+    StringDoubleEntry dailyRevenue[MAX_ENTRIES];
+    int dailyRevenueSize = 0;
+    StringIntEntry dailyCount[MAX_ENTRIES];
+    int dailyCountSize = 0;
+    
+    while (getline(fin,line)) {
+        if (line.empty()) continue;
+        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1);
+        size_t p4=line.find('|',p3+1); size_t p5=line.find('|',p4+1);
+        if (p5==string::npos) continue;
+        string date=line.substr(p1+1,p2-p1-1);
+        int final=0; for (size_t i=p4+1;i<p5;++i) 
+            if (line[i]>='0'&&line[i]<='9') final=final*10+(line[i]-'0');
+        addStringDoubleEntry(dailyRevenue, dailyRevenueSize, date, final);
+        addStringIntEntry(dailyCount, dailyCountSize, date, 1);
+    }
+    fin.close();
+    
+    cout<<"\nRingkasan Penjualan Per Hari:\n";
+    cout<<"-----------------------------------------------\n";
+    cout<<"Tanggal    | Jumlah Transaksi | Total Pendapatan\n";
+    cout<<"-----------------------------------------------\n";
+    
+    double totalAll=0;
+    for (int i = 0; i < dailyRevenueSize; ++i) {
+        cout<<dailyRevenue[i].key<<" | "<<getStringIntValue(dailyCount, dailyCountSize, dailyRevenue[i].key)<<" transaksi | Rp"<<(int)dailyRevenue[i].value<<"\n";
+        totalAll+=dailyRevenue[i].value;
+    }
+    cout<<"-----------------------------------------------\n";
+    cout<<"Total Keseluruhan: Rp"<<(int)totalAll<<"\n";
+    cout<<"========================================\n";
+}
         void hitungPenjualanMingguan() { monthlySalesReport(); }
         void hitungPenjualanBulanan() { monthlySalesReport(); }
         void hitungPenjualanTahunan() { monthlySalesReport(); }
@@ -1632,7 +1668,39 @@ class AnalisisProduk{
     public:
         void hitungBarangTerlaris() { bestSellingAnalysis(); }
         void rankingProduk() { bestSellingAnalysis(); }
-        bool rekomendasiRestock() { profitMarginAnalysis(); return false; }
+        void rekomendasiRestock(){
+    ifstream fprod(PRODUCTS_FILE.c_str());
+    ifstream fin(TRANSACTIONS_FILE.c_str());
+    if (!fprod || !fin) { cout<<"\nFile tidak ditemukan.\n"; 
+    return; 
+}
+    
+    string line;
+    cout<<"\n========== ANALISIS MARGIN KEUNTUNGAN ==========\n";
+    cout<<"Catatan: Perhitungan berdasarkan harga jual produk\n";
+    cout<<"-----------------------------------------------\n";
+    cout<<"ID Produk | Nama Produk | Harga Jual | Margin\n";
+    cout<<"-----------------------------------------------\n";
+    
+    while (getline(fprod,line)) {
+        if (line.empty()) continue;
+        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1);
+        if (p1==string::npos || p2==string::npos || p3==string::npos) continue;
+        
+        string pid=line.substr(0,p1);
+        string pname=line.substr(p1+1,p2-p1-1);
+        int price=0; for (size_t i=p2+1;i<p3;++i) 
+            if (line[i]>='0'&&line[i]<='9') price=price*10+(line[i]-'0');
+        
+        // Assume 40% markup/margin
+        int margin=(price*40)/100;
+        cout<<pid<<" | "<<pname<<" | Rp"<<price<<" | Rp"<<margin<<" (40%)\n";
+    }
+    fprod.close();
+    fin.close();
+    cout<<"-----------------------------------------------\n";
+    cout<<"=============================================\n";
+        }
 
 };
 
@@ -2608,44 +2676,6 @@ void bestSellingAnalysis() {
     cout<<"======================================\n";
 }
 
-void dailySalesReport() {
-    ifstream fin(TRANSACTIONS_FILE.c_str());
-    if (!fin) { cout<<"\nBelum ada data transaksi.\n"; return; }
-    string line;
-    cout<<"\n========== LAPORAN PENJUALAN HARIAN ==========\n";
-    StringDoubleEntry dailyRevenue[MAX_ENTRIES];
-    int dailyRevenueSize = 0;
-    StringIntEntry dailyCount[MAX_ENTRIES];
-    int dailyCountSize = 0;
-    
-    while (getline(fin,line)) {
-        if (line.empty()) continue;
-        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1);
-        size_t p4=line.find('|',p3+1); size_t p5=line.find('|',p4+1);
-        if (p5==string::npos) continue;
-        string date=line.substr(p1+1,p2-p1-1);
-        int final=0; for (size_t i=p4+1;i<p5;++i) 
-            if (line[i]>='0'&&line[i]<='9') final=final*10+(line[i]-'0');
-        addStringDoubleEntry(dailyRevenue, dailyRevenueSize, date, final);
-        addStringIntEntry(dailyCount, dailyCountSize, date, 1);
-    }
-    fin.close();
-    
-    cout<<"\nRingkasan Penjualan Per Hari:\n";
-    cout<<"-----------------------------------------------\n";
-    cout<<"Tanggal    | Jumlah Transaksi | Total Pendapatan\n";
-    cout<<"-----------------------------------------------\n";
-    
-    double totalAll=0;
-    for (int i = 0; i < dailyRevenueSize; ++i) {
-        cout<<dailyRevenue[i].key<<" | "<<getStringIntValue(dailyCount, dailyCountSize, dailyRevenue[i].key)<<" transaksi | Rp"<<(int)dailyRevenue[i].value<<"\n";
-        totalAll+=dailyRevenue[i].value;
-    }
-    cout<<"-----------------------------------------------\n";
-    cout<<"Total Keseluruhan: Rp"<<(int)totalAll<<"\n";
-    cout<<"========================================\n";
-}
-
 void categorySalesAnalysis() {
     ifstream fprod(PRODUCTS_FILE.c_str());
     if (!fprod) { cout<<"\nFile produk tidak ditemukan.\n"; return; }
@@ -2759,38 +2789,6 @@ void revenueByDateRange() {
     cout<<"====================================================\n";
 }
 
-void profitMarginAnalysis() {
-    ifstream fprod(PRODUCTS_FILE.c_str());
-    ifstream fin(TRANSACTIONS_FILE.c_str());
-    if (!fprod || !fin) { cout<<"\nFile tidak ditemukan.\n"; return; }
-    
-    string line;
-    cout<<"\n========== ANALISIS MARGIN KEUNTUNGAN ==========\n";
-    cout<<"Catatan: Perhitungan berdasarkan harga jual produk\n";
-    cout<<"-----------------------------------------------\n";
-    cout<<"ID Produk | Nama Produk | Harga Jual | Margin\n";
-    cout<<"-----------------------------------------------\n";
-    
-    while (getline(fprod,line)) {
-        if (line.empty()) continue;
-        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1);
-        if (p1==string::npos || p2==string::npos || p3==string::npos) continue;
-        
-        string pid=line.substr(0,p1);
-        string pname=line.substr(p1+1,p2-p1-1);
-        int price=0; for (size_t i=p2+1;i<p3;++i) 
-            if (line[i]>='0'&&line[i]<='9') price=price*10+(line[i]-'0');
-        
-        // Assume 40% markup/margin
-        int margin=(price*40)/100;
-        cout<<pid<<" | "<<pname<<" | Rp"<<price<<" | Rp"<<margin<<" (40%)\n";
-    }
-    fprod.close();
-    fin.close();
-    cout<<"-----------------------------------------------\n";
-    cout<<"=============================================\n";
-}
-
 void memberSalesAnalysis() {
     ifstream fin(TRANSACTIONS_FILE.c_str());
     if (!fin) { cout<<"\nBelum ada data transaksi.\n"; return; }
@@ -2851,6 +2849,8 @@ void memberSalesAnalysis() {
 }
 
 void financialDashboard() {
+    LaporanPenjualan harian;
+    AnalisisProduk analisis;
     while (true) {
         cout<<"\n========== DASHBOARD ANALISIS KEUANGAN ==========\n";
         cout<<"1. Laporan Penjualan Bulanan\n";
@@ -2866,10 +2866,10 @@ void financialDashboard() {
         
         if (choice=="1") monthlySalesReport();
         else if (choice=="2") bestSellingAnalysis();
-        else if (choice=="3") dailySalesReport();
+        else if (choice=="3") harian.hitungPenjualanHarian();
         else if (choice=="4") categorySalesAnalysis();
         else if (choice=="5") revenueByDateRange();
-        else if (choice=="6") profitMarginAnalysis();
+        else if (choice=="6") analisis.rekomendasiRestock();
         else if (choice=="7") memberSalesAnalysis();
         else if (choice=="8") break;
         else cout<<"Pilihan tidak dikenali.\n";
