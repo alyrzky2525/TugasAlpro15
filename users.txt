@@ -1,2 +1,2 @@
-auli|123|kasir
 aulia|1234|kasir
+wawa|222|admin
