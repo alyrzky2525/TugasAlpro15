@@ -1569,7 +1569,18 @@ class Shift{
         string tanggalShift;
         string jenisShift;
     public:
-        void tambahShift() { ::addShift(); }
+        void tambahShift() {
+    string date = inputLine("Tanggal (YYYY-MM-DD): "); if (date.empty()) { cout<<"Tanggal kosong.\n"; return; }
+    cout<<"Tipe shift: 1=Opening,2=Middle,3=Closing\n";
+    string s = inputLine("Pilih tipe shift (1/2/3): "); string shiftName;
+    if (s=="1") shiftName="Opening"; else if (s=="2") shiftName="Middle"; else if (s=="3") shiftName="Closing"; else { cout<<"Tipe tidak valid.\n"; return; }
+    string emp = inputLine("Username pegawai: "); if (emp.empty()) { cout<<"Username kosong.\n"; return; }
+    // generate id
+    int id=1; ifstream fin(SHIFTS_FILE.c_str()); string line; while (fin && getline(fin,line)) { if (!line.empty()) id++; } fin.close();
+    ofstream fout(SHIFTS_FILE.c_str(), ios::app); if (!fout) { cout<<"Gagal menulis file shift.\n"; return; }
+    fout << id << '|' << date << '|' << shiftName << '|' << emp << '\n'; fout.close();
+    cout<<"Jadwal shift ditambahkan (ID:"<<id<<").\n";
+}
         void hapusShift() { ::deleteShift(); }
         void editShift() { ::editShift(); }
         void tampilShift() { ::listShifts(); }
@@ -2387,18 +2398,6 @@ void shiftMenu() {
 }
 
 // shifts format: id|date|shift|employee
-void addShift() {
-    string date = inputLine("Tanggal (YYYY-MM-DD): "); if (date.empty()) { cout<<"Tanggal kosong.\n"; return; }
-    cout<<"Tipe shift: 1=Opening,2=Middle,3=Closing\n";
-    string s = inputLine("Pilih tipe shift (1/2/3): "); string shiftName;
-    if (s=="1") shiftName="Opening"; else if (s=="2") shiftName="Middle"; else if (s=="3") shiftName="Closing"; else { cout<<"Tipe tidak valid.\n"; return; }
-    string emp = inputLine("Username pegawai: "); if (emp.empty()) { cout<<"Username kosong.\n"; return; }
-    // generate id
-    int id=1; ifstream fin(SHIFTS_FILE.c_str()); string line; while (fin && getline(fin,line)) { if (!line.empty()) id++; } fin.close();
-    ofstream fout(SHIFTS_FILE.c_str(), ios::app); if (!fout) { cout<<"Gagal menulis file shift.\n"; return; }
-    fout << id << '|' << date << '|' << shiftName << '|' << emp << '\n'; fout.close();
-    cout<<"Jadwal shift ditambahkan (ID:"<<id<<").\n";
-}
 
 void listShifts() {
     ifstream fin(SHIFTS_FILE.c_str()); if (!fin) { cout<<"Belum ada jadwal shift.\n"; return; }
