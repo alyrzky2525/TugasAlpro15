@@ -1542,23 +1542,30 @@ class Produk{
             return found;
         }
 
-        bool productCodeExists(const string& code) {
-        ifstream fin(PRODUCTS_FILE.c_str());
-        if (!fin) return false;
+bool productCodeExists(const string& code) {
+    ifstream fin(PRODUCTS_FILE.c_str());
 
-        string line;
+    if (!fin)
+        return false;
+
+    string line;
+
     while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
         size_t p = line.find('|');
-        if (p == string::npos) continue;
 
-        string c = line.substr(0, p);
+        if (p == string::npos)
+            continue;
 
-        if (c == code)
+        if (line.substr(0, p) == code)
             return true;
     }
 
     return false;
-}   
+} 
 
     bool findProductByCode(const string& code, string& nama, string& kategori, string& harga, string& stok, string& expired) {
     ifstream fin(PRODUCTS_FILE.c_str());
