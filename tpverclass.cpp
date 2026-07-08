@@ -1044,7 +1044,7 @@ void kelolaPromo() {
         void lihatLaporan() {
             menuDashboardKeuangan();
         }
-      void buatPengguna() {
+void buatPengguna() {
     cout << "\n";
     cout << "==================================================\n";
     cout << "              BUAT PENGGUNA BARU\n";
