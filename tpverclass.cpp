@@ -3072,7 +3072,7 @@ bool checkoutCart(const string& curDate) {
         // update stock in allProducts string
         int newStock = stokVal - needQty;
         string newStockStr = to_string(newStock);
-       allProducts.replace(p6 + 1, p7 - p6 - 1, newStockStr);
+        allProducts.replace(p6 + 1, p7 - p6 - 1, newStockStr);
         // continue to next item
     }
 
