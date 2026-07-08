@@ -755,7 +755,8 @@ void dashboardAdmin(const string& username) {
 
     cout << "Produk berhasil ditambahkan.\n";
 }
-        void editProduk() {
+void editProduk() {
+
     string kode = inputLine("Masukkan kode produk yang akan diedit: ");
 
     if (!productCodeExists(kode)) {
@@ -769,31 +770,115 @@ void dashboardAdmin(const string& username) {
     string line;
 
     while (getline(fin, line)) {
-        if (line.empty()) {
-            continue;
-        }
+
+        if (line.empty()) continue;
 
         size_t p = line.find('|');
 
-        if (p == string::npos) {
-            continue;
-        }
+        if (p == string::npos) continue;
 
         string c = line.substr(0, p);
 
         if (c == kode) {
-            cout << "Mengedit produk: " << kode << "\n";
 
-            string nama = inputLine("Nama baru: ");
-            string kategori = inputLine("Kategori baru: ");
-            string harga = inputLine("Harga baru: ");
-            string stok = inputLine("Stok baru: ");
-            string expired = inputLine("Expired baru (YYYY-MM-DD): ");
+            cout << "\n=== Edit Produk ===\n";
 
-            all += kode + '|' + nama + '|' + kategori + '|' + harga + '|' + stok + '|' + expired + '\n';
-        } else {
-            all += line + '\n';
+            string nama = inputLine("Nama Produk : ");
+
+            // ==========================
+            // PILIH BRAND
+            // ==========================
+            cout << "\nPilih Brand\n";
+            cout << "1. Wardah\n";
+            cout << "2. Emina\n";
+            cout << "3. Skintific\n";
+            cout << "4. Somethinc\n";
+            cout << "5. Garnier\n";
+            cout << "6. Azarine\n";
+            cout << "7. Maybelline\n";
+            cout << "8. Implora\n";
+            cout << "9. Pinkflash\n";
+            cout << "10. Scarlett\n";
+            cout << "11. Hada Labo\n";
+            cout << "12. Nivea\n";
+            cout << "13. Vaseline\n";
+            cout << "14. HMNS\n";
+            cout << "15. Lainnya\n";
+
+            string pilihBrand = inputLine("Pilihan : ");
+            string brand;
+
+            if (pilihBrand=="1") brand="Wardah";
+            else if (pilihBrand=="2") brand="Emina";
+            else if (pilihBrand=="3") brand="Skintific";
+            else if (pilihBrand=="4") brand="Somethinc";
+            else if (pilihBrand=="5") brand="Garnier";
+            else if (pilihBrand=="6") brand="Azarine";
+            else if (pilihBrand=="7") brand="Maybelline";
+            else if (pilihBrand=="8") brand="Implora";
+            else if (pilihBrand=="9") brand="Pinkflash";
+            else if (pilihBrand=="10") brand="Scarlett";
+            else if (pilihBrand=="11") brand="Hada Labo";
+            else if (pilihBrand=="12") brand="Nivea";
+            else if (pilihBrand=="13") brand="Vaseline";
+            else if (pilihBrand=="14") brand="HMNS";
+            else if (pilihBrand=="15")
+                brand = inputLine("Masukkan Brand : ");
+            else {
+                cout<<"Brand tidak valid.\n";
+                return;
+            }
+
+            // ==========================
+            // PILIH KATEGORI
+            // ==========================
+            cout << "\nPilih Kategori\n";
+            cout << "1. Skincare\n";
+            cout << "2. Makeup\n";
+            cout << "3. Body Care\n";
+            cout << "4. Hair Care\n";
+            cout << "5. Fragrance\n";
+            cout << "6. Beauty Tools\n";
+            cout << "7. Personal Care\n";
+
+            string pilihKategori = inputLine("Pilihan : ");
+            string kategori;
+
+            if (pilihKategori=="1") kategori="Skincare";
+            else if (pilihKategori=="2") kategori="Makeup";
+            else if (pilihKategori=="3") kategori="Body Care";
+            else if (pilihKategori=="4") kategori="Hair Care";
+            else if (pilihKategori=="5") kategori="Fragrance";
+            else if (pilihKategori=="6") kategori="Beauty Tools";
+            else if (pilihKategori=="7") kategori="Personal Care";
+            else {
+                cout<<"Kategori tidak valid.\n";
+                return;
+            }
+
+            string hargaBeli = inputLine("Harga Beli : ");
+            string hargaJual = inputLine("Harga Jual : ");
+            string stok = inputLine("Stok : ");
+            string minimalStok = inputLine("Minimal Stok : ");
+            string expired = inputLine("Expired (YYYY-MM-DD) : ");
+
+            all += kode + "|" +
+                   nama + "|" +
+                   brand + "|" +
+                   kategori + "|" +
+                   hargaBeli + "|" +
+                   hargaJual + "|" +
+                   stok + "|" +
+                   minimalStok + "|" +
+                   expired + "\n";
+
         }
+        else {
+
+            all += line + "\n";
+
+        }
+
     }
 
     fin.close();
@@ -801,13 +886,17 @@ void dashboardAdmin(const string& username) {
     ofstream fout(PRODUCTS_FILE.c_str(), ios::trunc);
 
     if (!fout) {
+
         cout << "Gagal menulis file produk.\n";
         return;
+
     }
 
     fout << all;
 
-    cout << "Produk diperbarui.\n";
+    fout.close();
+
+    cout << "\nProduk berhasil diperbarui.\n";
 }
         void hapusProduk() {
     string kode = inputLine("Masukkan kode produk yang akan dihapus: ");
@@ -1049,69 +1138,221 @@ class Produk{
         string tanggalExpired;
 
     public:
-        void tampilProduk() {
-            ifstream fin(PRODUCTS_FILE.c_str());
-            if (!fin) {
-                cout << "Belum ada produk atau file tidak tersedia.\n";
-                return;
-            }
+      void tampilProduk() {
 
-            string line;
-            int idx = 1;
+    ifstream fin(PRODUCTS_FILE.c_str());
 
-            cout << "\nDaftar produk:\n";
+    if (!fin) {
+        cout << "Belum ada produk atau file tidak tersedia.\n";
+        return;
+    }
 
-            while (getline(fin, line)) {
-                if (line.empty()) continue;
+    string line;
 
-                size_t p1 = line.find('|');
-                size_t p2 = line.find('|', p1 + 1);
-                size_t p3 = line.find('|', p2 + 1);
-                size_t p4 = line.find('|', p3 + 1);
-                size_t p5 = line.find('|', p4 + 1);
+    cout << "\n===================================================================================================================================\n";
 
-                if (p1 == string::npos ||
-                    p2 == string::npos ||
-                    p3 == string::npos ||
-                    p4 == string::npos ||
-                    p5 == string::npos)
-                    continue;
+    cout << left
+         << setw(4)  << "No"
+         << setw(10) << "Kode"
+         << setw(28) << "Nama Produk"
+         << setw(18) << "Brand"
+         << setw(16) << "Kategori"
+         << setw(13) << "Harga Beli"
+         << setw(13) << "Harga Jual"
+         << setw(12) << "Margin"
+         << setw(8)  << "Stok"
+         << setw(12) << "Min Stok"
+         << setw(15) << "Expired"
+         << endl;
 
-                string kodeProduk = line.substr(0, p1);
-                string namaProduk = line.substr(p1 + 1, p2 - p1 - 1);
-                string kategori = line.substr(p2 + 1, p3 - p2 - 1);
-                string harga = line.substr(p3 + 1, p4 - p3 - 1);
-                string stok = line.substr(p4 + 1, p5 - p4 - 1);
-                string tanggalExpired = line.substr(p5 + 1);
+    cout << "===================================================================================================================================\n";
 
-                cout << idx++ << ". "
-                     << kodeProduk << " | "
-                     << namaProduk << " | "
-                     << kategori << " | Rp"
-                     << harga << " | stok: "
-                     << stok << " | exp: "
-                     << tanggalExpired << endl;
-            }
+    int no = 1;
 
-            if (idx == 1) {
-                cout << "Belum ada produk.\n";
-            }
-        }
+    while (getline(fin, line)) {
 
-        void tambahProduk() {
-            string kode = inputLine("Kode produk: ");
-            if (kode.empty()) { cout << "Kode tidak boleh kosong.\n"; return; }
-            if (productCodeExists(kode)) { cout << "Kode sudah ada.\n"; return; }
-            string nama = inputLine("Nama produk: ");
-            string kategori = inputLine("Kategori: ");
-            string harga = inputLine("Harga: ");
-            string stok = inputLine("Stok: ");
-            string expired = inputLine("Expired (YYYY-MM-DD): ");
-            ofstream fout(PRODUCTS_FILE.c_str(), ios::app);
-            if (!fout) { cout << "Gagal menulis file produk.\n"; return; }
-            fout << kode << '|' << nama << '|' << kategori << '|' << harga << '|' << stok << '|' << expired << '\n';
-            cout << "Produk ditambahkan.\n";
-        }
+        if (line.empty()) continue;
+
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+        size_t p4 = line.find('|', p3 + 1);
+        size_t p5 = line.find('|', p4 + 1);
+        size_t p6 = line.find('|', p5 + 1);
+        size_t p7 = line.find('|', p6 + 1);
+        size_t p8 = line.find('|', p7 + 1);
+
+        if (p1==string::npos||p2==string::npos||p3==string::npos||
+            p4==string::npos||p5==string::npos||p6==string::npos||
+            p7==string::npos||p8==string::npos)
+            continue;
+
+        string kode       = line.substr(0,p1);
+        string nama       = line.substr(p1+1,p2-p1-1);
+        string brand      = line.substr(p2+1,p3-p2-1);
+        string kategori   = line.substr(p3+1,p4-p3-1);
+        string hargaBeli  = line.substr(p4+1,p5-p4-1);
+        string hargaJual  = line.substr(p5+1,p6-p5-1);
+        string stok       = line.substr(p6+1,p7-p6-1);
+        string minStok    = line.substr(p7+1,p8-p7-1);
+        string expired    = line.substr(p8+1);
+
+        int stokInt = atoi(stok.c_str());
+        int minInt = atoi(minStok.c_str());
+
+        int beli = atoi(hargaBeli.c_str());
+        int jual = atoi(hargaJual.c_str());
+
+        int margin = jual - beli;
+
+        string status;
+
+        if (stokInt < minInt)
+            status = "RESTOCK";
+        else if (stokInt == minInt)
+            status = "MENIPIS";
+        else
+            status = "AMAN";
+
+        cout << left
+            << setw(4)  << no++
+            << setw(10) << kode
+            << setw(28) << nama
+            << setw(18) << brand
+            << setw(16) << kategori
+            << setw(13) << ("Rp"+hargaBeli)
+            << setw(13) << ("Rp"+hargaJual)
+            << setw(12) << ("Rp"+to_string(margin))
+            << setw(8)  << stok
+            << setw(12) << minStok
+            << setw(15) << status
+            << setw(15) << expired
+            << endl;
+    }
+
+    cout << "===================================================================================================================================\n";
+
+    fin.close();
+}
+
+      void tambahProduk() {
+
+    // Generate kode otomatis
+    int nomor = 1;
+    ifstream fin(PRODUCTS_FILE.c_str());
+    string line;
+    while (getline(fin, line)) {
+        if (!line.empty())
+            nomor++;
+    }
+    fin.close();
+
+    string kode = "P";
+    if (nomor < 10) kode += "000";
+    else if (nomor < 100) kode += "00";
+    else if (nomor < 1000) kode += "0";
+    kode += to_string(nomor);
+
+    cout << "\nKode Produk : " << kode << " (otomatis)\n";
+
+    string nama = inputLine("Nama Produk : ");
+
+    // =======================
+    // BRAND
+    // =======================
+    cout << "\nPilih Brand\n";
+    cout << "1. Wardah\n";
+    cout << "2. Emina\n";
+    cout << "3. Skintific\n";
+    cout << "4. Somethinc\n";
+    cout << "5. Garnier\n";
+    cout << "6. Azarine\n";
+    cout << "7. Maybelline\n";
+    cout << "8. Implora\n";
+    cout << "9. Pinkflash\n";
+    cout << "10. Scarlett\n";
+    cout << "11. Hada Labo\n";
+    cout << "12. Nivea\n";
+    cout << "13. Vaseline\n";
+    cout << "14. HMNS\n";
+    cout << "15. Lainnya\n";
+
+    string pilihBrand = inputLine("Pilihan : ");
+    string brand;
+
+    if (pilihBrand == "1") brand = "Wardah";
+    else if (pilihBrand == "2") brand = "Emina";
+    else if (pilihBrand == "3") brand = "Skintific";
+    else if (pilihBrand == "4") brand = "Somethinc";
+    else if (pilihBrand == "5") brand = "Garnier";
+    else if (pilihBrand == "6") brand = "Azarine";
+    else if (pilihBrand == "7") brand = "Maybelline";
+    else if (pilihBrand == "8") brand = "Implora";
+    else if (pilihBrand == "9") brand = "Pinkflash";
+    else if (pilihBrand == "10") brand = "Scarlett";
+    else if (pilihBrand == "11") brand = "Hada Labo";
+    else if (pilihBrand == "12") brand = "Nivea";
+    else if (pilihBrand == "13") brand = "Vaseline";
+    else if (pilihBrand == "14") brand = "HMNS";
+    else if (pilihBrand == "15")
+        brand = inputLine("Masukkan Brand : ");
+    else {
+        cout << "Pilihan brand tidak valid.\n";
+        return;
+    }
+
+    // KATEGORI
+    cout << "\nPilih Kategori\n";
+    cout << "1. Skincare\n";
+    cout << "2. Makeup\n";
+    cout << "3. Body Care\n";
+    cout << "4. Hair Care\n";
+    cout << "5. Fragrance\n";
+    cout << "6. Beauty Tools\n";
+    cout << "7. Personal Care\n";
+
+    string pilihKategori = inputLine("Pilihan : ");
+    string kategori;
+
+    if (pilihKategori == "1") kategori = "Skincare";
+    else if (pilihKategori == "2") kategori = "Makeup";
+    else if (pilihKategori == "3") kategori = "Body Care";
+    else if (pilihKategori == "4") kategori = "Hair Care";
+    else if (pilihKategori == "5") kategori = "Fragrance";
+    else if (pilihKategori == "6") kategori = "Beauty Tools";
+    else if (pilihKategori == "7") kategori = "Personal Care";
+    else {
+        cout << "Kategori tidak valid.\n";
+        return;
+    }
+
+    string hargaBeli = inputLine("Harga Beli : ");
+    string hargaJual = inputLine("Harga Jual : ");
+    string stok = inputLine("Stok : ");
+    string minimalStok = inputLine("Minimal Stok : ");
+    string expired = inputLine("Expired (YYYY-MM-DD) : ");
+
+    ofstream fout(PRODUCTS_FILE.c_str(), ios::app);
+
+    if (!fout) {
+        cout << "Gagal menulis file produk.\n";
+        return;
+    }
+
+    fout << kode << '|'
+         << nama << '|'
+         << brand << '|'
+         << kategori << '|'
+         << hargaBeli << '|'
+         << hargaJual << '|'
+         << stok << '|'
+         << minimalStok << '|'
+         << expired << '\n';
+
+    fout.close();
+
+    cout << "\nProduk berhasil ditambahkan.\n";
+}
 
    void editProduk() {
     string kode = inputLine("Masukkan kode produk yang akan diedit: ");
@@ -1711,69 +1952,106 @@ double applyPromo(const string& promoCode, const string& date, bool isMember, bo
 class Keranjang{
 public:
    
-    bool tambahBarang(const string& code, int qty) {
-        Produk produk;
-        if (qty <= 0) return false;
-        if (!produk.productCodeExists(code))
-            return false;
+bool tambahBarang(const string& code, int qty) {
+    Produk produk;
 
-        ifstream fin(PRODUCTS_FILE.c_str());
-        if (!fin) return false;
+    if (qty <= 0)
+        return false;
 
-        string line;
-        while (getline(fin, line)) {
-            if (line.empty()) continue;
+    if (!produk.productCodeExists(code))
+        return false;
 
-            size_t p1 = line.find('|');
-            if (p1 == string::npos) continue;
+    ifstream fin(PRODUCTS_FILE.c_str());
+    if (!fin)
+        return false;
 
-            string kode = line.substr(0, p1);
-            if (kode != code) continue;
+    string line;
 
-            size_t p2 = line.find('|', p1 + 1);
-            size_t p3 = line.find('|', p2 + 1);
-            size_t p4 = line.find('|', p3 + 1);
-            size_t p5 = line.find('|', p4 + 1);
+    while (getline(fin, line)) {
+        if (line.empty())
+            continue;
 
-            if (p2 == string::npos || p3 == string::npos ||
-                p4 == string::npos || p5 == string::npos) continue;
+        size_t p1 = line.find('|');
+        if (p1 == string::npos)
+            continue;
 
-            string nama = line.substr(p1 + 1, p2 - p1 - 1);
-            string kategori = line.substr(p2 + 1, p3 - p2 - 1);
-            string harga = line.substr(p3 + 1, p4 - p3 - 1);
-            string stok = line.substr(p4 + 1, p5 - p4 - 1);
-            string expired = line.substr(p5 + 1);
+        string kode = line.substr(0, p1);
 
-            double price = 0.0;
-            try {
-                price = stod(harga);
-            } catch (...) {
-                price = 0.0;
-            }
+        if (kode != code)
+            continue;
 
-            // cek apakah sudah ada di cart
-            for (int i = 0; i < cartCount; ++i) {
-                if (cartCode[i] == code) {
-                    cartQty[i] += qty;
-                    cartSubtotal[i] = cartQty[i] * cartPrice[i];
-                    return true;
-                }
-            }
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+        size_t p4 = line.find('|', p3 + 1);
+        size_t p5 = line.find('|', p4 + 1);
+        size_t p6 = line.find('|', p5 + 1);
+        size_t p7 = line.find('|', p6 + 1);
+        size_t p8 = line.find('|', p7 + 1);
 
-            if (cartCount >= MAX_CART) return false;
+        if (p2 == string::npos || p3 == string::npos ||
+            p4 == string::npos || p5 == string::npos ||
+            p6 == string::npos || p7 == string::npos ||
+            p8 == string::npos)
+            continue;
 
-            cartCode[cartCount] = code;
-            cartName[cartCount] = nama;
-            cartPrice[cartCount] = price;   // FIX DI SINI
-            cartQty[cartCount] = qty;
-            cartSubtotal[cartCount] = qty * price;
+        string nama = line.substr(p1 + 1, p2 - p1 - 1);
+        string brand = line.substr(p2 + 1, p3 - p2 - 1);
+        string kategori = line.substr(p3 + 1, p4 - p3 - 1);
+        string hargaBeli = line.substr(p4 + 1, p5 - p4 - 1);
+        string hargaJual = line.substr(p5 + 1, p6 - p5 - 1);
+        string stok = line.substr(p6 + 1, p7 - p6 - 1);
+        string minStok = line.substr(p7 + 1, p8 - p7 - 1);
+        string expired = line.substr(p8 + 1);
 
-            cartCount++;
-            return true;
+        double price = 0.0;
+        try {
+            price = stod(hargaJual);
+        } catch (...) {
+            price = 0.0;
         }
 
-        return false;
+        int stokProduk = atoi(stok.c_str());
+
+        // Cek stok jika produk baru ditambahkan
+        if (qty > stokProduk) {
+            cout << "Stok tidak mencukupi.\n";
+            return false;
+        }
+
+        // Jika produk sudah ada di keranjang
+        for (int i = 0; i < cartCount; ++i) {
+            if (cartCode[i] == code) {
+
+                if (cartQty[i] + qty > stokProduk) {
+                    cout << "Stok tidak mencukupi.\n";
+                    return false;
+                }
+
+                cartQty[i] += qty;
+                cartSubtotal[i] = cartQty[i] * cartPrice[i];
+
+                return true;
+            }
+        }
+
+        if (cartCount >= MAX_CART) {
+            cout << "Keranjang sudah penuh.\n";
+            return false;
+        }
+
+        cartCode[cartCount] = code;
+        cartName[cartCount] = nama;
+        cartPrice[cartCount] = price;
+        cartQty[cartCount] = qty;
+        cartSubtotal[cartCount] = qty * price;
+
+        cartCount++;
+
+        return true;
     }
+
+    return false;
+}
 
   bool hapusBarang(int idx) {
     if (idx < 1 || idx > cartCount) return false;
@@ -1894,6 +2172,17 @@ class Transaksi{
 
     double finalAmount = total - discount;
 
+    // Jika promo kosong
+    string promo = promoCode;
+    if (promo.empty())
+        promo = "-";
+
+    // Jika bukan member
+    string namaMember = member;
+    if (namaMember.empty())
+        namaMember = "Non-Member";
+
+    // Simpan transaksi
     fout << id << '|'
          << date << '|'
          << (int)total << '|'
@@ -1901,20 +2190,25 @@ class Transaksi{
          << (int)finalAmount << '|'
          << (int)paid << '|'
          << (int)change << '|'
-         << promoCode << '|'
-         << member << '|'
+         << promo << '|'
+         << namaMember << '|'
          << items
          << endl;
 
-    if (!member.empty()) {
+    fout.close();
+
+    // Simpan riwayat belanja hanya untuk member
+    if (namaMember != "Non-Member") {
         ofstream fh(MEMBER_HISTORY_FILE.c_str(), ios::app);
 
         if (fh) {
-            fh << member << '|'
+            fh << namaMember << '|'
                << id << '|'
                << date << '|'
                << (int)finalAmount
                << endl;
+
+            fh.close();
         }
     }
 }
@@ -2750,17 +3044,35 @@ bool checkoutCart(const string& curDate) {
         size_t p3 = allProducts.find('|', p2 + 1);
         size_t p4 = allProducts.find('|', p3 + 1);
         size_t p5 = allProducts.find('|', p4 + 1);
-        if (p2==string::npos||p3==string::npos||p4==string::npos||p5==string::npos) { cout << "Format file produk rusak.\n"; return false; }
-        string stokStr = allProducts.substr(p4 + 1, p5 - (p4 + 1));
-        size_t nlpos = allProducts.find('\n', p5 + 1);
-        string expired = (nlpos==string::npos) ? allProducts.substr(p5 + 1) : allProducts.substr(p5 + 1, nlpos - (p5 + 1));
+        size_t p6 = allProducts.find('|', p5 + 1);
+        size_t p7 = allProducts.find('|', p6 + 1);
+        size_t p8 = allProducts.find('|', p7 + 1);
+
+        if (p2==string::npos || p3==string::npos ||
+            p4==string::npos || p5==string::npos ||
+            p6==string::npos || p7==string::npos ||
+            p8==string::npos) {
+            cout << "Format file produk rusak.\n";
+            return false;
+        }
+
+        string stokStr = allProducts.substr(p6 + 1, p7 - p6 - 1);
+
+        size_t nlpos = allProducts.find('\n', p8 + 1);
+
+        string expired;
+
+        if (nlpos == string::npos)
+            expired = allProducts.substr(p8 + 1);
+        else
+            expired = allProducts.substr(p8 + 1, nlpos - p8 - 1);
         int stokVal = 0; for (size_t i=0;i<stokStr.size();++i) if (stokStr[i]>='0'&&stokStr[i]<='9') stokVal = stokVal*10 + (stokStr[i]-'0');
         if (!curDate.empty() && isExpired(expired, curDate)) { cout << "Produk " << code << " sudah expired/tidak layak jual.\n"; return false; }
         if (stokVal < needQty) { cout << "Stok tidak cukup untuk produk " << code << ". (butuh " << needQty << ", tersedia " << stokVal << ")\n"; return false; }
         // update stock in allProducts string
         int newStock = stokVal - needQty;
         string newStockStr = to_string(newStock);
-        allProducts.replace(p4 + 1, p5 - (p4 + 1), newStockStr);
+       allProducts.replace(p6 + 1, p7 - p6 - 1, newStockStr);
         // continue to next item
     }
 
@@ -3397,61 +3709,106 @@ void laporanPendapatanPerPeriode() {
 
 void analisisPenjualanMember() {
     ifstream fin(TRANSACTIONS_FILE.c_str());
-    if (!fin) { cout<<"\nBelum ada data transaksi.\n"; return; }
-    
+    if (!fin) {
+        cout << "\nBelum ada data transaksi.\n";
+        return;
+    }
+
     string line;
     MemberSummary memberRevenue[MAX_ENTRIES];
     int memberRevenueSize = 0;
-    double nonMemberRevenue=0;
-    int nonMemberCount=0;
-    
-    while (getline(fin,line)) {
+
+    double nonMemberRevenue = 0;
+    int nonMemberCount = 0;
+
+    while (getline(fin, line)) {
         if (line.empty()) continue;
-        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1);
-        size_t p4=line.find('|',p3+1); size_t p5=line.find('|',p4+1); size_t p6=line.find('|',p5+1);
-        size_t p7=line.find('|',p6+1); size_t p8=line.find('|',p7+1);
-        if (p8==string::npos) continue;
-        
-        int final=0; for (size_t i=p4+1;i<p5;++i) 
-            if (line[i]>='0'&&line[i]<='9') final=final*10+(line[i]-'0');
-        string member=line.substr(p8+1);
-        
-        if (member=="Non-Member") {
-            nonMemberRevenue+=final;
+
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+        size_t p4 = line.find('|', p3 + 1);
+        size_t p5 = line.find('|', p4 + 1);
+        size_t p6 = line.find('|', p5 + 1);
+        size_t p7 = line.find('|', p6 + 1);
+        size_t p8 = line.find('|', p7 + 1);
+        size_t p9 = line.find('|', p8 + 1);
+
+        if (p9 == string::npos) continue;
+
+        int final = 0;
+        for (size_t i = p4 + 1; i < p5; ++i)
+            if (line[i] >= '0' && line[i] <= '9')
+                final = final * 10 + (line[i] - '0');
+
+        string member = line.substr(p8 + 1, p9 - p8 - 1);
+
+        if (member.empty() || member == "Non-Member") {
+            nonMemberRevenue += final;
             nonMemberCount++;
-        } else {
+        }
+        else {
             int idx = -1;
-            for (int i = 0; i < memberRevenueSize; ++i) {
+
+            for (int i = 0; i < memberRevenueSize; i++) {
                 if (memberRevenue[i].key == member) {
                     idx = i;
                     break;
                 }
             }
-            if (idx >= 0) {
-                memberRevenue[idx].revenue += final;
-                memberRevenue[idx].count++;
-            } else {
+
+            if (idx == -1) {
                 memberRevenue[memberRevenueSize].key = member;
                 memberRevenue[memberRevenueSize].revenue = final;
                 memberRevenue[memberRevenueSize].count = 1;
-                ++memberRevenueSize;
+                memberRevenueSize++;
+            }
+            else {
+                memberRevenue[idx].revenue += final;
+                memberRevenue[idx].count++;
             }
         }
     }
+
     fin.close();
-    
-    cout<<"\n========== ANALISIS PENJUALAN PER MEMBER ==========\n";
-    cout<<"Member | Jumlah Transaksi | Total Pendapatan\n";
-    cout<<"---------------------------------------------------\n";
-    
-    for (int i = 0; i < memberRevenueSize; ++i) {
-        cout<<memberRevenue[i].key<<" | "<<memberRevenue[i].count<<" | Rp"<<(int)memberRevenue[i].revenue<<"\n";
+
+    cout << "\n========== ANALISIS PENJUALAN MEMBER ==========\n";
+    cout << "Nama Member | Jumlah Transaksi | Total Pendapatan\n";
+    cout << "-------------------------------------------------\n";
+
+    double totalMemberRevenue = 0;
+    int totalMemberCount = 0;
+
+    for (int i = 0; i < memberRevenueSize; i++) {
+        cout << memberRevenue[i].key
+             << " | "
+             << memberRevenue[i].count
+             << " | Rp"
+             << (int)memberRevenue[i].revenue
+             << endl;
+
+        totalMemberRevenue += memberRevenue[i].revenue;
+        totalMemberCount += memberRevenue[i].count;
     }
-    cout<<"\nPenjualan Non-Member: "<<nonMemberCount<<" transaksi, Rp"<<(int)nonMemberRevenue<<"\n";
-    double totalAllMember=0;
-    for (int i = 0; i < memberRevenueSize; ++i) totalAllMember+=memberRevenue[i].revenue;
-    cout<<"Total: Rp"<<(int)(nonMemberRevenue+totalAllMember)<<" (semua member & non-member)\n";
-    cout<<"====================================================\n";
+
+    cout << "-------------------------------------------------\n";
+    cout << "Total Transaksi Member : " << totalMemberCount << endl;
+    cout << "Total Pendapatan Member: Rp" << (int)totalMemberRevenue << endl;
+
+    cout << "\n========== PENJUALAN NON-MEMBER ==========\n";
+    cout << "Total Transaksi : " << nonMemberCount << endl;
+    cout << "Total Pendapatan: Rp" << (int)nonMemberRevenue << endl;
+
+    cout << "\n========== KESELURUHAN ==========\n";
+    cout << "Total Seluruh Transaksi : "
+         << totalMemberCount + nonMemberCount
+         << endl;
+
+    cout << "Total Seluruh Pendapatan : Rp"
+         << (int)(totalMemberRevenue + nonMemberRevenue)
+         << endl;
+
+    cout << "==========================================\n";
 }
 
 void menuDashboardKeuangan() {
