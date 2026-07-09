@@ -119,6 +119,7 @@ void editProduct();
 void deleteProduct();
 void addCategory();
 void daftarKategori();
+string toLowerCase(string text);
 // promos
 bool promoCodeExists(const string& code);
 void tampilPromo();
@@ -1454,61 +1455,94 @@ class Produk{
             cout << "Produk dihapus.\n";
         }
 
-        void cariProduk(const string& q) {
-            ifstream fin(PRODUCTS_FILE.c_str());
-            if (!fin) {
-                cout << "File produk tidak ditemukan.\n";
-                return;
-            }
+void cariProduk(const string& q) {
+    ifstream fin(PRODUCTS_FILE.c_str());
 
-            string line;
-            int ditemukan = 0;
+    if (!fin) {
+        cout << "File produk tidak ditemukan.\n";
+        return;
+    }
 
-            cout << "\nHasil pencarian untuk '" << q << "':\n";
+    string line;
+    int ditemukan = 0;
 
-            while (getline(fin, line)) {
-                if (line.empty()) continue;
+    cout << "\n================ HASIL PENCARIAN ================\n";
+    cout << "Keyword : " << q << "\n\n";
 
-                size_t p1 = line.find('|');
-                size_t p2 = line.find('|', p1 + 1);
-                size_t p3 = line.find('|', p2 + 1);
-                size_t p4 = line.find('|', p3 + 1);
-                size_t p5 = line.find('|', p4 + 1);
+    string keyword = toLowerCase(q);
 
-                if (p1 == string::npos ||
-                    p2 == string::npos ||
-                    p3 == string::npos ||
-                    p4 == string::npos ||
-                    p5 == string::npos)
-                    continue;
+    cout << left
+         << setw(8)  << "Kode"
+         << setw(22) << "Nama"
+         << setw(15) << "Brand"
+         << setw(15) << "Kategori"
+         << setw(12) << "Harga"
+         << setw(8)  << "Stok"
+         << "Expired\n";
 
-                string kodeProduk = line.substr(0, p1);
-                string namaProduk = line.substr(p1 + 1, p2 - p1 - 1);
-                string kategori = line.substr(p2 + 1, p3 - p2 - 1);
-                string harga = line.substr(p3 + 1, p4 - p3 - 1);
-                string stok = line.substr(p4 + 1, p5 - p4 - 1);
-                string tanggalExpired = line.substr(p5 + 1);
+    cout << "--------------------------------------------------------------------------\n";
 
-                if (kodeProduk.find(q) != string::npos ||
-                    namaProduk.find(q) != string::npos ||
-                    kategori.find(q) != string::npos) {
+while (getline(fin, line)) {
 
-                    cout << "- "
-                         << kodeProduk << " | "
-                         << namaProduk << " | "
-                         << kategori << " | Rp"
-                         << harga << " | stok:"
-                         << stok << " | exp:"
-                         << tanggalExpired << endl;
+    if (line.empty())
+        continue;
 
-                    ditemukan++;
-                }
-            }
+    size_t p1 = line.find('|');
+    size_t p2 = line.find('|', p1 + 1);
+    size_t p3 = line.find('|', p2 + 1);
+    size_t p4 = line.find('|', p3 + 1);
+    size_t p5 = line.find('|', p4 + 1);
+    size_t p6 = line.find('|', p5 + 1);
+    size_t p7 = line.find('|', p6 + 1);
+    size_t p8 = line.find('|', p7 + 1);
 
-            if (!ditemukan) {
-                cout << "Tidak ditemukan produk yang cocok.\n";
-            }
-        }
+    if (p1 == string::npos || p2 == string::npos || p3 == string::npos ||
+        p4 == string::npos || p5 == string::npos || p6 == string::npos ||
+        p7 == string::npos || p8 == string::npos)
+        continue;
+
+    string kode      = line.substr(0, p1);
+    string nama      = line.substr(p1 + 1, p2 - p1 - 1);
+    string brand     = line.substr(p2 + 1, p3 - p2 - 1);
+    string kategori  = line.substr(p3 + 1, p4 - p3 - 1);
+
+    string hargaJual = line.substr(p5 + 1, p6 - p5 - 1);
+    string stok      = line.substr(p6 + 1, p7 - p6 - 1);
+    string expired   = line.substr(p8 + 1);
+
+    // Pencarian tanpa membedakan huruf besar/kecil
+    string kodeCari      = toLowerCase(kode);
+    string namaCari      = toLowerCase(nama);
+    string brandCari     = toLowerCase(brand);
+    string kategoriCari  = toLowerCase(kategori);
+
+    if (kodeCari.find(keyword) != string::npos ||
+        namaCari.find(keyword) != string::npos ||
+        brandCari.find(keyword) != string::npos ||
+        kategoriCari.find(keyword) != string::npos) {
+
+        cout << left
+             << setw(8)  << kode
+             << setw(22) << nama
+             << setw(15) << brand
+             << setw(15) << kategori
+             << setw(12) << ("Rp" + hargaJual)
+             << setw(8)  << stok
+             << expired
+             << endl;
+
+        ditemukan++;
+    }
+}
+
+    fin.close();
+
+    if (ditemukan == 0) {
+        cout << "\nProduk tidak ditemukan.\n";
+    }
+
+    cout << "=============================================================\n";
+}
 
         bool cekExpired() {
             string d = inputLine("Tampilkan produk yang expired sampai tanggal (YYYY-MM-DD):");
@@ -2680,6 +2714,14 @@ bool findProductByCode(const string& code, string& nama, string& kategori, strin
     return false;
 }
 
+string toLowerCase(string text) {
+    for (size_t i = 0; i < text.length(); i++) {
+        if (text[i] >= 'A' && text[i] <= 'Z') {
+            text[i] = text[i] - 'A' + 'a';
+        }
+    }
+    return text;
+}
 
 bool memberExists(const string& uname) {
     ifstream fin(MEMBERS_FILE.c_str()); if (!fin) return false;
