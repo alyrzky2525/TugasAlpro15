@@ -3488,6 +3488,7 @@ void listTransactions() {
 }
 
 void viewTransactionDetails(int id) {
+
     ifstream fin(TRANSACTIONS_FILE.c_str());
 
     if (!fin) {
@@ -3499,16 +3500,19 @@ void viewTransactionDetails(int id) {
     bool found = false;
 
     while (getline(fin, line)) {
+
         if (line.empty())
             continue;
 
         size_t p1 = line.find('|');
+
         if (p1 == string::npos)
             continue;
 
         string sid = line.substr(0, p1);
 
         int iid = 0;
+
         for (size_t i = 0; i < sid.size(); ++i) {
             if (sid[i] >= '0' && sid[i] <= '9')
                 iid = iid * 10 + (sid[i] - '0');
@@ -3529,54 +3533,99 @@ void viewTransactionDetails(int id) {
         size_t p8 = line.find('|', p7 + 1);
         size_t p9 = line.find('|', p8 + 1);
 
-        string date = (p2 == string::npos) ? string("") : line.substr(p1 + 1, p2 - p1 - 1);
-        string total = (p3 == string::npos) ? string("") : line.substr(p2 + 1, p3 - p2 - 1);
-        string discount = (p4 == string::npos) ? string("") : line.substr(p3 + 1, p4 - p3 - 1);
-        string finalAmt = (p5 == string::npos) ? string("") : line.substr(p4 + 1, p5 - p4 - 1);
-        string paid = (p6 == string::npos) ? string("") : line.substr(p5 + 1, p6 - p5 - 1);
-        string change = (p7 == string::npos) ? string("") : line.substr(p6 + 1, p7 - p6 - 1);
-        string promo = (p8 == string::npos) ? string("") : line.substr(p7 + 1, p8 - p7 - 1);
-        string member = (p9 == string::npos) ? string("") : line.substr(p8 + 1, p9 - p8 - 1);
-        string items = (p9 == string::npos) ? string("") : line.substr(p9 + 1);
+        string date = (p2 == string::npos)
+                        ? string("")
+                        : line.substr(p1 + 1, p2 - p1 - 1);
 
-        // Cetak struk
-        cout << "\n--- Struk Transaksi (ID:" << id << ") ---\n";
-        cout << "Toko Kosmetik - TPalPro\n";
-        cout << "Alamat: Jl. Contoh No.1\n";
-        cout << "Tanggal: " << date << "\n";
-        cout << "Member: " << member << "\n";
-        cout << "Items:\n";
+        string total = (p3 == string::npos)
+                        ? string("")
+                        : line.substr(p2 + 1, p3 - p2 - 1);
 
-        // Format item: kode:qty:harga,kode2:qty:harga,...
+        string discount = (p4 == string::npos)
+                        ? string("")
+                        : line.substr(p3 + 1, p4 - p3 - 1);
+
+        string finalAmt = (p5 == string::npos)
+                        ? string("")
+                        : line.substr(p4 + 1, p5 - p4 - 1);
+
+        string paid = (p6 == string::npos)
+                        ? string("")
+                        : line.substr(p5 + 1, p6 - p5 - 1);
+
+        string change = (p7 == string::npos)
+                        ? string("")
+                        : line.substr(p6 + 1, p7 - p6 - 1);
+
+        string promo = (p8 == string::npos)
+                        ? string("")
+                        : line.substr(p7 + 1, p8 - p7 - 1);
+
+        string member = (p9 == string::npos)
+                        ? string("")
+                        : line.substr(p8 + 1, p9 - p8 - 1);
+
+        string items = (p9 == string::npos)
+                        ? string("")
+                        : line.substr(p9 + 1);
+
+        // =============================
+        // CETAK STRUK
+        // =============================
+
+        cout << "\n=========================================================\n";
+        cout << "                 TOKO KOSMETIK TPalPro\n";
+        cout << "=========================================================\n";
+        cout << "Alamat       : Jl. Contoh No.1\n";
+        cout << "ID Transaksi : " << id << endl;
+        cout << "Tanggal      : " << date << endl;
+        cout << "Member       : " << member << endl;
+        cout << "=========================================================\n";
+
+        cout << left
+             << setw(15) << "Kode"
+             << setw(10) << "Qty"
+             << setw(15) << "Harga"
+             << endl;
+
+        cout << "---------------------------------------------------------\n";
+
+        // Format item:
+        // kode:qty:harga,kode2:qty:harga,...
+
         size_t pos = 0;
 
         while (pos < items.size()) {
+
             size_t comma = items.find(',', pos);
 
             string chunk = (comma == string::npos)
-                ? items.substr(pos)
-                : items.substr(pos, comma - pos);
+                            ? items.substr(pos)
+                            : items.substr(pos, comma - pos);
 
             size_t a = chunk.find(':');
+
             size_t b = (a == string::npos)
-                ? string::npos
-                : chunk.find(':', a + 1);
+                        ? string::npos
+                        : chunk.find(':', a + 1);
 
             string code = (a == string::npos)
-                ? chunk
-                : chunk.substr(0, a);
+                            ? chunk
+                            : chunk.substr(0, a);
 
             string qty = (a == string::npos || b == string::npos)
-                ? string("")
-                : chunk.substr(a + 1, b - a - 1);
+                            ? string("")
+                            : chunk.substr(a + 1, b - a - 1);
 
             string price = (b == string::npos)
-                ? string("")
-                : chunk.substr(b + 1);
+                            ? string("")
+                            : chunk.substr(b + 1);
 
-            cout << " - " << code
-                 << " x" << qty
-                 << " @Rp" << price << "\n";
+            cout << left
+                 << setw(15) << code
+                 << setw(10) << qty
+                 << ("Rp" + price)
+                 << endl;
 
             if (comma == string::npos)
                 break;
@@ -3584,13 +3633,18 @@ void viewTransactionDetails(int id) {
             pos = comma + 1;
         }
 
-        cout << "Subtotal   : Rp" << total << "\n";
-        cout << "Diskon     : Rp" << discount << "\n";
-        cout << "Total Akhir: Rp" << finalAmt << "\n";
-        cout << "Dibayar    : Rp" << paid
-             << " | Kembali: Rp" << change << "\n";
-        cout << "Promo      : " << promo << "\n";
-        cout << "----------------------------------------\n";
+        cout << "=========================================================\n";
+
+        cout << "Subtotal      : Rp" << total << endl;
+        cout << "Diskon        : Rp" << discount << endl;
+        cout << "Total Bayar   : Rp" << finalAmt << endl;
+        cout << "Tunai         : Rp" << paid << endl;
+        cout << "Kembalian     : Rp" << change << endl;
+        cout << "Promo         : " << promo << endl;
+
+        cout << "=========================================================\n";
+        cout << "          Terima kasih telah berbelanja.\n";
+        cout << "=========================================================\n";
 
         string pr = inputLine("Cetak struk ke file? (y/n): ");
 
@@ -3610,315 +3664,893 @@ void viewTransactionDetails(int id) {
     }
 }
 
-
 void searchTransactions(const string& q) {
-    ifstream fin(TRANSACTIONS_FILE.c_str()); if (!fin) { cout<<"Belum ada transaksi.\n"; return; }
-    string line; int found=0; cout<<"\nHasil pencarian riwayat untuk '"<<q<<"':\n";
-    while (getline(fin,line)) {
-        if (line.empty()) continue;
-        if (line.find(q) != string::npos) {
-            // print brief
-            size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p4=line.find('|',p2+1);
-            string id=line.substr(0,p1); string date=line.substr(p1+1,p2-p1-1); string finalAmt=line.substr(p4+1,p2-p4-1);
-            cout<<"- ID:"<<id<<" | "<<date<<" | Rp"<<finalAmt<<"\n"; found++; }
+
+    ifstream fin(TRANSACTIONS_FILE.c_str());
+
+    if (!fin) {
+        cout << "Belum ada transaksi.\n";
+        return;
     }
-    if (!found) cout<<"Tidak ditemukan riwayat yang cocok.\n";
+
+    string line;
+    int found = 0;
+
+    cout << "\n=====================================================\n";
+    cout << "           HASIL PENCARIAN TRANSAKSI\n";
+    cout << "=====================================================\n";
+    cout << "Kata Kunci : " << q << endl;
+    cout << "-----------------------------------------------------\n";
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        if (line.find(q) != string::npos) {
+
+            // Format:
+            // id|date|total|discount|final|paid|change|promo|member|items
+
+            size_t p1 = line.find('|');
+            size_t p2 = line.find('|', p1 + 1);
+            size_t p3 = line.find('|', p2 + 1);
+            size_t p4 = line.find('|', p3 + 1);
+            size_t p5 = line.find('|', p4 + 1);
+
+            string id = line.substr(0, p1);
+            string date = line.substr(p1 + 1, p2 - p1 - 1);
+
+            string finalAmt = (p5 == string::npos)
+                                ? string("")
+                                : line.substr(p4 + 1, p5 - p4 - 1);
+
+            cout << "ID Transaksi : " << id << endl;
+            cout << "Tanggal      : " << date << endl;
+            cout << "Total Bayar  : Rp" << finalAmt << endl;
+            cout << "-----------------------------------------------------\n";
+
+            found++;
+        }
+    }
+
+    if (!found) {
+        cout << "Tidak ditemukan riwayat yang cocok.\n";
+    }
+
+    cout << "=====================================================\n";
+
+    fin.close();
 }
 
 void cartMenu() {
-Keranjang krj;
-Produk produk;
+
+    Keranjang krj;
+    Produk produk;
+
     // keep existing cart in memory across menu usage (do not re-init here)
+
     while (true) {
-        cout << "\n--- Keranjang Belanja ---\n";
-        cout << "1. Tambah barang ke keranjang\n";
-        cout << "2. Hapus barang dari keranjang\n";
-        cout << "3. Ubah jumlah barang di keranjang\n";
-        cout << "4. Lihat isi keranjang\n";
+
+        cout << "\n==============================\n";
+        cout << "     MENU KERANJANG BELANJA\n";
+        cout << "==============================\n";
+        cout << "1. Tambah Barang ke Keranjang\n";
+        cout << "2. Hapus Barang dari Keranjang\n";
+        cout << "3. Ubah Jumlah Barang\n";
+        cout << "4. Lihat Isi Keranjang\n";
         cout << "5. Checkout\n";
-        cout << "6. Kosongkan keranjang\n";
+        cout << "6. Kosongkan Keranjang\n";
         cout << "7. Kembali\n";
-        cout << "Pilih: ";
-        string ch; getline(cin, ch);
+        cout << "==============================\n";
+        cout << "Pilih Menu : ";
+
+        string ch;
+        getline(cin, ch);
+
         if (ch == "1") {
-            cout << "\nDaftar produk tersedia:\n";
+
+            cout << "\nDaftar Produk Tersedia\n";
             produk.tampilProduk();
-            string code = inputLine("Kode produk: ");
-            string q = inputLine("Jumlah: ");
-            int qty = 0; for (size_t i=0;i<q.size();++i) if (q[i]>='0'&&q[i]<='9') qty = qty*10 + (q[i]-'0');
-            if (qty <= 0) { cout << "Jumlah tidak valid.\n"; continue; }
-            if (krj.tambahBarang(code, qty)) cout << "Barang ditambahkan ke keranjang.\n";
-            else cout << "Gagal menambahkan ke keranjang. (cek kode atau stok)\n";
-        } else if (ch == "2") {
+
+            string code = inputLine("Kode Produk : ");
+            string q = inputLine("Jumlah      : ");
+
+            int qty = 0;
+
+            for (size_t i = 0; i < q.size(); ++i) {
+                if (q[i] >= '0' && q[i] <= '9')
+                    qty = qty * 10 + (q[i] - '0');
+            }
+
+            if (qty <= 0) {
+                cout << "Jumlah tidak valid.\n";
+                continue;
+            }
+
+            if (krj.tambahBarang(code, qty))
+                cout << "Barang berhasil ditambahkan ke keranjang.\n";
+            else
+                cout << "Gagal menambahkan barang (cek kode atau stok).\n";
+        }
+
+        else if (ch == "2") {
+
             krj.tampilKeranjang();
-            string idxs = inputLine("Masukkan nomor item yang akan dihapus: ");
-            int idx = 0; for (size_t i=0;i<idxs.size();++i) if (idxs[i]>='0'&&idxs[i]<='9') idx = idx*10 + (idxs[i]-'0');
-            if (krj.hapusBarang(idx)) cout << "Item dihapus dari keranjang.\n";
-            else cout << "Gagal menghapus item.\n";
-        } else if (ch == "3") {
+
+            string idxs = inputLine("Nomor Item : ");
+
+            int idx = 0;
+
+            for (size_t i = 0; i < idxs.size(); ++i) {
+                if (idxs[i] >= '0' && idxs[i] <= '9')
+                    idx = idx * 10 + (idxs[i] - '0');
+            }
+
+            if (krj.hapusBarang(idx))
+                cout << "Item berhasil dihapus.\n";
+            else
+                cout << "Gagal menghapus item.\n";
+        }
+
+        else if (ch == "3") {
+
             krj.tampilKeranjang();
-            string idxs = inputLine("Masukkan nomor item yang akan diubah: ");
-            int idx = 0; for (size_t i=0;i<idxs.size();++i) if (idxs[i]>='0'&&idxs[i]<='9') idx = idx*10 + (idxs[i]-'0');
-            string q = inputLine("Jumlah baru: ");
-            int qty = 0; for (size_t i=0;i<q.size();++i) if (q[i]>='0'&&q[i]<='9') qty = qty*10 + (q[i]-'0');
-            if (krj.ubahJumlah(idx, qty)) cout << "Jumlah diperbarui.\n";
-            else cout << "Gagal memperbarui jumlah.\n";
-        } else if (ch == "4") {
+
+            string idxs = inputLine("Nomor Item  : ");
+
+            int idx = 0;
+
+            for (size_t i = 0; i < idxs.size(); ++i) {
+                if (idxs[i] >= '0' && idxs[i] <= '9')
+                    idx = idx * 10 + (idxs[i] - '0');
+            }
+
+            string q = inputLine("Jumlah Baru : ");
+
+            int qty = 0;
+
+            for (size_t i = 0; i < q.size(); ++i) {
+                if (q[i] >= '0' && q[i] <= '9')
+                    qty = qty * 10 + (q[i] - '0');
+            }
+
+            if (krj.ubahJumlah(idx, qty))
+                cout << "Jumlah berhasil diperbarui.\n";
+            else
+                cout << "Gagal memperbarui jumlah.\n";
+        }
+
+        else if (ch == "4") {
+
             krj.tampilKeranjang();
-        } else if (ch == "5") {
-            string date = inputLine("Tanggal transaksi (YYYY-MM-DD): ");
-            if (checkoutCart(date)) cout << "Transaksi tersimpan.\n";
-            else cout << "Checkout gagal.\n";
-        } else if (ch == "6") {
+
+        }
+
+        else if (ch == "5") {
+
+            string date = inputLine("Tanggal Transaksi (YYYY-MM-DD): ");
+
+            if (checkoutCart(date))
+                cout << "Transaksi berhasil disimpan.\n";
+            else
+                cout << "Checkout gagal.\n";
+        }
+
+        else if (ch == "6") {
+
             krj.kosongkanKeranjang();
-            cout << "Keranjang dikosongkan.\n";
-        } else if (ch == "7") {
+            cout << "Keranjang berhasil dikosongkan.\n";
+
+        }
+
+        else if (ch == "7") {
+
             break;
-        } else cout << "Pilihan tidak dikenali.\n";
-    }
-}
 
-// --- Shift schedule & attendance implementation ---
+        }
 
-void shiftMenu() {
-    while (true) {
-        cout << "\n--- Menu Jadwal Shift ---\n";
-        cout << "1. Tambah jadwal shift\n";
-        cout << "2. Lihat jadwal shift\n";
-        cout << "3. Ubah jadwal shift\n";
-        cout << "4. Hapus jadwal shift\n";
-        cout << "5. Kembali\n";
-        string c = inputLine("Pilih: ");
-        Shift shift;
-        if (c=="1") shift.tambahShift();
-        else if (c=="2") shift.tampilShift();
-        else if (c=="3") shift.editShift();
-        else if (c=="4") shift.hapusShift();
-        else if (c=="5") break;
-        else cout<<"Pilihan tidak dikenali.\n";
+        else {
+
+            cout << "Pilihan tidak dikenali.\n";
+
+        }
     }
 }
 
 // shifts format: id|date|shift|employee
 
 void listShifts() {
-    ifstream fin(SHIFTS_FILE.c_str()); if (!fin) { cout<<"Belum ada jadwal shift.\n"; return; }
-    string line; cout<<"\nDaftar jadwal shift:\n";
-    while (getline(fin,line)) {
-        if (line.empty()) continue;
-        // id|date|shift|employee
-       size_t p1 = line.find('|');
-size_t p2 = line.find('|', p1 + 1);
-size_t p3 = line.find('|', p2 + 1);
 
-if (p1 == string::npos ||
-    p2 == string::npos ||
-    p3 == string::npos)
-    continue;
+    ifstream fin(SHIFTS_FILE.c_str());
 
-string id = line.substr(0, p1);
-string date = line.substr(p1 + 1, p2 - p1 - 1);
-string shift = line.substr(p2 + 1, p3 - p2 - 1);
-string emp = line.substr(p3 + 1);
-        cout<<"- ID:"<<id<<" | "<<date<<" | "<<shift<<" | "<<emp<<"\n";
+    if (!fin) {
+        cout << "Belum ada jadwal shift.\n";
+        return;
     }
+
+    string line;
+
+    cout << "\n========================================================\n";
+    cout << "                 DAFTAR JADWAL SHIFT\n";
+    cout << "========================================================\n";
+
+    cout << left
+         << setw(8)  << "ID"
+         << setw(15) << "Tanggal"
+         << setw(15) << "Shift"
+         << setw(20) << "Karyawan"
+         << endl;
+
+    cout << "--------------------------------------------------------\n";
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        // Format:
+        // id|date|shift|employee
+
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+
+        if (p1 == string::npos ||
+            p2 == string::npos ||
+            p3 == string::npos)
+            continue;
+
+        string id = line.substr(0, p1);
+
+        string date = line.substr(
+            p1 + 1,
+            p2 - p1 - 1
+        );
+
+        string shift = line.substr(
+            p2 + 1,
+            p3 - p2 - 1
+        );
+
+        string emp = line.substr(p3 + 1);
+
+        cout << left
+             << setw(8)  << id
+             << setw(15) << date
+             << setw(15) << shift
+             << setw(20) << emp
+             << endl;
+    }
+
+    cout << "========================================================\n";
+
     fin.close();
 }
 
+
+void shiftMenu() {
+    Shift shift;
+
+    while (true) {
+        cout << "\n========== MENU JADWAL SHIFT ==========\n";
+        cout << "1. Tambah Jadwal Shift\n";
+        cout << "2. Lihat Jadwal Shift\n";
+        cout << "3. Edit Jadwal Shift\n";
+        cout << "4. Hapus Jadwal Shift\n";
+        cout << "5. Kembali\n";
+        cout << "=======================================\n";
+
+        string pilihan = inputLine("Pilih menu: ");
+
+        if (pilihan == "1") {
+            shift.tambahShift();
+        }
+        else if (pilihan == "2") {
+            shift.tampilShift();
+        }
+        else if (pilihan == "3") {
+            shift.editShift();
+        }
+        else if (pilihan == "4") {
+            shift.hapusShift();
+        }
+        else if (pilihan == "5") {
+            break;
+        }
+        else {
+            cout << "Pilihan tidak valid.\n";
+        }
+    }
+}
+
 void editShift() {
-    string rid = inputLine("Masukkan ID jadwal yang akan diedit: "); if (rid.empty()) { cout<<"ID kosong.\n"; return; }
-    int id=0; for (size_t i=0;i<rid.size();++i) if (rid[i]>='0'&&rid[i]<='9') id=id*10+(rid[i]-'0'); if (id==0) { cout<<"ID tidak valid.\n"; return; }
-    ifstream fin(SHIFTS_FILE.c_str()); if (!fin) { cout<<"File shift tidak ditemukan.\n"; return; }
-    string all; string line; bool found=false;
-    while (getline(fin,line)) {
-        if (line.empty()) continue;
-        size_t p1=line.find('|'); if (p1==string::npos) { all += line+'\n'; continue; }
-        int cid=0; for (size_t i=0;i<p1;++i) if (line[i]>='0'&&line[i]<='9') cid=cid*10+(line[i]-'0');
-        if (cid != id) { all += line+'\n'; continue; }
-        found=true;
-        string date = inputLine("Tanggal baru (YYYY-MM-DD): "); string s = inputLine("Tipe shift (1=Opening,2=Middle,3=Closing): "); string emp = inputLine("Username pegawai baru: "); string shiftName;
-        if (s=="1") shiftName="Opening"; else if (s=="2") shiftName="Middle"; else if (s=="3") shiftName="Closing"; else shiftName = "Opening";
+
+    string rid = inputLine("Masukkan ID jadwal yang akan diedit: ");
+
+    if (rid.empty()) {
+        cout << "ID kosong.\n";
+        return;
+    }
+
+    int id = 0;
+
+    for (size_t i = 0; i < rid.size(); ++i) {
+        if (rid[i] >= '0' && rid[i] <= '9')
+            id = id * 10 + (rid[i] - '0');
+    }
+
+    if (id == 0) {
+        cout << "ID tidak valid.\n";
+        return;
+    }
+
+    ifstream fin(SHIFTS_FILE.c_str());
+
+    if (!fin) {
+        cout << "File shift tidak ditemukan.\n";
+        return;
+    }
+
+    string all;
+    string line;
+    bool found = false;
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        size_t p1 = line.find('|');
+
+        if (p1 == string::npos) {
+            all += line + '\n';
+            continue;
+        }
+
+        int cid = 0;
+
+        for (size_t i = 0; i < p1; ++i) {
+            if (line[i] >= '0' && line[i] <= '9')
+                cid = cid * 10 + (line[i] - '0');
+        }
+
+        if (cid != id) {
+            all += line + '\n';
+            continue;
+        }
+
+        found = true;
+
+        cout << "\n========================================\n";
+        cout << "         EDIT JADWAL SHIFT\n";
+        cout << "========================================\n";
+
+        string date = inputLine("Tanggal Baru (YYYY-MM-DD) : ");
+        string s = inputLine("Tipe Shift (1=Opening, 2=Middle, 3=Closing) : ");
+        string emp = inputLine("Username Pegawai Baru : ");
+
+        string shiftName;
+
+        if (s == "1")
+            shiftName = "Opening";
+        else if (s == "2")
+            shiftName = "Middle";
+        else if (s == "3")
+            shiftName = "Closing";
+        else
+            shiftName = "Opening";
+
         all += rid + '|' + date + '|' + shiftName + '|' + emp + '\n';
     }
-    fin.close(); if (!found) { cout<<"Jadwal ID tidak ditemukan.\n"; return; }
-    ofstream fout(SHIFTS_FILE.c_str(), ios::trunc); if (!fout) { cout<<"Gagal menyimpan jadwal.\n"; return; } fout<<all; cout<<"Jadwal diperbarui.\n";
+
+    fin.close();
+
+    if (!found) {
+        cout << "Jadwal dengan ID tersebut tidak ditemukan.\n";
+        return;
+    }
+
+    ofstream fout(SHIFTS_FILE.c_str(), ios::trunc);
+
+    if (!fout) {
+        cout << "Gagal menyimpan jadwal.\n";
+        return;
+    }
+
+    fout << all;
+    fout.close();
+
+    cout << "\nJadwal shift berhasil diperbarui.\n";
 }
 
 void deleteShift() {
-    string rid = inputLine("Masukkan ID jadwal yang akan dihapus: "); if (rid.empty()) { cout<<"ID kosong.\n"; return; }
-    int id=0; for (size_t i=0;i<rid.size();++i) if (rid[i]>='0'&&rid[i]<='9') id=id*10+(rid[i]-'0'); if (id==0) { cout<<"ID tidak valid.\n"; return; }
-    if (!confirmAction(string("Konfirmasi hapus jadwal ID ")+rid+"?")) return;
-    ifstream fin(SHIFTS_FILE.c_str()); if (!fin) { cout<<"File shift tidak ditemukan.\n"; return; }
-    string all; string line; bool found=false;
-    while (getline(fin,line)) {
-        if (line.empty()) continue;
-        size_t p1=line.find('|'); if (p1==string::npos) { all+=line+'\n'; continue; }
-        int cid=0; for (size_t i=0;i<p1;++i) if (line[i]>='0'&&line[i]<='9') cid=cid*10+(line[i]-'0');
-        if (cid==id) { found=true; continue; }
+
+    string rid = inputLine("Masukkan ID jadwal yang akan dihapus: ");
+
+    if (rid.empty()) {
+        cout << "ID kosong.\n";
+        return;
+    }
+
+    int id = 0;
+
+    for (size_t i = 0; i < rid.size(); ++i) {
+        if (rid[i] >= '0' && rid[i] <= '9')
+            id = id * 10 + (rid[i] - '0');
+    }
+
+    if (id == 0) {
+        cout << "ID tidak valid.\n";
+        return;
+    }
+
+    if (!confirmAction(string("Konfirmasi hapus jadwal ID ") + rid + "?"))
+        return;
+
+    ifstream fin(SHIFTS_FILE.c_str());
+
+    if (!fin) {
+        cout << "File shift tidak ditemukan.\n";
+        return;
+    }
+
+    string all;
+    string line;
+    bool found = false;
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        size_t p1 = line.find('|');
+
+        if (p1 == string::npos) {
+            all += line + '\n';
+            continue;
+        }
+
+        int cid = 0;
+
+        for (size_t i = 0; i < p1; ++i) {
+            if (line[i] >= '0' && line[i] <= '9')
+                cid = cid * 10 + (line[i] - '0');
+        }
+
+        if (cid == id) {
+            found = true;
+            continue;
+        }
+
         all += line + '\n';
     }
-    fin.close(); if (!found) { cout<<"Jadwal tidak ditemukan.\n"; return; }
-    ofstream fout(SHIFTS_FILE.c_str(), ios::trunc); if (!fout) { cout<<"Gagal menyimpan file shift.\n"; return; } fout<<all; cout<<"Jadwal dihapus.\n";
+
+    fin.close();
+
+    if (!found) {
+        cout << "Jadwal tidak ditemukan.\n";
+        return;
+    }
+
+    ofstream fout(SHIFTS_FILE.c_str(), ios::trunc);
+
+    if (!fout) {
+        cout << "Gagal menyimpan file shift.\n";
+        return;
+    }
+
+    fout << all;
+    fout.close();
+
+    cout << "\nJadwal shift berhasil dihapus.\n";
 }
 
 // attendance: attendance format id|date|username|status
 void attendanceMenuForUser(const string& username) {
+
     while (true) {
-        cout << "\n--- Menu Presensi ("<<username<<") ---\n";
-        cout << "1. Input presensi hari ini\n";
-        cout << "2. Lihat riwayat presensi saya\n";
+
+        cout << "\n=========================================\n";
+        cout << "          MENU PRESENSI PEGAWAI\n";
+        cout << "=========================================\n";
+        cout << "Username : " << username << endl;
+        cout << "-----------------------------------------\n";
+        cout << "1. Input Presensi Hari Ini\n";
+        cout << "2. Lihat Riwayat Presensi\n";
         cout << "3. Kembali\n";
-        string c = inputLine("Pilih: ");
-        if (c=="1") { recordAttendance(username); }
-        else if (c=="2") { listAttendanceForEmployee(username); }
-        else if (c=="3") break;
-        else cout<<"Pilihan tidak dikenali.\n";
+        cout << "=========================================\n";
+
+        string c = inputLine("Pilih Menu : ");
+
+        if (c == "1") {
+
+            recordAttendance(username);
+
+        }
+        else if (c == "2") {
+
+            listAttendanceForEmployee(username);
+
+        }
+        else if (c == "3") {
+
+            break;
+
+        }
+        else {
+
+            cout << "Pilihan tidak dikenali.\n";
+
+        }
     }
 }
 
 void recordAttendance(const string& username) {
-    string date = inputLine("Tanggal presensi (YYYY-MM-DD): "); if (date.empty()) { cout<<"Tanggal kosong.\n"; return; }
-    cout<<"Status: 1=Hadir,2=Izin,3=Sakit,4=Alfa\n";
-    string s = inputLine("Pilih status (1/2/3/4): "); string status;
-    if (s=="1") status = "Hadir"; else if (s=="2") status = "Izin"; else if (s=="3") status = "Sakit"; else status = "Alfa";
-    int id=1; ifstream fin(ATTENDANCE_FILE.c_str()); string line; while (fin && getline(fin,line)) { if (!line.empty()) id++; } fin.close();
-    ofstream fout(ATTENDANCE_FILE.c_str(), ios::app); if (!fout) { cout<<"Gagal menulis file presensi.\n"; return; }
-    fout << id << '|' << date << '|' << username << '|' << status << '\n'; fout.close();
-    cout<<"Presensi tersimpan (ID:"<<id<<").\n";
+
+    string date = inputLine("Tanggal Presensi (YYYY-MM-DD): ");
+
+    if (date.empty()) {
+        cout << "Tanggal tidak boleh kosong.\n";
+        return;
+    }
+
+    cout << "\n=========================================\n";
+    cout << "            INPUT PRESENSI\n";
+    cout << "=========================================\n";
+    cout << "1. Hadir\n";
+    cout << "2. Izin\n";
+    cout << "3. Sakit\n";
+    cout << "4. Alfa\n";
+    cout << "=========================================\n";
+
+    string s = inputLine("Pilih Status (1/2/3/4): ");
+
+    string status;
+
+    if (s == "1")
+        status = "Hadir";
+    else if (s == "2")
+        status = "Izin";
+    else if (s == "3")
+        status = "Sakit";
+    else
+        status = "Alfa";
+
+    int id = 1;
+
+    ifstream fin(ATTENDANCE_FILE.c_str());
+
+    string line;
+
+    while (fin && getline(fin, line)) {
+
+        if (!line.empty())
+            id++;
+
+    }
+
+    fin.close();
+
+    ofstream fout(ATTENDANCE_FILE.c_str(), ios::app);
+
+    if (!fout) {
+        cout << "Gagal menulis file presensi.\n";
+        return;
+    }
+
+    fout << id
+         << '|'
+         << date
+         << '|'
+         << username
+         << '|'
+         << status
+         << '\n';
+
+    fout.close();
+
+    cout << "\n=========================================\n";
+    cout << "Presensi berhasil disimpan.\n";
+    cout << "ID Presensi : " << id << endl;
+    cout << "Tanggal     : " << date << endl;
+    cout << "Username    : " << username << endl;
+    cout << "Status      : " << status << endl;
+    cout << "=========================================\n";
 }
 
 void listAttendance() {
-    ifstream fin(ATTENDANCE_FILE.c_str()); if (!fin) { cout<<"Belum ada data presensi.\n"; return; }
-    string line; cout<<"\nDaftar presensi:\n";
-    while (getline(fin,line)) {
-        if (line.empty()) continue;
-        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1); size_t p4=line.find('|',p3+1);
-        if (p1==string::npos||p2==string::npos||p3==string::npos||p4==string::npos) continue;
-        string id=line.substr(0,p1); string date=line.substr(p1+1,p2-p1-1); string user=line.substr(p2+1,p3-p2-1); string status=line.substr(p3+1);
-        cout<<"- ID:"<<id<<" | "<<date<<" | "<<user<<" | "<<status<<"\n";
+
+    ifstream fin(ATTENDANCE_FILE.c_str());
+
+    if (!fin) {
+        cout << "Belum ada data presensi.\n";
+        return;
     }
+
+    string line;
+
+    cout << "\n==============================================================\n";
+    cout << "                    DAFTAR DATA PRESENSI\n";
+    cout << "==============================================================\n";
+
+    cout << left
+         << setw(8)  << "ID"
+         << setw(15) << "Tanggal"
+         << setw(20) << "Username"
+         << setw(15) << "Status"
+         << endl;
+
+    cout << "--------------------------------------------------------------\n";
+
+    int totalPresensi = 0;
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+        size_t p4 = line.find('|', p3 + 1);
+
+        if (p1 == string::npos ||
+            p2 == string::npos ||
+            p3 == string::npos ||
+            p4 == string::npos)
+            continue;
+
+        string id = line.substr(0, p1);
+
+        string date = line.substr(
+            p1 + 1,
+            p2 - p1 - 1
+        );
+
+        string user = line.substr(
+            p2 + 1,
+            p3 - p2 - 1
+        );
+
+        string status = line.substr(p3 + 1);
+
+        cout << left
+             << setw(8)  << id
+             << setw(15) << date
+             << setw(20) << user
+             << setw(15) << status
+             << endl;
+
+        totalPresensi++;
+    }
+
+    cout << "==============================================================\n";
+    cout << "Total Data Presensi : " << totalPresensi << endl;
+    cout << "==============================================================\n";
+
     fin.close();
 }
 
 void listAttendanceForEmployee(const string& username) {
-    if (username.empty()) { listAttendance(); return; }
-    ifstream fin(ATTENDANCE_FILE.c_str()); if (!fin) { cout<<"Belum ada data presensi.\n"; return; }
-    string line; cout<<"\nRiwayat presensi untuk "<<username<<":\n";
-    int found=0;
-    while (getline(fin,line)) {
-        if (line.empty()) continue;
-        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1); size_t p4=line.find('|',p3+1);
-        if (p1==string::npos||p2==string::npos||p3==string::npos||p4==string::npos) continue;
-        string date=line.substr(p1+1,p2-p1-1); string user=line.substr(p2+1,p3-p2-1); string status=line.substr(p3+1);
-        if (user == username) { cout<<"- "<<date<<" | "<<status<<"\n"; found++; }
+
+    if (username.empty()) {
+        listAttendance();
+        return;
     }
-    fin.close(); if (!found) cout<<"Tidak ditemukan riwayat untuk pengguna ini.\n";
+
+    ifstream fin(ATTENDANCE_FILE.c_str());
+
+    if (!fin) {
+        cout << "Belum ada data presensi.\n";
+        return;
+    }
+
+    string line;
+    int found = 0;
+
+    cout << "\n=====================================================\n";
+    cout << "           RIWAYAT PRESENSI PEGAWAI\n";
+    cout << "=====================================================\n";
+    cout << "Username : " << username << endl;
+    cout << "-----------------------------------------------------\n";
+
+    cout << left
+         << setw(15) << "Tanggal"
+         << setw(15) << "Status"
+         << endl;
+
+    cout << "-----------------------------------------------------\n";
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+        size_t p4 = line.find('|', p3 + 1);
+
+        if (p1 == string::npos ||
+            p2 == string::npos ||
+            p3 == string::npos ||
+            p4 == string::npos)
+            continue;
+
+        string date = line.substr(
+            p1 + 1,
+            p2 - p1 - 1
+        );
+
+        string user = line.substr(
+            p2 + 1,
+            p3 - p2 - 1
+        );
+
+        string status = line.substr(p3 + 1);
+
+        if (user == username) {
+
+            cout << left
+                 << setw(15) << date
+                 << setw(15) << status
+                 << endl;
+
+            found++;
+        }
+    }
+
+    cout << "-----------------------------------------------------\n";
+
+    if (found == 0) {
+
+        cout << "Tidak ditemukan riwayat presensi.\n";
+
+    } else {
+
+        cout << "Total Riwayat Presensi : "
+             << found
+             << endl;
+
+    }
+
+    cout << "=====================================================\n";
+
+    fin.close();
 }
 
 // ======== FINANCIAL ANALYSIS FUNCTIONS ========
 
 void laporanPenjualanBulanan() {
+
     ifstream fin(TRANSACTIONS_FILE.c_str());
-    if (!fin) { cout<<"\nBelum ada data transaksi.\n"; return; }
-    string line; double totalRevenue=0; int txCount=0; double totalDiscount=0;
-    cout<<"\n========== LAPORAN PENJUALAN BULANAN ==========\n";
-    cout<<"Format: ID|Tanggal|Total|Diskon|Final|Paid|Change|Promo|Member|Items\n";
-    cout<<"\nDetail Transaksi:\n";
-    cout<<"---------------------------------------------------------\n";
-    cout<<"ID | Tgl      | Total     | Diskon | Final    | Member\n";
-    cout<<"---------------------------------------------------------\n";
-    while (getline(fin,line)) {
-        if (line.empty()) continue;
-        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1);
-        size_t p4=line.find('|',p3+1); size_t p5=line.find('|',p4+1); size_t p6=line.find('|',p5+1);
-        size_t p7=line.find('|',p6+1); size_t p8=line.find('|',p7+1); size_t p9=line.find('|',p8+1);
-        if (p1==string::npos||p2==string::npos||p3==string::npos||p4==string::npos||p5==string::npos) continue;
-        string id=line.substr(0,p1);
-        string date=line.substr(p1+1,p2-p1-1);
-        int total=0; for (size_t i=p2+1;i<p3;++i) if (line[i]>='0'&&line[i]<='9') total=total*10+(line[i]-'0');
-        int diskon=0; for (size_t i=p3+1;i<p4;++i) if (line[i]>='0'&&line[i]<='9') diskon=diskon*10+(line[i]-'0');
-        int final=0; for (size_t i=p4+1;i<p5;++i) if (line[i]>='0'&&line[i]<='9') final=final*10+(line[i]-'0');
-        string member=(p8!=string::npos)?line.substr(p8+1,p9-p8-1):"Non-Member";
-        cout<<id<<" | "<<date<<" | Rp"<<total<<" | Rp"<<diskon<<" | Rp"<<final<<" | "<<member<<"\n";
-        totalRevenue+=final; totalDiscount+=diskon; txCount++;
+
+    if (!fin) {
+        cout << "\nBelum ada data transaksi.\n";
+        return;
     }
+
+    string line;
+
+    double totalRevenue = 0;
+    double totalDiscount = 0;
+    int txCount = 0;
+
+    cout << "\n===================================================================================================\n";
+    cout << "                              LAPORAN PENJUALAN BULANAN\n";
+    cout << "===================================================================================================\n";
+
+    cout << left
+         << setw(8)  << "ID"
+         << setw(15) << "Tanggal"
+         << right
+         << setw(18) << "Total"
+         << setw(18) << "Diskon"
+         << setw(18) << "Final"
+         << "   Member"
+         << endl;
+
+    cout << "---------------------------------------------------------------------------------------------------\n";
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+        size_t p4 = line.find('|', p3 + 1);
+        size_t p5 = line.find('|', p4 + 1);
+        size_t p6 = line.find('|', p5 + 1);
+        size_t p7 = line.find('|', p6 + 1);
+        size_t p8 = line.find('|', p7 + 1);
+        size_t p9 = line.find('|', p8 + 1);
+
+        if (p1 == string::npos ||
+            p2 == string::npos ||
+            p3 == string::npos ||
+            p4 == string::npos ||
+            p5 == string::npos)
+            continue;
+
+        string id = line.substr(0, p1);
+
+        string date = line.substr(
+            p1 + 1,
+            p2 - p1 - 1
+        );
+
+        int total = 0;
+
+        for (size_t i = p2 + 1; i < p3; ++i) {
+            if (line[i] >= '0' && line[i] <= '9')
+                total = total * 10 + (line[i] - '0');
+        }
+
+        int diskon = 0;
+
+        for (size_t i = p3 + 1; i < p4; ++i) {
+            if (line[i] >= '0' && line[i] <= '9')
+                diskon = diskon * 10 + (line[i] - '0');
+        }
+
+        int final = 0;
+
+        for (size_t i = p4 + 1; i < p5; ++i) {
+            if (line[i] >= '0' && line[i] <= '9')
+                final = final * 10 + (line[i] - '0');
+        }
+
+        string member;
+
+        if (p8 != string::npos)
+            member = line.substr(p8 + 1, p9 - p8 - 1);
+        else
+            member = "Non-Member";
+
+        cout << left
+             << setw(8) << id
+             << setw(15) << date
+             << right
+             << setw(18) << formatRupiah(total)
+             << setw(18) << formatRupiah(diskon)
+             << setw(18) << formatRupiah(final)
+             << "   "
+             << member
+             << endl;
+
+        totalRevenue += final;
+        totalDiscount += diskon;
+        txCount++;
+    }
+
     fin.close();
-    cout<<"---------------------------------------------------------\n";
-    cout<<"Total Transaksi: "<<txCount<<"\n";
-    cout<<"Total Diskon: Rp"<<(int)totalDiscount<<"\n";
-    cout<<"Total Pendapatan Bersih: Rp"<<(int)totalRevenue<<"\n";
-    cout<<"Rata-rata Transaksi: Rp"<<(txCount>0?(int)(totalRevenue/txCount):0)<<"\n";
-    cout<<"=================================================\n";
+
+    cout << "===================================================================================================\n";
+
+    cout << "\nRINGKASAN LAPORAN\n";
+    cout << "===================================================================================================\n";
+
+    cout << "Total Transaksi           : " << txCount << endl;
+
+    cout << "Total Diskon             : "
+         << formatRupiah((int)totalDiscount)
+         << endl;
+
+    cout << "Total Pendapatan Bersih  : "
+         << formatRupiah((int)totalRevenue)
+         << endl;
+
+    cout << "Rata-rata Transaksi      : "
+         << formatRupiah(txCount > 0 ? (int)(totalRevenue / txCount) : 0)
+         << endl;
+
+    cout << "===================================================================================================\n";
 }
 
-void analisisProdukTerlaris() {
-    ifstream fin(TRANSACTIONS_FILE.c_str());
-    if (!fin) { cout<<"\nBelum ada data transaksi.\n"; return; }
-    string line; 
-    cout<<"\n========== ANALISIS BARANG TERLARIS ==========\n";
-    StringIntEntry productSales[MAX_ENTRIES];
-    int productSalesSize = 0;
-    StringIntEntry productCount[MAX_ENTRIES];
-    int productCountSize = 0;
-    
-    while (getline(fin,line)) {
-        if (line.empty()) continue;
-        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1);
-        size_t p4=line.find('|',p3+1); size_t p5=line.find('|',p4+1); size_t p6=line.find('|',p5+1);
-        size_t p7=line.find('|',p6+1); size_t p8=line.find('|',p7+1); size_t p9=line.find('|',p8+1);
-        if (p9==string::npos) continue;
-        string items=line.substr(p9+1);
-        
-        // parse items: "P0001(2),P0002(1)" etc
-        size_t pos=0;
-        while (pos<items.length()) {
-            size_t popen=items.find('(',pos);
-            size_t pclose=items.find(')',popen);
-            if (popen==string::npos||pclose==string::npos) break;
-            string productId=items.substr(pos,popen-pos);
-            int qty=0;
-            for (size_t i=popen+1;i<pclose;++i)
-                if (items[i]>='0'&&items[i]<='9') qty=qty*10+(items[i]-'0');
-            addStringIntEntry(productSales, productSalesSize, productId, qty);
-            addStringIntEntry(productCount, productCountSize, productId, 1);
-            pos=pclose+1;
-            if (pos<items.length() && items[pos]==',') pos++;
-        }
-    }
-    fin.close();
-    
-    // Display results
-    cout<<"\nProduk Terlaris (berdasarkan jumlah terjual):\n";
-    cout<<"-------------------------------------------\n";
-    cout<<"Rank | ID Produk | Jumlah Terjual | Frekuensi\n";
-    cout<<"-------------------------------------------\n";
-    
-    ProductSummary sorted[MAX_ENTRIES];
-    int sortedSize = 0;
-    for (int i = 0; i < productSalesSize; ++i) {
-        sorted[sortedSize].key = productSales[i].key;
-        sorted[sortedSize].sold = productSales[i].value;
-        sorted[sortedSize].transactions = getStringIntValue(productCount, productCountSize, productSales[i].key);
-        ++sortedSize;
-    }
-    
-    for (int i = 0; i < sortedSize; ++i) {
-        for (int j = i + 1; j < sortedSize; ++j) {
-            if (sorted[j].sold > sorted[i].sold) {
-                swapProductSummary(sorted[i], sorted[j]);
-            }
-        }
-    }
-    
-    int rank=1;
-    for (int i = 0; i < sortedSize; ++i) {
-        if (rank>10) break;
-        cout<<rank<<" | "<<sorted[i].key<<" | "<<sorted[i].sold<<" unit | "<<sorted[i].transactions<<" transaksi\n";
-        rank++;
-    }
-    cout<<"-------------------------------------------\n";
-    cout<<"======================================\n";
-}
+
 void analisisPenjualanPerKategori() {
 
     ifstream fprod(PRODUCTS_FILE.c_str());
@@ -3935,7 +4567,10 @@ void analisisPenjualanPerKategori() {
         return;
     }
 
-    // Membaca kategori produk
+    // ===============================
+    // Membaca data kategori produk
+    // ===============================
+
     StringStringEntry productCategory[MAX_ENTRIES];
     int productCategorySize = 0;
 
@@ -3978,7 +4613,10 @@ void analisisPenjualanPerKategori() {
 
     fprod.close();
 
-    // Analisis Penjualan
+    // ===============================
+    // Analisis penjualan
+    // ===============================
+
     StringDoubleEntry catRevenue[MAX_ENTRIES];
     int catRevenueSize = 0;
 
@@ -3990,7 +4628,6 @@ void analisisPenjualanPerKategori() {
         if (line.empty())
             continue;
 
-        // Ambil field terakhir (items)
         size_t pos = 0;
 
         for (int i = 0; i < 9; i++) {
@@ -4061,93 +4698,285 @@ void analisisPenjualanPerKategori() {
 
     fin.close();
 
-    // Output
-    cout << "\n===============================================================\n";
-    cout << "               ANALISIS PENJUALAN PER KATEGORI\n";
-    cout << "===============================================================\n";
-
-    cout << left
-         << setw(20) << "Kategori"
-         << setw(20) << "Item Terjual"
-         << "Total Pendapatan"
-         << endl;
-
-    cout << "---------------------------------------------------------------\n";
+    // ===============================
+    // Hitung Total Pendapatan
+    // ===============================
 
     double totalPendapatan = 0;
 
     for (int i = 0; i < catRevenueSize; i++) {
-
-        cout << left
-             << setw(20) << catRevenue[i].key
-             << setw(20) << getStringIntValue(
-                                catQuantity,
-                                catQuantitySize,
-                                catRevenue[i].key)
-             << formatRupiah((int)catRevenue[i].value)
-             << endl;
-
         totalPendapatan += catRevenue[i].value;
     }
 
-    cout << "---------------------------------------------------------------\n";
+    // ===============================
+    // Output
+    // ===============================
+
+    cout << "\n=========================================================================================\n";
+    cout << "                         ANALISIS PENJUALAN PER KATEGORI\n";
+    cout << "=========================================================================================\n";
+
+    cout << left
+         << setw(20) << "Kategori"
+         << setw(18) << "Item Terjual"
+         << setw(20) << "Pendapatan"
+         << "Kontribusi"
+         << endl;
+
+    cout << "-----------------------------------------------------------------------------------------\n";
+
+    string kategoriTerlaris = "-";
+    string kategoriTersedikit = "-";
+
+    int itemTerbanyak = -1;
+    int itemTersedikit = 999999999;
+
+    for (int i = 0; i < catRevenueSize; i++) {
+
+        int jumlahItem =
+            getStringIntValue(
+                catQuantity,
+                catQuantitySize,
+                catRevenue[i].key
+            );
+
+        double persen = 0;
+
+        if (totalPendapatan != 0)
+            persen =
+                (catRevenue[i].value * 100.0)
+                / totalPendapatan;
+
+        if (jumlahItem > itemTerbanyak) {
+            itemTerbanyak = jumlahItem;
+            kategoriTerlaris = catRevenue[i].key;
+        }
+
+        if (jumlahItem < itemTersedikit) {
+            itemTersedikit = jumlahItem;
+            kategoriTersedikit = catRevenue[i].key;
+        }
+
+        cout << left
+             << setw(20) << catRevenue[i].key
+             << setw(18) << jumlahItem
+             << setw(20) << formatRupiah((int)catRevenue[i].value)
+             << fixed << setprecision(2)
+             << persen << "%"
+             << endl;
+    }
+
+    cout << "-----------------------------------------------------------------------------------------\n";
 
     cout << "Total Pendapatan Seluruh Kategori : "
          << formatRupiah((int)totalPendapatan)
          << endl;
 
-    cout << "===============================================================\n";
+    cout << "\nRINGKASAN ANALISIS\n";
+    cout << "-----------------------------------------------------------------------------------------\n";
+
+    cout << "Total Kategori              : "
+         << catRevenueSize
+         << endl;
+
+    cout << "Kategori Terlaris           : "
+         << kategoriTerlaris
+         << " ("
+         << itemTerbanyak
+         << " item)"
+         << endl;
+
+    cout << "Kategori Penjualan Terendah : "
+         << kategoriTersedikit
+         << " ("
+         << itemTersedikit
+         << " item)"
+         << endl;
+
+    cout << "Total Pendapatan            : "
+         << formatRupiah((int)totalPendapatan)
+         << endl;
+
+    cout << "=========================================================================================\n";
 }
 
 void laporanPendapatanPerPeriode() {
-    string startDate=inputLine("Masukkan tanggal mulai (YYYY-MM-DD): ");
-    string endDate=inputLine("Masukkan tanggal akhir (YYYY-MM-DD): ");
-    
-    ifstream fin(TRANSACTIONS_FILE.c_str());
-    if (!fin) { cout<<"\nBelum ada data transaksi.\n"; return; }
-    
-    string line;
-    double revenue=0; int count=0; double discount=0;
-    cout<<"\n========== LAPORAN PENDAPATAN PER PERIODE ==========\n";
-    cout<<"Periode: "<<startDate<<" hingga "<<endDate<<"\n";
-    cout<<"---------------------------------------------------\n";
-    
-    while (getline(fin,line)) {
-        if (line.empty()) continue;
-        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1);
-        size_t p4=line.find('|',p3+1); size_t p5=line.find('|',p4+1);
-        if (p5==string::npos) continue;
-        
-        string date=line.substr(p1+1,p2-p1-1);
-        if (date>=startDate && date<=endDate) {
-            int total=0; for (size_t i=p2+1;i<p3;++i) 
-                if (line[i]>='0'&&line[i]<='9') total=total*10+(line[i]-'0');
-            int diskon=0; for (size_t i=p3+1;i<p4;++i) 
-                if (line[i]>='0'&&line[i]<='9') diskon=diskon*10+(line[i]-'0');
-            int final=0; for (size_t i=p4+1;i<p5;++i) 
-                if (line[i]>='0'&&line[i]<='9') final=final*10+(line[i]-'0');
-            revenue+=final;
-            discount+=diskon;
-            count++;
-        }
-    }
-    fin.close();
-    
-    cout<<"Total Transaksi: "<<count<<"\n";
-    cout<<"Total Diskon: Rp"<<(int)discount<<"\n";
-    cout<<"Total Pendapatan: Rp"<<(int)revenue<<"\n";
-    cout<<"Rata-rata per Transaksi: Rp"<<(count>0?(int)(revenue/count):0)<<"\n";
-    cout<<"====================================================\n";
-}
 
-void analisisPenjualanMember() {
+    string startDate = inputLine("Masukkan tanggal mulai (YYYY-MM-DD): ");
+    string endDate   = inputLine("Masukkan tanggal akhir (YYYY-MM-DD): ");
+
     ifstream fin(TRANSACTIONS_FILE.c_str());
+
     if (!fin) {
         cout << "\nBelum ada data transaksi.\n";
         return;
     }
 
     string line;
+
+    double revenue = 0;
+    double discount = 0;
+    int count = 0;
+
+    int transaksiTerbesar = 0;
+    int transaksiTerkecil = 999999999;
+
+    cout << "\n=====================================================================================================\n";
+    cout << "                           LAPORAN PENDAPATAN PER PERIODE\n";
+    cout << "=====================================================================================================\n";
+
+    cout << "Periode : "
+         << startDate
+         << " s/d "
+         << endDate
+         << endl;
+
+    cout << "-----------------------------------------------------------------------------------------------------\n";
+
+    cout << left
+         << setw(8)  << "ID"
+         << setw(15) << "Tanggal"
+         << right
+         << setw(18) << "Total"
+         << setw(18) << "Diskon"
+         << setw(18) << "Pendapatan"
+         << endl;
+
+    cout << "-----------------------------------------------------------------------------------------------------\n";
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+        size_t p4 = line.find('|', p3 + 1);
+        size_t p5 = line.find('|', p4 + 1);
+
+        if (p5 == string::npos)
+            continue;
+
+        string id = line.substr(0, p1);
+
+        string date = line.substr(
+            p1 + 1,
+            p2 - p1 - 1
+        );
+
+        if (date >= startDate &&
+            date <= endDate) {
+
+            int total = 0;
+
+            for (size_t i = p2 + 1; i < p3; i++) {
+
+                if (line[i] >= '0' &&
+                    line[i] <= '9')
+
+                    total =
+                        total * 10 +
+                        (line[i] - '0');
+            }
+
+            int diskon = 0;
+
+            for (size_t i = p3 + 1; i < p4; i++) {
+
+                if (line[i] >= '0' &&
+                    line[i] <= '9')
+
+                    diskon =
+                        diskon * 10 +
+                        (line[i] - '0');
+            }
+
+            int final = 0;
+
+            for (size_t i = p4 + 1; i < p5; i++) {
+
+                if (line[i] >= '0' &&
+                    line[i] <= '9')
+
+                    final =
+                        final * 10 +
+                        (line[i] - '0');
+            }
+
+            cout << left
+                 << setw(8) << id
+                 << setw(15) << date
+                 << right
+                 << setw(18) << formatRupiah(total)
+                 << setw(18) << formatRupiah(diskon)
+                 << setw(18) << formatRupiah(final)
+                 << endl;
+
+            revenue += final;
+            discount += diskon;
+            count++;
+
+            if (final > transaksiTerbesar)
+                transaksiTerbesar = final;
+
+            if (final < transaksiTerkecil)
+                transaksiTerkecil = final;
+        }
+    }
+
+    fin.close();
+
+    cout << "=====================================================================================================\n";
+
+    cout << "\nRINGKASAN LAPORAN\n";
+    cout << "=====================================================================================================\n";
+
+    cout << "Total Transaksi           : "
+         << count
+         << endl;
+
+    cout << "Total Diskon             : "
+         << formatRupiah((int)discount)
+         << endl;
+
+    cout << "Total Pendapatan         : "
+         << formatRupiah((int)revenue)
+         << endl;
+
+    cout << "Rata-rata Transaksi      : "
+         << formatRupiah(
+                count > 0 ?
+                (int)(revenue / count) :
+                0
+            )
+         << endl;
+
+    if (count > 0) {
+
+        cout << "Transaksi Terbesar       : "
+             << formatRupiah(transaksiTerbesar)
+             << endl;
+
+        cout << "Transaksi Terkecil       : "
+             << formatRupiah(transaksiTerkecil)
+             << endl;
+    }
+
+    cout << "=====================================================================================================\n";
+}
+
+void analisisPenjualanMember() {
+
+    ifstream fin(TRANSACTIONS_FILE.c_str());
+
+    if (!fin) {
+        cout << "\nBelum ada data transaksi.\n";
+        return;
+    }
+
+    string line;
+
     MemberSummary memberRevenue[MAX_ENTRIES];
     int memberRevenueSize = 0;
 
@@ -4155,7 +4984,9 @@ void analisisPenjualanMember() {
     int nonMemberCount = 0;
 
     while (getline(fin, line)) {
-        if (line.empty()) continue;
+
+        if (line.empty())
+            continue;
 
         size_t p1 = line.find('|');
         size_t p2 = line.find('|', p1 + 1);
@@ -4167,36 +4998,56 @@ void analisisPenjualanMember() {
         size_t p8 = line.find('|', p7 + 1);
         size_t p9 = line.find('|', p8 + 1);
 
-        if (p9 == string::npos) continue;
+        if (p9 == string::npos)
+            continue;
 
         int final = 0;
-        for (size_t i = p4 + 1; i < p5; ++i)
-            if (line[i] >= '0' && line[i] <= '9')
-                final = final * 10 + (line[i] - '0');
 
-        string member = line.substr(p8 + 1, p9 - p8 - 1);
+        for (size_t i = p4 + 1; i < p5; i++) {
 
-        if (member.empty() || member == "Non-Member") {
+            if (line[i] >= '0' &&
+                line[i] <= '9')
+
+                final =
+                    final * 10 +
+                    (line[i] - '0');
+        }
+
+        string member =
+            line.substr(
+                p8 + 1,
+                p9 - p8 - 1
+            );
+
+        if (member.empty() ||
+            member == "Non-Member") {
+
             nonMemberRevenue += final;
             nonMemberCount++;
         }
         else {
+
             int idx = -1;
 
             for (int i = 0; i < memberRevenueSize; i++) {
+
                 if (memberRevenue[i].key == member) {
+
                     idx = i;
                     break;
                 }
             }
 
             if (idx == -1) {
+
                 memberRevenue[memberRevenueSize].key = member;
                 memberRevenue[memberRevenueSize].revenue = final;
                 memberRevenue[memberRevenueSize].count = 1;
+
                 memberRevenueSize++;
             }
             else {
+
                 memberRevenue[idx].revenue += final;
                 memberRevenue[idx].count++;
             }
@@ -4205,69 +5056,184 @@ void analisisPenjualanMember() {
 
     fin.close();
 
-    cout << "\n========== ANALISIS PENJUALAN MEMBER ==========\n";
-    cout << "Nama Member | Jumlah Transaksi | Total Pendapatan\n";
-    cout << "-------------------------------------------------\n";
-
     double totalMemberRevenue = 0;
     int totalMemberCount = 0;
 
+    string memberTerbaik = "-";
+    double revenueTerbesar = 0;
+
+    cout << "\n====================================================================================================\n";
+    cout << "                               ANALISIS PENJUALAN MEMBER\n";
+    cout << "====================================================================================================\n";
+
+    cout << left
+         << setw(25) << "Nama Member"
+         << setw(20) << "Transaksi"
+         << setw(20) << "Pendapatan"
+         << "Rata-rata"
+         << endl;
+
+    cout << "----------------------------------------------------------------------------------------------------\n";
+
     for (int i = 0; i < memberRevenueSize; i++) {
-        cout << memberRevenue[i].key
-             << " | "
-             << memberRevenue[i].count
-             << " | Rp"
-             << (int)memberRevenue[i].revenue
+
+        double rata =
+            memberRevenue[i].revenue /
+            memberRevenue[i].count;
+
+        cout << left
+             << setw(25) << memberRevenue[i].key
+             << setw(20) << memberRevenue[i].count
+             << setw(20) << formatRupiah((int)memberRevenue[i].revenue)
+             << formatRupiah((int)rata)
              << endl;
 
-        totalMemberRevenue += memberRevenue[i].revenue;
-        totalMemberCount += memberRevenue[i].count;
+        totalMemberRevenue +=
+            memberRevenue[i].revenue;
+
+        totalMemberCount +=
+            memberRevenue[i].count;
+
+        if (memberRevenue[i].revenue >
+            revenueTerbesar) {
+
+            revenueTerbesar =
+                memberRevenue[i].revenue;
+
+            memberTerbaik =
+                memberRevenue[i].key;
+        }
     }
 
-    cout << "-------------------------------------------------\n";
-    cout << "Total Transaksi Member : " << totalMemberCount << endl;
-    cout << "Total Pendapatan Member: Rp" << (int)totalMemberRevenue << endl;
+    cout << "====================================================================================================\n";
 
-    cout << "\n========== PENJUALAN NON-MEMBER ==========\n";
-    cout << "Total Transaksi : " << nonMemberCount << endl;
-    cout << "Total Pendapatan: Rp" << (int)nonMemberRevenue << endl;
+    cout << "\nRINGKASAN MEMBER\n";
+    cout << "----------------------------------------------------------------------------------------------------\n";
 
-    cout << "\n========== KESELURUHAN ==========\n";
-    cout << "Total Seluruh Transaksi : "
+    cout << "Jumlah Member Aktif        : "
+         << memberRevenueSize
+         << endl;
+
+    cout << "Total Transaksi Member     : "
+         << totalMemberCount
+         << endl;
+
+    cout << "Total Pendapatan Member    : "
+         << formatRupiah((int)totalMemberRevenue)
+         << endl;
+
+    if (totalMemberCount > 0) {
+
+        cout << "Rata-rata Belanja Member   : "
+             << formatRupiah(
+                    (int)(totalMemberRevenue /
+                    totalMemberCount)
+                )
+             << endl;
+    }
+
+    cout << "Member Terbaik             : "
+         << memberTerbaik
+         << endl;
+
+    cout << "\nDATA NON-MEMBER\n";
+    cout << "----------------------------------------------------------------------------------------------------\n";
+
+    cout << "Jumlah Transaksi           : "
+         << nonMemberCount
+         << endl;
+
+    cout << "Pendapatan Non-Member      : "
+         << formatRupiah((int)nonMemberRevenue)
+         << endl;
+
+    cout << "\nKESELURUHAN\n";
+    cout << "----------------------------------------------------------------------------------------------------\n";
+
+    cout << "Total Seluruh Transaksi    : "
          << totalMemberCount + nonMemberCount
          << endl;
 
-    cout << "Total Seluruh Pendapatan : Rp"
-         << (int)(totalMemberRevenue + nonMemberRevenue)
+    cout << "Total Seluruh Pendapatan   : "
+         << formatRupiah(
+                (int)(totalMemberRevenue +
+                nonMemberRevenue)
+            )
          << endl;
 
-    cout << "==========================================\n";
+    double persenMember = 0;
+
+    if ((totalMemberRevenue + nonMemberRevenue) != 0) {
+
+        persenMember =
+            (totalMemberRevenue * 100.0) /
+            (totalMemberRevenue + nonMemberRevenue);
+    }
+
+    cout << "Kontribusi Member          : "
+         << fixed
+         << setprecision(2)
+         << persenMember
+         << "%"
+         << endl;
+
+    cout << "Kontribusi Non-Member      : "
+         << fixed
+         << setprecision(2)
+         << (100.0 - persenMember)
+         << "%"
+         << endl;
+
+    cout << "====================================================================================================\n";
 }
 
 void menuDashboardKeuangan() {
     LaporanPenjualan harian;
     AnalisisProduk analisis;
+
     while (true) {
-        cout<<"\n========== DASHBOARD ANALISIS KEUANGAN ==========\n";
-        cout<<"1. Laporan Penjualan Bulanan\n";
-        cout<<"2. Analisis Barang Terlaris\n";
-        cout<<"3. Laporan Penjualan Harian\n";
-        cout<<"4. Analisis Penjualan Per Kategori\n";
-        cout<<"5. Pendapatan Per Periode Tanggal\n";
-        cout<<"6. Analisis Margin Keuntungan\n";
-        cout<<"7. Analisis Penjualan Per Member\n";
-        cout<<"8. Kembali\n";
-        cout<<"==================================================\n";
-        string choice=inputLine("Pilih menu (1-8): ");
-        
-        if (choice=="1") laporanPenjualanBulanan();
-        else if (choice=="2") analisisProdukTerlaris();
-        else if (choice=="3") harian.hitungPenjualanHarian();
-        else if (choice=="4") analisisPenjualanPerKategori();
-        else if (choice=="5") laporanPendapatanPerPeriode();
-        else if (choice=="6") analisis.analisisMarginKeuntungan();
-        else if (choice=="7") analisisPenjualanMember();
-        else if (choice=="8") break;
-        else cout<<"Pilihan tidak dikenali.\n";
+
+        cout << "\n==================================================\n";
+        cout << "         DASHBOARD ANALISIS KEUANGAN\n";
+        cout << "==================================================\n";
+        cout << "1. Laporan Penjualan Bulanan\n";
+        cout << "2. Analisis Barang Terlaris\n";
+        cout << "3. Laporan Penjualan Harian\n";
+        cout << "4. Analisis Penjualan Per Kategori\n";
+        cout << "5. Laporan Pendapatan Per Periode\n";
+        cout << "6. Analisis Margin Keuntungan\n";
+        cout << "7. Analisis Penjualan Member\n";
+        cout << "8. Kembali\n";
+        cout << "==================================================\n";
+
+        string choice = inputLine("Pilih menu (1-8): ");
+
+        if (choice == "1") {
+            laporanPenjualanBulanan();
+        }
+        else if (choice == "2") {
+            analisisProdukTerlaris();
+        }
+        else if (choice == "3") {
+            harian.hitungPenjualanHarian();
+        }
+        else if (choice == "4") {
+            analisisPenjualanPerKategori();
+        }
+        else if (choice == "5") {
+            laporanPendapatanPerPeriode();
+        }
+        else if (choice == "6") {
+            analisis.analisisMarginKeuntungan();
+        }
+        else if (choice == "7") {
+            analisisPenjualanMember();
+        }
+        else if (choice == "8") {
+            break;
+        }
+        else {
+            cout << "Pilihan tidak dikenali.\n";
+        }
     }
 }
