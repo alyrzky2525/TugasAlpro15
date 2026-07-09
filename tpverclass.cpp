@@ -3396,33 +3396,95 @@ bool checkoutCart(const string& curDate) {
 }
 
 // Transaction history and receipt printing
-    void listTransactions() {
-    ifstream fin(TRANSACTIONS_FILE.c_str()); if (!fin) { cout<<"Belum ada transaksi.\n"; return; }
-    string line; cout<<"\nDaftar transaksi:\n";
-    while (getline(fin,line)) {
-        if (line.empty()) continue;
-        // id|date|total|discount|final|paid|change|promo|member|items
-        size_t p1=line.find('|'); if (p1==string::npos) continue;
-        size_t p2=line.find('|',p1+1); if (p2==string::npos) continue;
-        size_t p3=line.find('|',p2+1); if (p3==string::npos) continue;
-        size_t p4=line.find('|',p3+1); if (p4==string::npos) continue;
-        size_t p5=line.find('|',p4+1); if (p5==string::npos) continue;
-        size_t p6=line.find('|',p5+1); if (p6==string::npos) continue;
-        size_t p7=line.find('|',p6+1); if (p7==string::npos) continue;
-        size_t p8=line.find('|',p7+1); if (p8==string::npos) continue;
-        size_t p9=line.find('|',p8+1);
-        string id = line.substr(0,p1);
-        string date = line.substr(p1+1,p2-p1-1);
-        string finalAmt = line.substr(p4+1,p5-p4-1);
-        string member = (p8==string::npos)?string(""):line.substr(p7+1,p8-p7-1);
-        cout<<"- ID:"<<id<<" | "<<date<<" | Rp"<<finalAmt<<" | Member:"<<member<<"\n";
+void listTransactions() {
+
+    ifstream fin(TRANSACTIONS_FILE.c_str());
+
+    if (!fin) {
+        cout << "Belum ada transaksi.\n";
+        return;
     }
+
+    string line;
+
+    cout << "\nDaftar Transaksi:\n";
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        // Format:
+        // id|date|total|discount|final|paid|change|promo|member|items
+
+        size_t p1 = line.find('|');
+        if (p1 == string::npos)
+            continue;
+
+        size_t p2 = line.find('|', p1 + 1);
+        if (p2 == string::npos)
+            continue;
+
+        size_t p3 = line.find('|', p2 + 1);
+        if (p3 == string::npos)
+            continue;
+
+        size_t p4 = line.find('|', p3 + 1);
+        if (p4 == string::npos)
+            continue;
+
+        size_t p5 = line.find('|', p4 + 1);
+        if (p5 == string::npos)
+            continue;
+
+        size_t p6 = line.find('|', p5 + 1);
+        if (p6 == string::npos)
+            continue;
+
+        size_t p7 = line.find('|', p6 + 1);
+        if (p7 == string::npos)
+            continue;
+
+        size_t p8 = line.find('|', p7 + 1);
+        if (p8 == string::npos)
+            continue;
+
+        size_t p9 = line.find('|', p8 + 1);
+
+        string id = line.substr(0, p1);
+        string date = line.substr(p1 + 1, p2 - p1 - 1);
+        string finalAmt = line.substr(p4 + 1, p5 - p4 - 1);
+
+        string member = (p8 == string::npos)
+                            ? string("")
+                            : line.substr(p7 + 1, p8 - p7 - 1);
+
+        cout << "- ID: " << id
+             << " | " << date
+             << " | Rp" << finalAmt
+             << " | Member: " << member
+             << endl;
+    }
+
     fin.close();
-    // allow view detail
-    string r = inputLine("Lihat detail transaksi ID (masukkan nomor) atau kosong untuk kembali: ");
-    if (r.empty()) return;
-    int id = 0; for (size_t i=0;i<r.size();++i) if (r[i]>='0'&&r[i]<='9') id = id*10 + (r[i]-'0');
-    if (id>0) viewTransactionDetails(id);
+
+    // Lihat detail transaksi
+    string r = inputLine(
+        "Lihat detail transaksi ID (masukkan nomor) atau kosong untuk kembali: ");
+
+    if (r.empty())
+        return;
+
+    int id = 0;
+
+    for (size_t i = 0; i < r.size(); ++i) {
+        if (r[i] >= '0' && r[i] <= '9')
+            id = id * 10 + (r[i] - '0');
+    }
+
+    if (id > 0) {
+        viewTransactionDetails(id);
+    }
 }
 
 void viewTransactionDetails(int id) {
