@@ -121,7 +121,7 @@ void addCategory();
 void daftarKategori();
 string toLowerCase(string text);
 int jumlahHariBulan(int bulan, int tahun);
-int jumlahHariBulan(int bulan, int tahun);
+int tanggalKeHari(string tgl);
 string statusExpired(string hariIni, string expired);
 // promos
 bool promoCodeExists(const string& code);
@@ -789,9 +789,7 @@ void editProduk() {
 
             string nama = inputLine("Nama Produk : ");
 
-            // ==========================
             // PILIH BRAND
-            // ==========================
             cout << "\nPilih Brand\n";
             cout << "1. Wardah\n";
             cout << "2. Emina\n";
@@ -2493,7 +2491,8 @@ class AnalisisProduk{
     public:
         void hitungBarangTerlaris() { analisisProdukTerlaris(); }
         void rankingProduk() { analisisProdukTerlaris(); }
-        void analisisMarginKeuntungan() {
+
+void analisisMarginKeuntungan() {
 
     ifstream fprod(PRODUCTS_FILE.c_str());
 
@@ -2506,30 +2505,37 @@ class AnalisisProduk{
 
     int totalProduk = 0;
     double totalMarginPersen = 0;
-    int totalKeuntungan = 0;
+    long long totalKeuntunganStok = 0;
 
-    int marginTerbesar = -1;
-    int marginTerkecil = 999999999;
+    int keuntunganUnitTerbesar = -1;
+    int keuntunganUnitTerkecil = 999999999;
 
-    string produkTerbesar = "-";
-    string produkTerkecil = "-";
+    long long keuntunganStokTerbesar = -1;
+    long long keuntunganStokTerkecil = 999999999999LL;
 
-    cout << "\n=====================================================================================================\n";
-    cout << "                                ANALISIS MARGIN KEUNTUNGAN PRODUK\n";
-    cout << "=====================================================================================================\n";
+    string produkUntungUnitTerbesar = "-";
+    string produkUntungUnitTerkecil = "-";
 
+    string produkUntungStokTerbesar = "-";
+    string produkUntungStokTerkecil = "-";
+
+    cout << "\n=====================================================================================================================\n";
+    cout << "                                     ANALISIS KEUNTUNGAN DAN MARGIN PRODUKK\n";
+    cout << "=====================================================================================================================\n";
     cout << left
-         << setw(10) << "Kode"
-         << setw(25) << "Nama Produk"
-         << right
-         << setw(18) << "Harga Modal"
-         << setw(18) << "Harga Jual"
-         << setw(18) << "Margin"
-         << setw(12) << "Margin %"
-         << endl;
+        << setw(8)  << "Kode"
+        << setw(25) << "Nama Produk"
+        << setw(15) << "Brand"
+        << right
+        << setw(16) << "Harga Beli"
+        << setw(16) << "Harga Jual"
+        << setw(8)  << "Stok"
+        << setw(20) << "Keuntungan/Unit"
+        << setw(20) << "Keuntungan Stok"
+        << setw(12) << "Margin %"
+        << endl;
 
-    cout << "-----------------------------------------------------------------------------------------------------\n";
-
+    cout << "==============================================================================================================================\n";
     while (getline(fprod, line)) {
 
         if (line.empty())
@@ -2537,78 +2543,111 @@ class AnalisisProduk{
 
         stringstream ss(line);
 
-        string kode, nama, kategori;
-        string hargaModalStr, hargaJualStr, stok, expired;
+        string kode;
+        string nama;
+        string brand;
+        string kategori;
+        string hargaModalStr;
+        string hargaJualStr;
+        string stok;
+        string minimalStok;
+        string expired;
 
         getline(ss, kode, '|');
         getline(ss, nama, '|');
+        getline(ss, brand, '|');
         getline(ss, kategori, '|');
         getline(ss, hargaModalStr, '|');
         getline(ss, hargaJualStr, '|');
         getline(ss, stok, '|');
-        getline(ss, expired, '|');
+        getline(ss, minimalStok, '|');
+        getline(ss, expired);
 
         int hargaModal = stoi(hargaModalStr);
         int hargaJual = stoi(hargaJualStr);
+        int stokProduk = stoi(stok);
 
-        int margin = hargaJual - hargaModal;
+        int keuntunganUnit = hargaJual - hargaModal;
+        long long keuntunganStok = (long long)keuntunganUnit * stokProduk;
 
-        double marginPersen = 0;
+        double marginPersen = 0.0;
 
         if (hargaJual != 0)
-            marginPersen = (margin * 100.0) / hargaJual;
+            marginPersen = (keuntunganUnit * 100.0) / hargaJual;
 
         totalProduk++;
         totalMarginPersen += marginPersen;
-        totalKeuntungan += margin;
+        totalKeuntunganStok += keuntunganStok;
 
-        if (margin > marginTerbesar) {
-            marginTerbesar = margin;
-            produkTerbesar = nama;
+        if (keuntunganUnit > keuntunganUnitTerbesar) {
+            keuntunganUnitTerbesar = keuntunganUnit;
+            produkUntungUnitTerbesar = nama;
         }
 
-        if (margin < marginTerkecil) {
-            marginTerkecil = margin;
-            produkTerkecil = nama;
+        if (keuntunganUnit < keuntunganUnitTerkecil) {
+            keuntunganUnitTerkecil = keuntunganUnit;
+            produkUntungUnitTerkecil = nama;
         }
 
-        cout << left
-             << setw(10) << kode
-             << setw(25) << nama
-             << right
-             << setw(18) << formatRupiah(hargaModal)
-             << setw(18) << formatRupiah(hargaJual)
-             << setw(18) << formatRupiah(margin)
-             << setw(11) << fixed << setprecision(2)
-             << marginPersen << "%"
-             << endl;
+        if (keuntunganStok > keuntunganStokTerbesar) {
+            keuntunganStokTerbesar = keuntunganStok;
+            produkUntungStokTerbesar = nama;
+        }
+
+        if (keuntunganStok < keuntunganStokTerkecil) {
+            keuntunganStokTerkecil = keuntunganStok;
+            produkUntungStokTerkecil = nama;
+        }
+
+    cout << left
+        << setw(10) << kode
+        << setw(25) << nama
+        << right
+        << setw(18) << formatRupiah(hargaModal)
+        << setw(18) << formatRupiah(hargaJual)
+        << setw(8)  << stokProduk
+        << setw(20) << formatRupiah(keuntunganUnit)
+        << setw(22) << formatRupiah(keuntunganStok)
+        << setw(11) << fixed << setprecision(2)
+        << marginPersen << "%"
+        << endl;
     }
 
-    cout << "=====================================================================================================\n";
+    cout << "=====================================================================================================================\n";
 
     if (totalProduk > 0) {
 
         cout << "\n============================== RINGKASAN ANALISIS ==============================\n";
 
-        cout << "Total Produk             : " << totalProduk << endl;
+        cout << "Jumlah Produk                            : " << totalProduk << endl;
 
-        cout << "Rata-rata Margin         : "
+        cout << "Rata-rata Margin                         : "
              << fixed << setprecision(2)
              << (totalMarginPersen / totalProduk)
              << "%" << endl;
 
-        cout << "Total Potensi Keuntungan : "
-             << formatRupiah(totalKeuntungan)
+        cout << "Total Keuntungan Stok                    : "
+             << formatRupiah(totalKeuntunganStok)
              << endl;
 
-        cout << "Produk Margin Terbesar   : "
-             << produkTerbesar
-             << " (" << formatRupiah(marginTerbesar) << ")"
+        cout << "Produk dengan Keuntungan/Unit Terbesar   : "
+             << produkUntungUnitTerbesar
+             << " (" << formatRupiah(keuntunganUnitTerbesar) << ")"
              << endl;
 
-        cout << "Produk Margin Terkecil   : "
-             << produkTerkecil
-             << " (" << formatRupiah(marginTerkecil) << ")"
+        cout << "Produk dengan Keuntungan/Unit Terkecil   : "
+             << produkUntungUnitTerkecil
+             << " (" << formatRupiah(keuntunganUnitTerkecil) << ")"
+             << endl;
+
+        cout << "Produk dengan Keuntungan Stok Terbesar   : "
+             << produkUntungStokTerbesar
+             << " (" << formatRupiah(keuntunganStokTerbesar) << ")"
+             << endl;
+
+        cout << "Produk dengan Keuntungan Stok Terkecil   : "
+             << produkUntungStokTerkecil
+             << " (" << formatRupiah(keuntunganStokTerkecil) << ")"
              << endl;
 
         cout << "===============================================================================\n";
@@ -2713,6 +2752,28 @@ bool findProductByCode(const string& code, string& nama, string& kategori, strin
     return false;
 }
 
+int jumlahHariBulan(int bulan, int tahun) {
+
+    switch (bulan) {
+
+    case 1: case 3: case 5: case 7:
+    case 8: case 10: case 12:
+        return 31;
+
+    case 4: case 6: case 9: case 11:
+        return 30;
+
+    case 2:
+        if ((tahun % 400 == 0) ||
+            (tahun % 4 == 0 && tahun % 100 != 0))
+            return 29;
+        return 28;
+
+    default:
+        return 30;
+    }
+}
+
 int tanggalKeHari(string tgl) {
 
     int tahun = atoi(tgl.substr(0,4).c_str());
@@ -2721,13 +2782,12 @@ int tanggalKeHari(string tgl) {
 
     int totalHari = 0;
 
-    for (int y = 1; y < tahun; y++) {
+    for (int t = 1; t < tahun; t++) {
 
-        bool kabisat =
-            (y % 400 == 0) ||
-            (y % 4 == 0 && y % 100 != 0);
-
-        totalHari += kabisat ? 366 : 365;
+        if ((t % 400 == 0) || (t % 4 == 0 && t % 100 != 0))
+            totalHari += 366;
+        else
+            totalHari += 365;
     }
 
     for (int b = 1; b < bulan; b++) {
@@ -3317,61 +3377,126 @@ bool checkoutCart(const string& curDate) {
 }
 
 void viewTransactionDetails(int id) {
-    ifstream fin(TRANSACTIONS_FILE.c_str()); if (!fin) { cout<<"Belum ada transaksi.\n"; return; }
-    string line; bool found=false;
-    while (getline(fin,line)) {
-        if (line.empty()) continue;
-        size_t p1=line.find('|'); if (p1==string::npos) continue;
-        string sid = line.substr(0,p1);
-        int iid=0; for (size_t i=0;i<sid.size();++i) if (sid[i]>='0'&&sid[i]<='9') iid = iid*10 + (sid[i]-'0');
-        if (iid != id) continue;
-        found=true;
-        // parse full
-        size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1); size_t p4=line.find('|',p3+1); size_t p5=line.find('|',p4+1); size_t p6=line.find('|',p5+1); size_t p7=line.find('|',p6+1); size_t p8=line.find('|',p7+1); size_t p9=line.find('|',p8+1);
-        string date = (p2==string::npos)?string(""):line.substr(p1+1,p2-p1-1);
-        string total = (p3==string::npos)?string(""):line.substr(p2+1,p3-p2-1);
-        string discount = (p4==string::npos)?string(""):line.substr(p3+1,p4-p3-1);
-        string finalAmt = (p5==string::npos)?string(""):line.substr(p4+1,p5-p4-1);
-        string paid = (p6==string::npos)?string(""):line.substr(p5+1,p6-p5-1);
-        string change = (p7==string::npos)?string(""):line.substr(p6+1,p7-p6-1);
-        string promo = (p8==string::npos)?string(""):line.substr(p7+1,p8-p7-1);
-        string member = (p9==string::npos)?string(""):line.substr(p8+1,p9-p8-1);
-        string items = (p9==string::npos)?string(""):line.substr(p9+1);
-        // print nicely with store header
-        cout<<"\n--- Struk Transaksi (ID:"<<id<<") ---\n";
-        cout<<"Toko Kosmetik - TPalPro\n";
-        cout<<"Alamat: Jl. Contoh No.1\n";
-        cout<<"Tanggal: "<<date<<"\n";
-        cout<<"Member: "<<member<<"\n";
-        cout<<"Items:\n";
-        // items format code:qty:price,code2:...
-        size_t pos=0; while (pos < items.size()) {
-            size_t comma = items.find(',', pos);
-            string chunk = (comma==string::npos)?items.substr(pos):items.substr(pos, comma-pos);
-            size_t a = chunk.find(':'); size_t b = (a==string::npos)?string::npos:chunk.find(':', a+1);
-            string code = (a==string::npos)?chunk:chunk.substr(0,a);
-            string qty = (a==string::npos||b==string::npos)?string(""):chunk.substr(a+1,b-a-1);
-            string price = (b==string::npos)?string(""):chunk.substr(b+1);
-            cout<<" - "<<code<<" x"<<qty<<" @Rp"<<price<<"\n";
-            if (comma==string::npos) break; pos = comma+1;
+    ifstream fin(TRANSACTIONS_FILE.c_str());
+
+    if (!fin) {
+        cout << "Belum ada transaksi.\n";
+        return;
+    }
+
+    string line;
+    bool found = false;
+
+    while (getline(fin, line)) {
+        if (line.empty())
+            continue;
+
+        size_t p1 = line.find('|');
+        if (p1 == string::npos)
+            continue;
+
+        string sid = line.substr(0, p1);
+
+        int iid = 0;
+        for (size_t i = 0; i < sid.size(); ++i) {
+            if (sid[i] >= '0' && sid[i] <= '9')
+                iid = iid * 10 + (sid[i] - '0');
         }
-        cout<<"Subtotal: Rp"<<total<<"\n";
-        cout<<"Diskon: Rp"<<discount<<"\n";
-        cout<<"Total akhir: Rp"<<finalAmt<<"\n";
-        cout<<"Dibayar: Rp"<<paid<<" | Kembali: Rp"<<change<<"\n";
-        cout<<"Promo: "<<promo<<"\n";
-        cout<<"---\n";
-        // offer to print to file
+
+        if (iid != id)
+            continue;
+
+        found = true;
+
+        // Parse data transaksi
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+        size_t p4 = line.find('|', p3 + 1);
+        size_t p5 = line.find('|', p4 + 1);
+        size_t p6 = line.find('|', p5 + 1);
+        size_t p7 = line.find('|', p6 + 1);
+        size_t p8 = line.find('|', p7 + 1);
+        size_t p9 = line.find('|', p8 + 1);
+
+        string date = (p2 == string::npos) ? string("") : line.substr(p1 + 1, p2 - p1 - 1);
+        string total = (p3 == string::npos) ? string("") : line.substr(p2 + 1, p3 - p2 - 1);
+        string discount = (p4 == string::npos) ? string("") : line.substr(p3 + 1, p4 - p3 - 1);
+        string finalAmt = (p5 == string::npos) ? string("") : line.substr(p4 + 1, p5 - p4 - 1);
+        string paid = (p6 == string::npos) ? string("") : line.substr(p5 + 1, p6 - p5 - 1);
+        string change = (p7 == string::npos) ? string("") : line.substr(p6 + 1, p7 - p6 - 1);
+        string promo = (p8 == string::npos) ? string("") : line.substr(p7 + 1, p8 - p7 - 1);
+        string member = (p9 == string::npos) ? string("") : line.substr(p8 + 1, p9 - p8 - 1);
+        string items = (p9 == string::npos) ? string("") : line.substr(p9 + 1);
+
+        // Cetak struk
+        cout << "\n--- Struk Transaksi (ID:" << id << ") ---\n";
+        cout << "Toko Kosmetik - TPalPro\n";
+        cout << "Alamat: Jl. Contoh No.1\n";
+        cout << "Tanggal: " << date << "\n";
+        cout << "Member: " << member << "\n";
+        cout << "Items:\n";
+
+        // Format item: kode:qty:harga,kode2:qty:harga,...
+        size_t pos = 0;
+
+        while (pos < items.size()) {
+            size_t comma = items.find(',', pos);
+
+            string chunk = (comma == string::npos)
+                ? items.substr(pos)
+                : items.substr(pos, comma - pos);
+
+            size_t a = chunk.find(':');
+            size_t b = (a == string::npos)
+                ? string::npos
+                : chunk.find(':', a + 1);
+
+            string code = (a == string::npos)
+                ? chunk
+                : chunk.substr(0, a);
+
+            string qty = (a == string::npos || b == string::npos)
+                ? string("")
+                : chunk.substr(a + 1, b - a - 1);
+
+            string price = (b == string::npos)
+                ? string("")
+                : chunk.substr(b + 1);
+
+            cout << " - " << code
+                 << " x" << qty
+                 << " @Rp" << price << "\n";
+
+            if (comma == string::npos)
+                break;
+
+            pos = comma + 1;
+        }
+
+        cout << "Subtotal   : Rp" << total << "\n";
+        cout << "Diskon     : Rp" << discount << "\n";
+        cout << "Total Akhir: Rp" << finalAmt << "\n";
+        cout << "Dibayar    : Rp" << paid
+             << " | Kembali: Rp" << change << "\n";
+        cout << "Promo      : " << promo << "\n";
+        cout << "----------------------------------------\n";
+
         string pr = inputLine("Cetak struk ke file? (y/n): ");
+
         Struk struk;
 
         if (pr == "y" || pr == "Y") {
-        struk.cetakKeFile(id);
-}
+            struk.cetakKeFile(id);
+        }
+
         break;
     }
+
     fin.close();
-    if (!found) cout<<"Transaksi tidak ditemukan.\n";
+
+    if (!found) {
+        cout << "Transaksi tidak ditemukan.\n";
+    }
 }
 
 
