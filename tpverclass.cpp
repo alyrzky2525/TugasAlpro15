@@ -4567,10 +4567,7 @@ void analisisPenjualanPerKategori() {
         return;
     }
 
-    // ===============================
     // Membaca data kategori produk
-    // ===============================
-
     StringStringEntry productCategory[MAX_ENTRIES];
     int productCategorySize = 0;
 
@@ -4613,10 +4610,7 @@ void analisisPenjualanPerKategori() {
 
     fprod.close();
 
-    // ===============================
     // Analisis penjualan
-    // ===============================
-
     StringDoubleEntry catRevenue[MAX_ENTRIES];
     int catRevenueSize = 0;
 
@@ -4698,20 +4692,14 @@ void analisisPenjualanPerKategori() {
 
     fin.close();
 
-    // ===============================
     // Hitung Total Pendapatan
-    // ===============================
-
     double totalPendapatan = 0;
 
     for (int i = 0; i < catRevenueSize; i++) {
         totalPendapatan += catRevenue[i].value;
     }
 
-    // ===============================
     // Output
-    // ===============================
-
     cout << "\n=========================================================================================\n";
     cout << "                         ANALISIS PENJUALAN PER KATEGORI\n";
     cout << "=========================================================================================\n";
