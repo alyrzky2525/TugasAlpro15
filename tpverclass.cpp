@@ -120,6 +120,9 @@ void deleteProduct();
 void addCategory();
 void daftarKategori();
 string toLowerCase(string text);
+int jumlahHariBulan(int bulan, int tahun);
+int jumlahHariBulan(int bulan, int tahun);
+string statusExpired(string hariIni, string expired);
 // promos
 bool promoCodeExists(const string& code);
 void tampilPromo();
@@ -899,59 +902,7 @@ void editProduk() {
 
     cout << "\nProduk berhasil diperbarui.\n";
 }
-        void hapusProduk() {
-    string kode = inputLine("Masukkan kode produk yang akan dihapus: ");
 
-    ifstream fin(PRODUCTS_FILE.c_str());
-
-    if (!fin) {
-        cout << "File produk tidak ditemukan.\n";
-        return;
-    }
-
-    string all;
-    string line;
-    bool found = false;
-
-    while (getline(fin, line)) {
-        if (line.empty()) {
-            continue;
-        }
-
-        size_t p = line.find('|');
-
-        if (p == string::npos) {
-            continue;
-        }
-
-        string c = line.substr(0, p);
-
-        if (c == kode) {
-            found = true;
-            continue;
-        }
-
-        all += line + '\n';
-    }
-
-    fin.close();
-
-    if (!found) {
-        cout << "Kode tidak ditemukan.\n";
-        return;
-    }
-
-    ofstream fout(PRODUCTS_FILE.c_str(), ios::trunc);
-
-    if (!fout) {
-        cout << "Gagal menulis file produk.\n";
-        return;
-    }
-
-    fout << all;
-
-    cout << "Produk dihapus.\n";
-}
 void kelolaKategori() {
     while (true) {
         cout << "\n";
@@ -1544,37 +1495,85 @@ while (getline(fin, line)) {
     cout << "=============================================================\n";
 }
 
-        bool cekExpired() {
-            string d = inputLine("Tampilkan produk yang expired sampai tanggal (YYYY-MM-DD):");
-            if (d.empty()) { cout << "Tanggal tidak boleh kosong.\n"; return false; }
-            ifstream fin(PRODUCTS_FILE.c_str());
-            if (!fin) { cout << "File produk tidak ditemukan.\n"; return false; }
-            bool found = false;
-            string line;
-            while (getline(fin, line)) {
-                if (line.empty()) continue;
-                size_t p1 = line.find('|');
-                size_t p2 = line.find('|', p1 + 1);
-                size_t p3 = line.find('|', p2 + 1);
-                size_t p4 = line.find('|', p3 + 1);
-                if (p4 == string::npos) continue;
-                size_t p5 = line.find('|', p4 + 1);
-                if (p5 == string::npos) continue;
-                string kode = line.substr(0, p1);
-                string nama = line.substr(p1 + 1, p2 - p1 - 1);
-                string expired = line.substr(p5 + 1);
-                if (expired <= d) {
-                    cout << kode << " | " << nama << " | exp:" << expired << "\n";
-                    found = true;
-                }
-            }
-            fin.close();
+bool cekExpired() {
 
-            if (!found) {
-            cout << "Tidak ada produk yang expired sebelum atau pada tanggal tersebut.\n";
+    string d = inputLine("Tampilkan produk yang expired sampai tanggal (YYYY-MM-DD): ");
+
+    if (d.empty()) {
+        cout << "Tanggal tidak boleh kosong.\n";
+        return false;
+    }
+
+    ifstream fin(PRODUCTS_FILE.c_str());
+
+    if (!fin) {
+        cout << "File produk tidak ditemukan.\n";
+        return false;
+    }
+
+    bool found = false;
+    string line;
+
+    cout << "\n=========================================================================================\n";
+    cout << left
+        << setw(8)  << "Kode"
+        << setw(25) << "Nama Produk"
+        << setw(15) << "Brand"
+        << setw(15) << "Kategori"
+        << setw(15) << "Expired"
+        << "Status\n";
+
+    cout << "=========================================================================================\n";
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+        size_t p4 = line.find('|', p3 + 1);
+        size_t p5 = line.find('|', p4 + 1);
+        size_t p6 = line.find('|', p5 + 1);
+        size_t p7 = line.find('|', p6 + 1);
+        size_t p8 = line.find('|', p7 + 1);
+
+        if (p1==string::npos || p2==string::npos || p3==string::npos ||
+            p4==string::npos || p5==string::npos || p6==string::npos ||
+            p7==string::npos || p8==string::npos)
+            continue;
+
+        string kode      = line.substr(0, p1);
+        string nama      = line.substr(p1 + 1, p2 - p1 - 1);
+        string brand     = line.substr(p2 + 1, p3 - p2 - 1);
+        string kategori  = line.substr(p3 + 1, p4 - p3 - 1);
+        string expired   = line.substr(p8 + 1);
+        string status = statusExpired(d, expired);
+
+        if (expired <= d) {
+
+    cout << left
+        << setw(8)  << kode
+        << setw(25) << nama
+        << setw(15) << brand
+        << setw(15) << kategori
+        << setw(15) << expired
+        << status
+        << endl;
+
+            found = true;
         }
-            return found;
-        }
+    }
+
+    fin.close();
+
+    if (!found) {
+        cout << "Tidak ada produk yang expired sebelum atau pada tanggal tersebut.\n";
+    }
+
+    return found;
+}
 
 bool productCodeExists(const string& code) {
     ifstream fin(PRODUCTS_FILE.c_str());
@@ -2712,6 +2711,48 @@ bool findProductByCode(const string& code, string& nama, string& kategori, strin
         }
     }
     return false;
+}
+
+int tanggalKeHari(string tgl) {
+
+    int tahun = atoi(tgl.substr(0,4).c_str());
+    int bulan = atoi(tgl.substr(5,2).c_str());
+    int hari  = atoi(tgl.substr(8,2).c_str());
+
+    int totalHari = 0;
+
+    for (int y = 1; y < tahun; y++) {
+
+        bool kabisat =
+            (y % 400 == 0) ||
+            (y % 4 == 0 && y % 100 != 0);
+
+        totalHari += kabisat ? 366 : 365;
+    }
+
+    for (int b = 1; b < bulan; b++) {
+        totalHari += jumlahHariBulan(b, tahun);
+    }
+
+    totalHari += hari;
+
+    return totalHari;
+}
+
+string statusExpired(string hariIni, string expired) {
+
+    int sekarang = tanggalKeHari(hariIni);
+    int exp = tanggalKeHari(expired);
+
+    int selisih = exp - sekarang;
+
+    if (selisih <= 0)
+        return "EXPIRED";
+
+    if (selisih <= 30)
+        return "HAMPIR EXPIRED";
+
+    return "AMAN";
 }
 
 string toLowerCase(string text) {
