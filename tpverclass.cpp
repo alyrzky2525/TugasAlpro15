@@ -2600,14 +2600,15 @@ void analisisMarginKeuntungan() {
         }
 
     cout << left
-        << setw(10) << kode
+        << setw(8)  << kode
         << setw(25) << nama
+        << setw(18) << brand
         << right
-        << setw(18) << formatRupiah(hargaModal)
-        << setw(18) << formatRupiah(hargaJual)
+        << setw(16) << formatRupiah(hargaModal)
+        << setw(16) << formatRupiah(hargaJual)
         << setw(8)  << stokProduk
         << setw(20) << formatRupiah(keuntunganUnit)
-        << setw(22) << formatRupiah(keuntunganStok)
+        << setw(20) << formatRupiah(keuntunganStok)
         << setw(11) << fixed << setprecision(2)
         << marginPersen << "%"
         << endl;
@@ -2956,38 +2957,86 @@ void ensureDefaultData() {
     if (needProducts) {
         ofstream pf(PRODUCTS_FILE.c_str(), ios::app);
         if (pf) {
-            // several sample products across categories
-            pf << "P0001|Lipstick Red|Bibir|75000|25|2028-12-31\n";
-            pf << "P0002|Lipstick Pink|Bibir|70000|30|2028-12-31\n";
-            pf << "P0003|Mascara Black|Mata|90000|15|2028-12-31\n";
-            pf << "P0004|Eyeliner Liquid|Mata|65000|18|2028-12-31\n";
-            pf << "P0005|Face Cleanser|Wajah|45000|40|2028-12-31\n";
-            pf << "P0006|Moisturizer|Wajah|120000|22|2028-12-31\n";
-            pf << "P0007|Body Lotion|Bodycare|60000|35|2028-12-31\n";
-            pf << "P0008|Hand Cream|Bodycare|40000|50|2028-12-31\n";
-            pf << "P0009|Serum Vitamin C|Skincare|150000|12|2028-12-31\n";
-            pf << "P0010|Sunscreen SPF50|Skincare|95000|28|2028-12-31\n";
-            pf << "P0011|Blush Peach|Wajah|55000|20|2028-12-31\n";
-            pf << "P0012|BB Cream|Wajah|85000|14|2028-12-31\n";
-            pf << "P0013|Face Mask Clay|Skincare|30000|60|2028-12-31\n";
-            pf << "P0014|Lip Balm|Bibir|20000|80|2028-12-31\n";
-            pf << "P0015|Eye Shadow Palette|Mata|180000|10|2028-12-31\n";
-            pf << "P0016|Facial Toner|Skincare|50000|45|2028-12-31\n";
-            pf << "P0017|Makeup Remover|Wajah|38000|33|2028-12-31\n";
-            pf << "P0018|Body Scrub|Bodycare|48000|26|2028-12-31\n";
-            pf << "P0019|Concealer|Wajah|67000|19|2028-12-31\n";
-            pf << "P0020|Facial Oil|Skincare|140000|9|2028-12-31\n";
+    // several sample products across categories
+        pf << "P0001|Lipstick Red|Wardah|Makeup|50000|75000|25|5|2028-12-31\n";
+        pf << "P0002|Lipstick Pink|Implora|Makeup|52000|70000|30|5|2028-12-31\n";
+        pf << "P0003|Mascara Black|Maybelline|Makeup|70000|90000|15|3|2028-12-31\n";
+        pf << "P0004|Eyeliner Liquid|Pinkflash|Makeup|45000|65000|18|4|2028-12-31\n";
+
+        pf << "P0005|Face Cleanser|Hanasui|Skincare|30000|45000|40|8|2028-12-31\n";
+        pf << "P0006|Moisturizer|Skintific|Skincare|90000|120000|22|5|2028-12-31\n";
+        pf << "P0007|Serum Vitamin C|Somethinc|Skincare|120000|150000|12|3|2028-12-31\n";
+        pf << "P0008|Facial Toner|Avoskin|Skincare|35000|50000|45|8|2028-12-31\n";
+
+        pf << "P0009|Body Lotion|Vaseline|Bodycare|45000|60000|35|7|2028-12-31\n";
+        pf << "P0010|Hand Cream|Nivea|Bodycare|25000|40000|50|10|2028-12-31\n";
+        pf << "P0011|Body Scrub|Purbasari|Bodycare|35000|48000|26|5|2028-12-31\n";
+
+        pf << "P0012|Shampoo Repair|Pantene|Haircare|40000|58000|30|6|2028-12-31\n";
+        pf << "P0013|Hair Serum|L'Oreal|Haircare|65000|90000|18|4|2028-12-31\n";
+        pf << "P0014|Hair Mask|Makarizo|Haircare|55000|78000|20|5|2028-12-31\n";
+
+        pf << "P0015|Perfume Floral|HMNS|Fragrance|150000|195000|10|2|2028-12-31\n";
+        pf << "P0016|Body Mist Fresh|Victoria's Secret|Fragrance|90000|120000|24|5|2028-12-31\n";
+
+        pf << "P0017|Facial Cotton|Selection|Beauty Tools|12000|18000|80|15|2028-12-31\n";
+        pf << "P0018|Makeup Sponge|Real Techniques|Beauty Tools|35000|50000|32|6|2028-12-31\n";
+
+        pf << "P0019|Sheet Mask Aloe|Nature Republic|Personal Care|18000|25000|60|10|2028-12-31\n";
+        pf << "P0020|Wet Tissue|Dettol|Personal Care|10000|15000|70|15|2028-12-31\n";
             // more entries to bulk up the file
-            for (int i = 21; i <= 40; ++i) {
-                char code[8]; sprintf(code, "P%04d", i);
-                string kode(code);
-                string name = string("SampleProd_") + kode;
-                string cat = (i%5==0)?"Bodycare":(i%5==1)?"Skincare":(i%5==2)?"Bibir":(i%5==3)?"Mata":"Wajah";
-                int price = 20000 + (i*1500);
-                int stock = 10 + (i%7)*5;
-                string exp = "2028-12-31";
-                pf << kode << '|' << name << '|' << cat << '|' << price << '|' << stock << '|' << exp << '\n';
-            }
+           for (int i = 21; i <= 40; i++) {
+
+            char code[8];
+            sprintf(code, "P%04d", i);
+
+            string kode(code);
+            string nama = "Sample Product " + to_string(i);
+
+            string brand;
+
+            switch (i % 8) {
+                case 0: brand = "Wardah"; break;
+                case 1: brand = "Implora"; break;
+                case 2: brand = "Maybelline"; break;
+                case 3: brand = "Pinkflash"; break;
+                case 4: brand = "Hanasui"; break;
+                case 5: brand = "Skintific"; break;
+                case 6: brand = "Emina"; break;
+                default: brand = "Somethinc";
+        }
+
+        string kategori;
+
+            switch (i % 7) {
+                case 0: kategori = "Makeup"; break;
+                case 1: kategori = "Skincare"; break;
+                case 2: kategori = "Bodycare"; break;
+                case 3: kategori = "Haircare"; break;
+                case 4: kategori = "Fragrance"; break;
+                case 5: kategori = "Beauty Tools"; break;
+                default: kategori = "Personal Care";
+    }
+
+            int hargaBeli = 20000 + (i * 1500);
+            int hargaJual = hargaBeli + (10000 + (i % 5) * 5000);
+
+            int stok = 10 + (i % 7) * 5;
+            int minimalStok = 5;
+
+        string expired = "2028-12-31";
+
+        pf << kode << "|"
+            << nama << "|"
+            << brand << "|"
+            << kategori << "|"
+            << hargaBeli << "|"
+            << hargaJual << "|"
+            << stok << "|"
+            << minimalStok << "|"
+            << expired
+            << "\n";
+}
             pf.close();
         }
     }
@@ -3808,77 +3857,184 @@ void analisisProdukTerlaris() {
     cout<<"-------------------------------------------\n";
     cout<<"======================================\n";
 }
-
 void analisisPenjualanPerKategori() {
+
     ifstream fprod(PRODUCTS_FILE.c_str());
-    if (!fprod) { cout<<"\nFile produk tidak ditemukan.\n"; return; }
+
+    if (!fprod) {
+        cout << "\nFile produk tidak ditemukan.\n";
+        return;
+    }
+
     ifstream fin(TRANSACTIONS_FILE.c_str());
-    if (!fin) { cout<<"\nBelum ada data transaksi.\n"; return; }
-    
-    // Load product categories
+
+    if (!fin) {
+        cout << "\nBelum ada data transaksi.\n";
+        return;
+    }
+
+    // Membaca kategori produk
     StringStringEntry productCategory[MAX_ENTRIES];
     int productCategorySize = 0;
+
     string line;
-    while (getline(fprod,line)) {
-        if (line.empty()) continue;
-        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1);
-        if (p1==string::npos || p2==string::npos) continue;
-        string pid=line.substr(0,p1);
-        string cat=line.substr(p1+1,p2-p1-1);
-        addStringStringEntry(productCategory, productCategorySize, pid, cat);
+
+    while (getline(fprod, line)) {
+
+        if (line.empty())
+            continue;
+
+        stringstream ss(line);
+
+        string kode;
+        string nama;
+        string brand;
+        string kategori;
+        string hargaBeli;
+        string hargaJual;
+        string stok;
+        string minimalStok;
+        string expired;
+
+        getline(ss, kode, '|');
+        getline(ss, nama, '|');
+        getline(ss, brand, '|');
+        getline(ss, kategori, '|');
+        getline(ss, hargaBeli, '|');
+        getline(ss, hargaJual, '|');
+        getline(ss, stok, '|');
+        getline(ss, minimalStok, '|');
+        getline(ss, expired);
+
+        addStringStringEntry(
+            productCategory,
+            productCategorySize,
+            kode,
+            kategori
+        );
     }
+
     fprod.close();
-    
-    // Calculate sales by category
+
+    // Analisis Penjualan
     StringDoubleEntry catRevenue[MAX_ENTRIES];
     int catRevenueSize = 0;
+
     StringIntEntry catQuantity[MAX_ENTRIES];
     int catQuantitySize = 0;
-    
-    while (getline(fin,line)) {
-        if (line.empty()) continue;
-        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1);
-        size_t p4=line.find('|',p3+1); size_t p5=line.find('|',p4+1); size_t p6=line.find('|',p5+1);
-        size_t p7=line.find('|',p6+1); size_t p8=line.find('|',p7+1); size_t p9=line.find('|',p8+1);
-        if (p9==string::npos) continue;
-        
-        int final=0; for (size_t i=p4+1;i<p5;++i) 
-            if (line[i]>='0'&&line[i]<='9') final=final*10+(line[i]-'0');
-        string items=line.substr(p9+1);
-        
-        size_t pos=0;
-        while (pos<items.length()) {
-            size_t popen=items.find('(',pos);
-            size_t pclose=items.find(')',popen);
-            if (popen==string::npos||pclose==string::npos) break;
-            string productId=items.substr(pos,popen-pos);
-            int qty=0;
-            for (size_t i=popen+1;i<pclose;++i)
-                if (items[i]>='0'&&items[i]<='9') qty=qty*10+(items[i]-'0');
-            
-            int catIdx = findStringStringEntry(productCategory, productCategorySize, productId);
-            if (catIdx >= 0) {
-                string cat = productCategory[catIdx].value;
-                addStringIntEntry(catQuantity, catQuantitySize, cat, qty);
-                addStringDoubleEntry(catRevenue, catRevenueSize, cat, final * qty / 100.0);
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        // Ambil field terakhir (items)
+        size_t pos = 0;
+
+        for (int i = 0; i < 9; i++) {
+
+            pos = line.find('|', pos);
+
+            if (pos == string::npos)
+                break;
+
+            pos++;
+        }
+
+        if (pos == string::npos)
+            continue;
+
+        string items = line.substr(pos);
+
+        stringstream itemStream(items);
+
+        string item;
+
+        while (getline(itemStream, item, ',')) {
+
+            stringstream ss(item);
+
+            string kodeProduk;
+            string qtyStr;
+            string hargaStr;
+
+            getline(ss, kodeProduk, ':');
+            getline(ss, qtyStr, ':');
+            getline(ss, hargaStr);
+
+            if (kodeProduk.empty() ||
+                qtyStr.empty() ||
+                hargaStr.empty())
+                continue;
+
+            int qty = stoi(qtyStr);
+            double harga = stod(hargaStr);
+
+            int idx = findStringStringEntry(
+                productCategory,
+                productCategorySize,
+                kodeProduk
+            );
+
+            if (idx >= 0) {
+
+                string kategori = productCategory[idx].value;
+
+                addStringIntEntry(
+                    catQuantity,
+                    catQuantitySize,
+                    kategori,
+                    qty
+                );
+
+                addStringDoubleEntry(
+                    catRevenue,
+                    catRevenueSize,
+                    kategori,
+                    qty * harga
+                );
             }
-            pos=pclose+1;
-            if (pos<items.length() && items[pos]==',') pos++;
         }
     }
+
     fin.close();
-    
-    cout<<"\n========== ANALISIS PENJUALAN PER KATEGORI ==========\n";
-    cout<<"Kategori | Jumlah Item Terjual | Total Pendapatan\n";
-    cout<<"----------------------------------------------------\n";
-    double totalCat=0;
-    for (int i = 0; i < catRevenueSize; ++i) {
-        cout<<catRevenue[i].key<<" | "<<getStringIntValue(catQuantity, catQuantitySize, catRevenue[i].key)<<" | Rp"<<(int)catRevenue[i].value<<"\n";
-        totalCat+=catRevenue[i].value;
+
+    // Output
+    cout << "\n===============================================================\n";
+    cout << "               ANALISIS PENJUALAN PER KATEGORI\n";
+    cout << "===============================================================\n";
+
+    cout << left
+         << setw(20) << "Kategori"
+         << setw(20) << "Item Terjual"
+         << "Total Pendapatan"
+         << endl;
+
+    cout << "---------------------------------------------------------------\n";
+
+    double totalPendapatan = 0;
+
+    for (int i = 0; i < catRevenueSize; i++) {
+
+        cout << left
+             << setw(20) << catRevenue[i].key
+             << setw(20) << getStringIntValue(
+                                catQuantity,
+                                catQuantitySize,
+                                catRevenue[i].key)
+             << formatRupiah((int)catRevenue[i].value)
+             << endl;
+
+        totalPendapatan += catRevenue[i].value;
     }
-    cout<<"----------------------------------------------------\n";
-    cout<<"Total Pendapatan dari Semua Kategori: Rp"<<(int)totalCat<<"\n";
-    cout<<"==================================================\n";
+
+    cout << "---------------------------------------------------------------\n";
+
+    cout << "Total Pendapatan Seluruh Kategori : "
+         << formatRupiah((int)totalPendapatan)
+         << endl;
+
+    cout << "===============================================================\n";
 }
 
 void laporanPendapatanPerPeriode() {
