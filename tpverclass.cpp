@@ -1100,20 +1100,23 @@ class Produk{
     string line;
 
     cout << "\n===================================================================================================================================\n";
-
-    cout << left
-         << setw(4)  << "No"
-         << setw(10) << "Kode"
-         << setw(28) << "Nama Produk"
-         << setw(18) << "Brand"
-         << setw(16) << "Kategori"
-         << setw(13) << "Harga Beli"
-         << setw(13) << "Harga Jual"
-         << setw(12) << "Margin"
-         << setw(8)  << "Stok"
-         << setw(12) << "Min Stok"
-         << setw(15) << "Expired"
-         << endl;
+cout << left
+     << setw(5)  << "No"
+     << setw(10) << "Kode"
+     << setw(30) << "Nama Produk"
+     << setw(18) << "Brand"
+     << setw(16) << "Kategori"
+     << right
+     << setw(16) << "Harga Beli"
+     << setw(16) << "Harga Jual"
+     << setw(16) << "Margin"
+     << setw(8)  << "Stok"
+     << setw(12) << "Min Stok"
+     << " "                      // separator
+     << left
+     << setw(12) << "Status"
+     << setw(15) << "Expired"
+     << endl;
 
     cout << "===================================================================================================================================\n";
 
@@ -1164,20 +1167,27 @@ class Produk{
         else
             status = "AMAN";
 
-        cout << left
-            << setw(4)  << no++
-            << setw(10) << kode
-            << setw(28) << nama
-            << setw(18) << brand
-            << setw(16) << kategori
-            << setw(13) << ("Rp"+hargaBeli)
-            << setw(13) << ("Rp"+hargaJual)
-            << setw(12) << ("Rp"+to_string(margin))
-            << setw(8)  << stok
-            << setw(12) << minStok
-            << setw(15) << status
-            << setw(15) << expired
-            << endl;
+cout << left
+     << setw(5)  << no++
+     << setw(10) << kode
+     << setw(30) << nama
+     << setw(18) << brand
+     << setw(16) << kategori
+
+     << right
+     << setw(16) << formatRupiah(stoi(hargaBeli))
+     << setw(16) << formatRupiah(stoi(hargaJual))
+     << setw(16) << formatRupiah(margin)
+
+     << setw(8)  << stok
+     << setw(12) << minStok
+
+     << "  "          // <-- tambahkan 2 spasi
+
+     << left
+     << setw(12) << status
+     << setw(15) << expired
+     << endl;
     }
 
     cout << "===================================================================================================================================\n";
@@ -2829,6 +2839,10 @@ bool memberExists(const string& uname) {
     ifstream fin(MEMBERS_FILE.c_str()); if (!fin) return false;
     string line; while (getline(fin,line)) { if (line.empty()) continue; size_t p=line.find('|'); if (p==string::npos) continue; string u=line.substr(0,p); if (u==uname) return true; } return false;
 }
+
+
+
+
 
 
 int main() {
@@ -4550,6 +4564,304 @@ void laporanPenjualanBulanan() {
     cout << "===================================================================================================\n";
 }
 
+void analisisProdukTerlaris() {
+
+    ifstream fprod(PRODUCTS_FILE.c_str());
+
+    if (!fprod) {
+        cout << "\nFile produk tidak ditemukan.\n";
+        return;
+    }
+
+    ifstream fin(TRANSACTIONS_FILE.c_str());
+
+    if (!fin) {
+        cout << "\nBelum ada data transaksi.\n";
+        return;
+    }
+
+    // ============================
+    // Membaca Data Produk
+    // ============================
+
+    StringStringEntry productName[MAX_ENTRIES];
+    int productNameSize = 0;
+
+    string line;
+
+    while (getline(fprod, line)) {
+
+        if (line.empty())
+            continue;
+
+        stringstream ss(line);
+
+        string kode;
+        string nama;
+        string kategori;
+        string hargaModal;
+        string hargaJual;
+        string stok;
+        string expired;
+
+        getline(ss, kode, '|');
+        getline(ss, nama, '|');
+        getline(ss, kategori, '|');
+        getline(ss, hargaModal, '|');
+        getline(ss, hargaJual, '|');
+        getline(ss, stok, '|');
+        getline(ss, expired);
+
+        addStringStringEntry(
+            productName,
+            productNameSize,
+            kode,
+            nama
+        );
+    }
+
+    fprod.close();
+
+    // ============================
+    // Data Hasil Analisis
+    // ============================
+
+    StringIntEntry qtySold[MAX_ENTRIES];
+    int qtySoldSize = 0;
+
+    StringDoubleEntry revenueSold[MAX_ENTRIES];
+    int revenueSoldSize = 0;
+
+    int totalBarangTerjual = 0;
+    double totalPendapatan = 0;
+
+    // ============================
+    // Membaca Seluruh Transaksi
+    // ============================
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        size_t pos = 0;
+
+        for (int i = 0; i < 9; i++) {
+
+            pos = line.find('|', pos);
+
+            if (pos == string::npos)
+                break;
+
+            pos++;
+        }
+
+        if (pos == string::npos)
+            continue;
+
+        string items = line.substr(pos);
+
+        stringstream itemStream(items);
+
+        string item;
+
+                while (getline(itemStream, item, ',')) {
+
+            if (item.empty())
+                continue;
+
+            stringstream ss(item);
+
+            string kodeProduk;
+            string qtyStr;
+            string hargaStr;
+
+            getline(ss, kodeProduk, ':');
+            getline(ss, qtyStr, ':');
+            getline(ss, hargaStr);
+
+            if (kodeProduk.empty() ||
+                qtyStr.empty() ||
+                hargaStr.empty())
+                continue;
+
+            int qty = stoi(qtyStr);
+            double harga = stod(hargaStr);
+
+            addStringIntEntry(
+                qtySold,
+                qtySoldSize,
+                kodeProduk,
+                qty
+            );
+
+            addStringDoubleEntry(
+                revenueSold,
+                revenueSoldSize,
+                kodeProduk,
+                qty * harga
+            );
+
+            totalBarangTerjual += qty;
+            totalPendapatan += qty * harga;
+        }
+    }
+
+    fin.close();
+
+    // ============================
+    // Tidak ada data penjualan
+    // ============================
+
+    if (qtySoldSize == 0) {
+
+        cout << "\nBelum ada data penjualan.\n";
+        return;
+    }
+        // ============================
+    // Sorting Produk Terlaris
+    // ============================
+for (int i = 0; i < qtySoldSize - 1; i++) {
+
+    for (int j = i + 1; j < qtySoldSize; j++) {
+
+        if (qtySold[j].value > qtySold[i].value) {
+
+            StringIntEntry tempQty = qtySold[i];
+            qtySold[i] = qtySold[j];
+            qtySold[j] = tempQty;
+        }
+    }
+}
+
+    // ============================
+    // Header Laporan
+    // ============================
+
+    cout << "\n=========================================================================================================\n";
+    cout << "                                  ANALISIS PRODUK TERLARIS\n";
+    cout << "=========================================================================================================\n";
+
+    cout << left
+         << setw(5)  << "No"
+         << setw(10) << "Kode"
+         << setw(30) << "Nama Produk"
+         << right
+         << setw(15) << "Terjual"
+         << setw(22) << "Pendapatan"
+         << endl;
+
+    cout << "---------------------------------------------------------------------------------------------------------\n";
+
+        string produkTerlaris = "-";
+    string produkTersedikit = "-";
+
+    int jumlahTerlaris = -1;
+    int jumlahTersedikit = 999999999;
+
+    for (int i = 0; i < qtySoldSize; i++) {
+
+        string namaProduk = "-";
+
+        int idxNama = findStringStringEntry(
+            productName,
+            productNameSize,
+            qtySold[i].key
+        );
+
+        if (idxNama >= 0)
+            namaProduk = productName[idxNama].value;
+
+        double pendapatan = 0;
+
+        int idxRevenue = findStringDoubleEntry(
+            revenueSold,
+            revenueSoldSize,
+            qtySold[i].key
+        );
+
+        if (idxRevenue >= 0)
+            pendapatan = revenueSold[idxRevenue].value;
+
+        if (qtySold[i].value > jumlahTerlaris) {
+            jumlahTerlaris = qtySold[i].value;
+            produkTerlaris = namaProduk;
+        }
+
+        if (qtySold[i].value < jumlahTersedikit) {
+            jumlahTersedikit = qtySold[i].value;
+            produkTersedikit = namaProduk;
+        }
+
+        cout << left
+             << setw(5) << i + 1
+             << setw(10) << qtySold[i].key
+             << setw(30) << namaProduk
+             << right
+             << setw(15) << (to_string(qtySold[i].value) + " pcs")
+             << setw(22) << formatRupiah((int)pendapatan)
+             << endl;
+    }
+
+    cout << "---------------------------------------------------------------------------------------------------------\n";
+
+        cout << "\nRINGKASAN ANALISIS\n";
+    cout << "=========================================================================================================\n";
+
+    cout << left
+         << setw(35) << "Total Jenis Produk"
+         << ": "
+         << qtySoldSize
+         << endl;
+
+    cout << left
+         << setw(35) << "Total Barang Terjual"
+         << ": "
+         << totalBarangTerjual
+         << " pcs"
+         << endl;
+
+    cout << left
+         << setw(35) << "Total Pendapatan"
+         << ": "
+         << formatRupiah((int)totalPendapatan)
+         << endl;
+
+    cout << left
+         << setw(35) << "Produk Terlaris"
+         << ": "
+         << produkTerlaris
+         << " ("
+         << jumlahTerlaris
+         << " pcs)"
+         << endl;
+
+    cout << left
+         << setw(35) << "Produk Penjualan Terendah"
+         << ": "
+         << produkTersedikit
+         << " ("
+         << jumlahTersedikit
+         << " pcs)"
+         << endl;
+
+    double rataRataPenjualan = 0;
+
+    if (qtySoldSize > 0)
+        rataRataPenjualan =
+            (double) totalBarangTerjual / qtySoldSize;
+
+    cout << left
+         << setw(35) << "Rata-rata Penjualan"
+         << ": "
+         << fixed
+         << setprecision(2)
+         << rataRataPenjualan
+         << " pcs / produk"
+         << endl;
+
+    cout << "=========================================================================================================\n";
+}
 
 void analisisPenjualanPerKategori() {
 
