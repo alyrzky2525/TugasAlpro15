@@ -2400,91 +2400,148 @@ void cetakKeFile(int id) {
         string items = (p9 == string::npos) ? string("") : line.substr(p9 + 1);
 
 // ================= HEADER STRUK =================
+
 stringstream noStruk;
 noStruk << "TRX"
          << setw(6)
          << setfill('0')
          << id;
 
+// reset fill menjadi spasi lagi
+noStruk << setfill(' ');
+
+stringstream struk;
+
+// Header
+struk << "================================================\n";
+struk << "                    CFBeauty\n";
+struk << "      Barang yang sudah dibeli tidak dapat\n";
+struk << "               dikembalikan\n\n";
+
+struk << "            Sleman, DI Yogyakarta\n";
+struk << "                 Indonesia\n";
+struk << "            Telp. 081391391313\n";
+struk << "================================================\n\n";
+
+// Informasi transaksi
+struk << left << setw(28) << "Tanggal"
+      << ": " << date << "\n";
+
+struk << left << setw(28) << "Kasir"
+      << ": " << currentUsername << "\n";
+
+struk << left << setw(28) << "Nomor Transaksi"
+      << ": " << noStruk.str() << "\n";
+
+if (member != "-" && !member.empty()) {
+    struk << left << setw(28) << "Member"
+          << ": " << member << "\n";
+}
+
+if (promo != "-" && !promo.empty()) {
+    struk << left << setw(28) << "Promo"
+          << ": " << promo << "\n";
+}
+
+struk << "\n";
+struk << "------------------------------------------------\n";
+struk << left << setw(6) << "Qty"
+      << left << setw(26) << "Nama Barang"
+      << right << setw(14) << "Subtotal\n";
+struk << "------------------------------------------------\n";
+
+// simpan dulu ke out
+out = struk.str();
+
+// ================= DAFTAR BARANG =================
+size_t pos = 0;
+
+while (pos < items.size()) {
+
+    size_t comma = items.find(',', pos);
+
+    string chunk = (comma == string::npos)
+        ? items.substr(pos)
+        : items.substr(pos, comma - pos);
+
+    size_t a = chunk.find(':');
+    size_t b = (a == string::npos)
+        ? string::npos
+        : chunk.find(':', a + 1);
+
+    string code = (a == string::npos)
+        ? chunk
+        : chunk.substr(0, a);
+
+    string qty = (a == string::npos || b == string::npos)
+        ? ""
+        : chunk.substr(a + 1, b - a - 1);
+
+    string price = (b == string::npos)
+        ? ""
+        : chunk.substr(b + 1);
+
+    string namaProduk = getProductName(code);
+
+    stringstream item;
+
+    item << left
+         << setw(30)
+         << (qty + " x " + namaProduk);
+
+    item << right
+         << setw(12)
+         << formatRupiah(stoi(price));
+
+    out += item.str() + "\n";
+
+    if (comma == string::npos)
+        break;
+
+    pos = comma + 1;
+}
+
+out += "------------------------------------------------\n";
+
+stringstream totalStr;
+
+totalStr << left << setw(20) << "Subtotal"
+         << right << setw(20)
+         << formatRupiah(stoi(total))
+         << "\n";
+
+totalStr << left << setw(20) << "Diskon"
+         << right << setw(20)
+         << formatRupiah(stoi(discount))
+         << "\n\n";
+
+totalStr << left << setw(20) << "Grand Total"
+         << right << setw(20)
+         << formatRupiah(stoi(finalAmt))
+         << "\n";
+
+totalStr << left << setw(20) << "Tunai"
+         << right << setw(20)
+         << formatRupiah(stoi(paid))
+         << "\n";
+
+totalStr << left << setw(20) << "Kembalian"
+         << right << setw(20)
+         << formatRupiah(stoi(change))
+         << "\n";
+
+out += totalStr.str();
+
+if (member != "-")
+    out += "\nMember : " + member + "\n";
+
+if (promo != "-")
+    out += "Promo  : " + promo + "\n";
+
+out += "\n";
 out += "================================================\n";
-out += "                    CFBeauty\n";
-out += "    Barang yang sudah dibeli tidak dapat\n";
-out += "             dikembalikan\n\n";
-
-out += "           Sleman, DI Yogyakarta\n";
-out += "                Indonesia\n";
-out += "           Telp. 081391391313\n";
-out += "================================================\n\n";
-
-out += "Waktu Penjualan                Kasir\n";
-out += date;
-
-// agar kolom kasir rata
-if (date.length() < 26)
-    out += string(26 - date.length(), ' ');
-
-out += currentUsername;       // ganti sesuai variabel username login
-out += "\n\n";
-
-out += "#" + noStruk.str() + "\n\n";
-
-out += "------------------------------------------------\n";
-out += "Item                           Jumlah\n";
-out += "------------------------------------------------\n";
-
-        size_t pos = 0;
-        while (pos < items.size()) {
-            size_t comma = items.find(',', pos);
-
-            string chunk = (comma == string::npos)
-                ? items.substr(pos)
-                : items.substr(pos, comma - pos);
-
-            size_t a = chunk.find(':');
-            size_t b = (a == string::npos)
-                ? string::npos
-                : chunk.find(':', a + 1);
-
-            string code = (a == string::npos)
-                ? chunk
-                : chunk.substr(0, a);
-
-            string qty = (a == string::npos || b == string::npos)
-                ? string("")
-                : chunk.substr(a + 1, b - a - 1);
-
-            string price = (b == string::npos)
-                ? string("")
-                : chunk.substr(b + 1);
-
-            stringstream item;
-
-string namaProduk = getProductName(code); // fungsi mencari nama produk
-
-item << qty << " " << left << setw(23) << namaProduk
-     << right << formatRupiah(stoi(price));
-
-out += item.str() + "\n";
-
-
-            if (comma == string::npos)
-                break;
-
-            pos = comma + 1;
-        }
-out += "------------------------------------------------\n";
-
-out += "Subtotal                  Rp" + formatRupiah(stoi(total)) + "\n";
-out += "Diskon                    Rp" + formatRupiah(stoi(discount)) + "\n\n";
-
-out += "Grand Total               Rp" + formatRupiah(stoi(finalAmt)) + "\n";
-out += "Tunai                     Rp" + formatRupiah(stoi(paid)) + "\n";
-out += "Kembalian                 Rp" + formatRupiah(stoi(change)) + "\n";
-
-out += "\n================================================\n";
-out += "         TERIMA KASIH TELAH BERBELANJA\n";
+out += "       TERIMA KASIH TELAH BERBELANJA\n";
 out += "================================================\n";
-
         break;
     }
 
