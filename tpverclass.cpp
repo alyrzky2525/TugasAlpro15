@@ -1,10 +1,13 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <ctime>
 #include <iomanip> // Mengatur format tampilan output (setw, left, right, fixed, setprecision)
 #include <sstream>  // Mengolah string menggunakan stringstream untuk parsing data dari file
 
 using namespace std;
+
+string currentUsername = "";
 
 const int MAX_ENTRIES = 5000;
 
@@ -263,6 +266,38 @@ bool changePassword(const string& username,
     fout << all;
 
     return true;
+}
+
+string getProductName(string kode) {
+    ifstream fin(PRODUCTS_FILE.c_str());
+
+    if (!fin)
+        return kode;
+
+    string line;
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        stringstream ss(line);
+
+        string kodeProduk;
+        string namaProduk;
+
+        getline(ss, kodeProduk, '|');
+        getline(ss, namaProduk, '|');
+
+        if (kodeProduk == kode) {
+            fin.close();
+            return namaProduk;
+        }
+    }
+
+    fin.close();
+
+    return kode;
 }
 
 void listUsers() {
@@ -543,10 +578,11 @@ class Admin{
             string p = inputLine("Password: ");
             string role;
             if (validateCredentials(u, p, role) && role == "admin") {
-                username = u;
-                password = p;
-                return true;
-            }
+            username = u;
+            password = p;
+            currentUsername = u;
+            return true;
+        }
             return false;
         }
 void dashboardAdmin(const string& username) {
@@ -1758,6 +1794,7 @@ public:
         if (validateCredentials(u, p, role) && role == "kasir") {
             username = u;
             password = p;
+            currentUsername = u;
             return true;
         }
 
@@ -2311,59 +2348,168 @@ class Struk{
     string nomorTelepon;
     string namaKasir;
     public:
-        void cetakKeFile(int id){
-    ifstream fin(TRANSACTIONS_FILE.c_str()); if (!fin) { cout<<"File transaksi tidak ditemuk    an.\n"; return; }
-    string line; bool found=false; string out;
-    while (getline(fin,line)) {
-        if (line.empty()) continue;
-        size_t p1=line.find('|'); if (p1==string::npos) continue;
-        int iid=0; for (size_t i=0;i<p1;++i) if (line[i]>='0'&&line[i]<='9') iid = iid*10 + (line[i]-'0');
-        if (iid!=id) continue;
-        found=true;
+
+void cetakKeFile(int id) {
+    ifstream fin(TRANSACTIONS_FILE.c_str());
+
+    if (!fin) {
+        cout << "File transaksi tidak ditemukan.\n";
+        return;
+    }
+
+    string line;
+    bool found = false;
+    string out;
+
+    while (getline(fin, line)) {
+        if (line.empty())
+            continue;
+
+        size_t p1 = line.find('|');
+        if (p1 == string::npos)
+            continue;
+
+        int iid = 0;
+        for (size_t i = 0; i < p1; ++i)
+            if (line[i] >= '0' && line[i] <= '9')
+                iid = iid * 10 + (line[i] - '0');
+
+        if (iid != id)
+            continue;
+
+        found = true;
+
         // reuse viewTransactionDetails parsing quickly
-        size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1); size_t p4=line.find('|',p3+1); size_t p5=line.find('|',p4+1); size_t p6=line.find('|',p5+1); size_t p7=line.find('|',p6+1); size_t p8=line.find('|',p7+1); size_t p9=line.find('|',p8+1);
-        string date = (p2==string::npos)?string(""):line.substr(p1+1,p2-p1-1);
-        string total = (p3==string::npos)?string(""):line.substr(p2+1,p3-p2-1);
-        string discount = (p4==string::npos)?string(""):line.substr(p3+1,p4-p3-1);
-        string finalAmt = (p5==string::npos)?string(""):line.substr(p4+1,p5-p4-1);
-        string paid = (p6==string::npos)?string(""):line.substr(p5+1,p6-p5-1);
-        string change = (p7==string::npos)?string(""):line.substr(p6+1,p7-p6-1);
-        string promo = (p8==string::npos)?string(""):line.substr(p7+1,p8-p7-1);
-        string member = (p9==string::npos)?string(""):line.substr(p8+1,p9-p8-1);
-        string items = (p9==string::npos)?string(""):line.substr(p9+1);
-        // build out
-        out += "Toko Kosmetik - TPalPro\n";
-        out += "Alamat: Jl. Contoh No.1\n";
-        out += string("Tanggal: ") + date + "\n";
-        out += string("Transaksi ID: ") + to_string(id) + "\n";
-        out += string("Member: ") + member + "\n";
-        out += "Items:\n";
-        size_t pos=0; while (pos < items.size()) {
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+        size_t p4 = line.find('|', p3 + 1);
+        size_t p5 = line.find('|', p4 + 1);
+        size_t p6 = line.find('|', p5 + 1);
+        size_t p7 = line.find('|', p6 + 1);
+        size_t p8 = line.find('|', p7 + 1);
+        size_t p9 = line.find('|', p8 + 1);
+
+        string date = (p2 == string::npos) ? string("") : line.substr(p1 + 1, p2 - p1 - 1);
+        string total = (p3 == string::npos) ? string("") : line.substr(p2 + 1, p3 - p2 - 1);
+        string discount = (p4 == string::npos) ? string("") : line.substr(p3 + 1, p4 - p3 - 1);
+        string finalAmt = (p5 == string::npos) ? string("") : line.substr(p4 + 1, p5 - p4 - 1);
+        string paid = (p6 == string::npos) ? string("") : line.substr(p5 + 1, p6 - p5 - 1);
+        string change = (p7 == string::npos) ? string("") : line.substr(p6 + 1, p7 - p6 - 1);
+        string promo = (p8 == string::npos) ? string("") : line.substr(p7 + 1, p8 - p7 - 1);
+        string member = (p9 == string::npos) ? string("") : line.substr(p8 + 1, p9 - p8 - 1);
+        string items = (p9 == string::npos) ? string("") : line.substr(p9 + 1);
+
+// ================= HEADER STRUK =================
+stringstream noStruk;
+noStruk << "TRX"
+         << setw(6)
+         << setfill('0')
+         << id;
+
+out += "================================================\n";
+out += "                    CFBeauty\n";
+out += "    Barang yang sudah dibeli tidak dapat\n";
+out += "             dikembalikan\n\n";
+
+out += "           Sleman, DI Yogyakarta\n";
+out += "                Indonesia\n";
+out += "           Telp. 081391391313\n";
+out += "================================================\n\n";
+
+out += "Waktu Penjualan                Kasir\n";
+out += date;
+
+// agar kolom kasir rata
+if (date.length() < 26)
+    out += string(26 - date.length(), ' ');
+
+out += currentUsername;       // ganti sesuai variabel username login
+out += "\n\n";
+
+out += "#" + noStruk.str() + "\n\n";
+
+out += "------------------------------------------------\n";
+out += "Item                           Jumlah\n";
+out += "------------------------------------------------\n";
+
+        size_t pos = 0;
+        while (pos < items.size()) {
             size_t comma = items.find(',', pos);
-            string chunk = (comma==string::npos)?items.substr(pos):items.substr(pos, comma-pos);
-            size_t a = chunk.find(':'); size_t b = (a==string::npos)?string::npos:chunk.find(':', a+1);
-            string code = (a==string::npos)?chunk:chunk.substr(0,a);
-            string qty = (a==string::npos||b==string::npos)?string(""):chunk.substr(a+1,b-a-1);
-            string price = (b==string::npos)?string(""):chunk.substr(b+1);
-            out += string(" - ") + code + " x" + qty + " @Rp" + price + "\n";
-            if (comma==string::npos) break; pos = comma+1;
+
+            string chunk = (comma == string::npos)
+                ? items.substr(pos)
+                : items.substr(pos, comma - pos);
+
+            size_t a = chunk.find(':');
+            size_t b = (a == string::npos)
+                ? string::npos
+                : chunk.find(':', a + 1);
+
+            string code = (a == string::npos)
+                ? chunk
+                : chunk.substr(0, a);
+
+            string qty = (a == string::npos || b == string::npos)
+                ? string("")
+                : chunk.substr(a + 1, b - a - 1);
+
+            string price = (b == string::npos)
+                ? string("")
+                : chunk.substr(b + 1);
+
+            stringstream item;
+
+string namaProduk = getProductName(code); // fungsi mencari nama produk
+
+item << qty << " " << left << setw(23) << namaProduk
+     << right << formatRupiah(stoi(price));
+
+out += item.str() + "\n";
+
+
+            if (comma == string::npos)
+                break;
+
+            pos = comma + 1;
         }
-        out += string("Subtotal: Rp") + total + "\n";
-        out += string("Diskon: Rp") + discount + "\n";
-        out += string("Total akhir: Rp") + finalAmt + "\n";
-        out += string("Dibayar: Rp") + paid + " | Kembali: Rp" + change + "\n";
-        out += string("Promo: ") + promo + "\n";
-        out += "--- Terima Kasih ---\n";
+out += "------------------------------------------------\n";
+
+out += "Subtotal                  Rp" + formatRupiah(stoi(total)) + "\n";
+out += "Diskon                    Rp" + formatRupiah(stoi(discount)) + "\n\n";
+
+out += "Grand Total               Rp" + formatRupiah(stoi(finalAmt)) + "\n";
+out += "Tunai                     Rp" + formatRupiah(stoi(paid)) + "\n";
+out += "Kembalian                 Rp" + formatRupiah(stoi(change)) + "\n";
+
+out += "\n================================================\n";
+out += "         TERIMA KASIH TELAH BERBELANJA\n";
+out += "================================================\n";
+
         break;
     }
+
     fin.close();
-    if (!found) { cout<<"Transaksi tidak ditemukan.\n"; return; }
+
+    if (!found) {
+        cout << "Transaksi tidak ditemukan.\n";
+        return;
+    }
+
     string fname = string("receipt_") + to_string(id) + string(".txt");
-    ofstream fout(fname.c_str()); if (!fout) { cout<<"Gagal membuat file struk.\n"; return; }
-    fout << out; fout.close();
-    cout<<"Struk disimpan sebagai "<<fname<<"\n";
+
+    ofstream fout(fname.c_str());
+
+    if (!fout) {
+        cout << "Gagal membuat file struk.\n";
+        return;
+    }
+
+    fout << out;
+    fout.close();
+
+    cout << "Struk disimpan sebagai " << fname << "\n";
 }
-        void cetakStruk() {
+void cetakStruk() {
             string sid = inputLine("Masukkan ID transaksi untuk cetak struk: ");
             int id = 0; for (size_t i = 0; i < sid.size(); ++i) if (sid[i] >= '0' && sid[i] <= '9') id = id * 10 + (sid[i] - '0');
             if (id > 0) cetakKeFile(id);

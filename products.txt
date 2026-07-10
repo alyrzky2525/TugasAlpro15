@@ -20,7 +20,7 @@ P0019|Concealer|Maybelline|Makeup|50000|67000|19|5|2028-12-31
 P0020|Facial Oil|Somethinc|Skincare|98000|140000|9|3|2028-12-31
 P0021|Hydrating Toner|Whitelab|Skincare|37000|51496|8|3|2028-12-31
 P0022|Lip Tint Nude|Implora|Makeup|39000|53000|15|5|2028-12-31
-P0023|Brow Pencil|Pinkflash|Makeup|41000|54500|20|5|2028-12-31
+P0023|Brow Pencil|Pinkflash|Makeup|41000|54496|20|5|2028-12-31
 P0024|Micellar Water|Garnier|Skincare|43000|56000|25|8|2028-12-31
 P0025|Body Wash|Nivea|Body Care|46000|57500|30|8|2028-12-31
 P0026|Niacinamide Serum|Somethinc|Skincare|47000|59000|35|8|2028-12-31
