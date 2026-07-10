@@ -129,7 +129,7 @@ void hapusPromo();
 double applyPromo(const string& promoCode, const string& date, bool isMember, bool &valid, string &outPromoCode);
 void kelolaPromo();
 // shift 
-void shiftMenu();
+void kelolaShift();
 void tambahShift();
 void listShifts();
 void editShift();
@@ -149,7 +149,7 @@ void analisisPenjualanMember();
 void menuDashboardKeuangan();
 void ensureDefaultData();
 // riwayat transaksi
-void listTransactions();
+void listTransaksi();
 void viewTransactionDetails(int id);
 void searchTransactions(const string& q);
 // membership
@@ -488,10 +488,10 @@ void adminDashboard(const string& username) {
             kelolaPromo();
 
         } else if (choice == "9") {
-            listTransactions();
+            listTransaksi();
 
         } else if (choice == "10") {
-            shiftMenu();
+            kelolaShift();
 
         } else if (choice == "11") {
             menuDashboardKeuangan();
@@ -677,10 +677,10 @@ void dashboardAdmin(const string& username) {
             kelolaPromo();
 
         } else if (choice == "9") {
-            listTransactions();
+            listTransaksi();
 
         } else if (choice == "10") {
-            shiftMenu();
+            kelolaShift();
 
         } else if (choice == "11") {
             menuDashboardKeuangan();
@@ -828,9 +828,7 @@ void editProduk() {
                 return;
             }
 
-            // ==========================
             // PILIH KATEGORI
-            // ==========================
             cout << "\nPilih Kategori\n";
             cout << "1. Skincare\n";
             cout << "2. Makeup\n";
@@ -991,63 +989,63 @@ void kelolaPromo() {
         void lihatLaporan() {
             menuDashboardKeuangan();
         }
-void buatPengguna() {
-    cout << "\n";
-    cout << "==================================================\n";
-    cout << "              BUAT PENGGUNA BARU\n";
-    cout << "==================================================\n";
+        void buatPengguna() {
+            cout << "\n";
+            cout << "==================================================\n";
+            cout << "              BUAT PENGGUNA BARU\n";
+            cout << "==================================================\n";
 
-    string u = inputLine("Username             : ");
+            string u = inputLine("Username             : ");
 
-    if (u.empty()) {
-        cout << "Username tidak boleh kosong.\n";
-        return;
-    }
+            if (u.empty()) {
+                cout << "Username tidak boleh kosong.\n";
+                    return;
+            }
 
-    if (usernameExists(u)) {
-        cout << "Username sudah ada.\n";
-        return;
-    }
+            if (usernameExists(u)) {
+                cout << "Username sudah ada.\n";
+                    return;
+            }
 
-    string pw = inputLine("Password             : ");
+            string pw = inputLine("Password             : ");
 
-    if (pw.length() < 8) {
-        cout << "Password minimal 8 karakter.\n";
-        return;
-    }
+             if (pw.length() < 8) {
+                cout << "Password minimal 8 karakter.\n";
+                    return;
+        }
 
-    string conf = inputLine("Konfirmasi Password  : ");
+            string conf = inputLine("Konfirmasi Password  : ");
 
-    if (pw != conf) {
-        cout << "Konfirmasi tidak sama.\n";
-        return;
-    }
+            if (pw != conf) {
+                cout << "Konfirmasi tidak sama.\n";
+                    return;
+        }
 
-    string role = inputLine("Role (admin/kasir)   : ");
+            string role = inputLine("Role (admin/kasir)   : ");
 
-    if (role != "admin" && role != "kasir") {
-        cout << "Role harus 'admin' atau 'kasir'.\n";
-        return;
-    }
+            if (role != "admin" && role != "kasir") {
+                cout << "Role harus 'admin' atau 'kasir'.\n";
+                    return;
+        }
 
-    cout << "\n";
-    cout << "--------------------------------------------------\n";
-    cout << "             RINGKASAN PENGGUNA BARU\n";
-    cout << "--------------------------------------------------\n";
-    cout << " Username : " << u << "\n";
-    cout << " Role     : " << role << "\n";
-    cout << "--------------------------------------------------\n";
+                cout << "\n";
+                cout << "--------------------------------------------------\n";
+                cout << "             RINGKASAN PENGGUNA BARU\n";
+                cout << "--------------------------------------------------\n";
+                cout << " Username : " << u << "\n";
+                cout << " Role     : " << role << "\n";
+                cout << "--------------------------------------------------\n";
 
-    if (!confirmAction("Konfirmasi buat pengguna?")) {
-        cout << "Pembuatan pengguna dibatalkan.\n";
-        return;
-    }
+            if (!confirmAction("Konfirmasi buat pengguna?")) {
+                cout << "Pembuatan pengguna dibatalkan.\n";
+                 return;
+        }
 
-    if (registerUser(u, pw, role)) {
-        cout << "Pengguna baru dibuat.\n";
-    } else {
-        cout << "Gagal membuat pengguna.\n";
-    }
+            if (registerUser(u, pw, role)) {
+                cout << "Pengguna baru dibuat.\n";
+             } else {
+                 cout << "Gagal membuat pengguna.\n";
+        }
 }
        void hapusPengguna() {
     cout << "\n";
@@ -1745,80 +1743,127 @@ class Member{
 
 };
 
-class Kasir{
-    private:
-        int idKasir;
-        string namaKasir;
-        string username;
-        string password;
-    public:
-        bool login() {
-            string u = inputLine("Username: ");
-            string p = inputLine("Password: ");
-            string role;
-            if (validateCredentials(u, p, role) && role == "kasir") {
-                username = u;
-                password = p;
-                return true;
-            }
-            return false;
+class Kasir {
+private:
+    int idKasir;
+    string namaKasir;
+    string username;
+    string password;
+
+public:
+    bool login() {
+        string u = inputLine("Username: ");
+        string p = inputLine("Password: ");
+        string role;
+
+        if (validateCredentials(u, p, role) && role == "kasir") {
+            username = u;
+            password = p;
+            return true;
         }
-        void logout() {
-            cout << "Logout berhasil.\n";
-        }
-        void dashboardKasir(const string& user) {
-            Member member;
-            Produk produk;
-            while (true) {
-                cout << "\n--- Dashboard Kasir ---\n";
-                cout << "Selamat datang, " << user << " (kasir)\n";
-                cout << "1. Logout\n";
-                cout << "2. Ganti password\n";
-                cout << "3. Keranjang Belanja\n";
-                cout << "4. Cari produk\n";
-                cout << "5. Membership\n";
-                cout << "6. Riwayat Transaksi\n";
-                cout << "Pilih: ";
-                string choice;
-                getline(cin, choice);
-                if (choice == "1") break;
-                else if (choice == "2") {
-                    string np = inputLine("Password baru: ");
-                    string nc = inputLine("Konfirmasi password baru: ");
-                    if (np == nc) {
-                        if (changePassword(user, np)) cout << "Password berhasil diubah.\n";
-                        else cout << "Gagal mengubah password.\n";
-                    } else cout << "Konfirmasi tidak sama.\n";
-                } else if (choice == "3") {
-                    KeranjangMenu();
-                } else if (choice == "4") {
-                    string q = inputLine("Masukkan kata kunci (nama/kode/kategori): ");
-                    if (q.empty()) cout << "Kata kunci kosong.\n";
-                    else produk.cariProduk(q);
-                } else if (choice == "5") {
-                    while (true) {
-                        cout << "\n-- Menu Membership --\n";
-                        cout << "1. Registrasi member\n";
-                        cout << "2. Lihat member\n";
-                        cout << "3. Lihat riwayat member\n";
-                        cout << "4. Kembali\n";
-                        string m = inputLine("Pilih: ");
-                        if (m == "1") member.daftarMember();
-                        else if (m == "2") member.tampilMember();
-                        else if (m == "3") {
-                            string mem = inputLine("Masukkan username member: ");
-                            if (mem.empty()) cout << "Username kosong.\n";
-                            else member.simpanRiwayatBelanja(mem);
-                        } else if (m == "4") break;
-                        else cout << "Pilihan tidak dikenali.\n";
-                    }
-                } else if (choice == "6") {
-                    listTransactions();
-                } else {
-                    cout << "Pilihan tidak dikenali.\n";
+
+        return false;
+    }
+
+    void logout() {
+        cout << "Logout berhasil.\n";
+    }
+
+        void transaksi() {
+         KeranjangMenu();
+    }
+
+        void inputMember() {
+        Member member;
+        member.daftarMember();
+    }
+
+    void dashboardKasir(const string& user) {
+        Member member;
+        Produk produk;
+
+        while (true) {
+            cout << "\n--- Dashboard Kasir ---\n";
+            cout << "Selamat datang, " << user << " (kasir)\n";
+            cout << "1. Logout\n";
+            cout << "2. Ganti password\n";
+            cout << "3. Keranjang Belanja\n";
+            cout << "4. Cari produk\n";
+            cout << "5. Membership\n";
+            cout << "6. Riwayat Transaksi\n";
+            cout << "Pilih: ";
+
+            string choice;
+            getline(cin, choice);
+
+            if (choice == "1") {
+                break;
+            } 
+            else if (choice == "2") {
+                string np = inputLine("Password baru: ");
+                string nc = inputLine("Konfirmasi password baru: ");
+
+                if (np == nc) {
+                    if (changePassword(user, np))
+                        cout << "Password berhasil diubah.\n";
+                    else
+                        cout << "Gagal mengubah password.\n";
+                } 
+                else {
+                    cout << "Konfirmasi tidak sama.\n";
                 }
+            } 
+            else if (choice == "3") {
+                 transaksi();   
+            } 
+            else if (choice == "4") {
+                string q = inputLine("Masukkan kata kunci (nama/kode/kategori): ");
+
+                if (q.empty())
+                    cout << "Kata kunci kosong.\n";
+                else
+                    produk.cariProduk(q);
+            } 
+            else if (choice == "5") {
+                while (true) {
+                    cout << "\n-- Menu Membership --\n";
+                    cout << "1. Registrasi member\n";
+                    cout << "2. Lihat member\n";
+                    cout << "3. Lihat riwayat member\n";
+                    cout << "4. Kembali\n";
+
+                    string m = inputLine("Pilih: ");
+
+                    if (m == "1") {
+                         inputMember();
+                    } 
+                    else if (m == "2") {
+                        member.tampilMember();
+                    } 
+                    else if (m == "3") {
+                        string mem = inputLine("Masukkan username member: ");
+
+                        if (mem.empty())
+                            cout << "Username kosong.\n";
+                        else
+                            member.simpanRiwayatBelanja(mem);
+                    } 
+                    else if (m == "4") {
+                        break;
+                    } 
+                    else {
+                        cout << "Pilihan tidak dikenali.\n";
+                    }
+                }
+            } 
+            else if (choice == "6") {
+                listTransaksi();
+            } 
+            else {
+                cout << "Pilihan tidak dikenali.\n";
             }
         }
+    }
 };
 
 class Promo{
@@ -3041,7 +3086,7 @@ void kasirDashboard(const string& username) {
                 else cout << "Pilihan tidak dikenali.\n";
             }
         } else if (choice == "6") {
-            listTransactions();
+            listTransaksi();
         } else if (choice == "7") {
             menuDashboardKeuangan();
         } else {
@@ -3715,8 +3760,8 @@ bool checkoutCart(const string& curDate) {
     return true;
 }
 
-// Transaction history and receipt printing
-void listTransactions() {
+// Transaction history
+void listTransaksi() {
 
     ifstream fin(TRANSACTIONS_FILE.c_str());
 
@@ -4048,8 +4093,6 @@ void KeranjangMenu() {
     Keranjang krj;
     Produk produk;
 
-    // keep existing cart in memory across menu usage (do not re-init here)
-
     while (true) {
 
         cout << "\n==============================\n";
@@ -4246,7 +4289,7 @@ void listShifts() {
 }
 
 
-void shiftMenu() {
+void kelolaShift() {
     Shift shift;
 
     while (true) {
