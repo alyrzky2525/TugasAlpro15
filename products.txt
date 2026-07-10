@@ -9,7 +9,7 @@ P0008|Hand Cream|Vaseline|Body Care|24000|40000|50|10|2028-12-31
 P0009|Serum Vitamin C|Skintific|Skincare|95000|149995|12|5|2028-12-31
 P0010|Sunscreen SPF50|Azarine|Skincare|68000|95000|28|8|2028-12-31
 P0011|Blush Peach|Emina|Makeup|36000|55000|20|5|2028-12-31
-P0012|BB Cream|Wardah|Makeup|72000|85000|14|5|2028-12-31
+P0012|BB Cream|Wardah|Makeup|72000|84988|14|5|2028-12-31
 P0013|Face Mask Clay|Whitelab|Skincare|18000|29998|60|10|2028-12-31
 P0014|Lip Balm|Nivea|Personal Care|12000|20000|80|15|2028-12-31
 P0015|Eye Shadow Palette|Make Over|Makeup|135000|180000|10|3|2028-12-31
@@ -18,7 +18,7 @@ P0017|Makeup Remover|Garnier|Skincare|26000|38000|33|8|2028-12-31
 P0018|Body Scrub|Scarlett|Body Care|33000|48000|26|8|2028-12-31
 P0019|Concealer|Maybelline|Makeup|50000|67000|19|5|2028-12-31
 P0020|Facial Oil|Somethinc|Skincare|98000|140000|9|3|2028-12-31
-P0021|Hydrating Toner|Whitelab|Skincare|37000|51493|8|3|2028-12-31
+P0021|Hydrating Toner|Whitelab|Skincare|37000|51491|8|3|2028-12-31
 P0022|Lip Tint Nude|Implora|Makeup|39000|53000|15|5|2028-12-31
 P0023|Brow Pencil|Pinkflash|Makeup|41000|54496|20|5|2028-12-31
 P0024|Micellar Water|Garnier|Skincare|43000|56000|25|8|2028-12-31
@@ -36,7 +36,7 @@ P0035|Body Mist Fresh|Victoria's Secret|Fragrance|62000|72500|10|3|2028-12-31
 P0036|Acne Serum|Skintific|Skincare|63000|74000|15|5|2028-12-31
 P0037|Compact Powder|Wardah|Makeup|65000|75500|20|5|2028-12-31
 P0038|Beauty Blender|Real Techniques|Beauty Tools|66000|77000|25|5|2028-12-31
-P0039|Facial Sunscreen|Skin Aqua|Skincare|67000|78500|30|8|2028-12-31
+P0039|Facial Sunscreen|Skin Aqua|Skincare|67000|78497|30|8|2028-12-31
 P0040|Eau de Parfum Bloom|HMNS|Fragrance|69000|80000|35|8|2028-12-31
 P0041|Perfect Bright Moisturizer|Wardah|Skincare|70000|100000|15|5|2026-07-22
-P0042|Lip Cream Matte|Emina|Makeup|17000|25000|13|5|2028-01-30
+P0042|Lip Cream Matte|Emina|Makeup|17000|24998|13|5|2028-01-30
