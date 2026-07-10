@@ -570,7 +570,7 @@ string getCurrentDateTime() {
        << setw(2) << ltm->tm_min;
 
     return ss.str();
-}
+} 
 
 // --- Cart & Transactions implementation ---
 const int MAX_CART = 200;
@@ -2298,11 +2298,14 @@ class Transaksi{
     
        
 }
-        void prosesTransaksi() {
-            string curDate = inputLine("Tanggal transaksi (YYYY-MM-DD): ");
-            if (checkoutCart(curDate)) cout << "Transaksi tersimpan.\n";
-            else cout << "Checkout gagal.\n";
-        }
+       void prosesTransaksi() {
+    string curDate = getCurrentDateTime();
+
+    if (checkoutCart(curDate))
+        cout << "Transaksi tersimpan.\n";
+    else
+        cout << "Checkout gagal.\n";
+}
         double hitungTotal() {
             double total = 0.0;
             for (int i = 0; i < cartCount; ++i) total += cartSubtotal[i];
@@ -2438,45 +2441,38 @@ stringstream struk;
 
 //==================================================
 // HEADER STRUK
-//==================================================
-
-stringstream struk;
-stringstream noStruk;
-
+//=================================================
 noStruk << "TRX"
          << setfill('0')
          << setw(6)
          << id;
 
-struk << "==========================================\n";
-struk << "                 CFBEAUTY\n";
-struk << "    Barang yang sudah dibeli tidak dapat\n";
-struk << "           dikembalikan\n";
-struk << "      Sleman Kabupaten, DI Yogyakarta\n";
-struk << "               Indonesia\n";
-struk << "           Telp. 081391391313\n";
-struk << "==========================================\n\n";
+cout << "\n";
+cout << "==========================================\n";
+cout << "                 CFBEAUTY\n";
+cout << "      Barang yang sudah dibeli tidak\n";
+cout << "          dapat dikembalikan\n";
+cout << "      Sleman Kabupaten, DI Yogyakarta\n";
+cout << "               Indonesia\n";
+cout << "           +6281391391313\n\n";
 
-struk << left
-      << setw(32)
-      << "Waktu Penjualan"
-      << "Kasir\n";
+cout << left
+     << setw(30) << "Waktu Penjualan"
+     << "Kasir\n";
 
-struk << left
-      << setw(32)
-      << date
-      << currentUsername
-      << "\n\n";
+cout << left
+     << setw(30) << date
+     << currentUsername
+     << "\n\n";
 
-struk << "#" << noStruk.str() << "\n";
+cout << "#TRX"
+     << setfill('0')
+     << setw(6)
+     << id
+     << setfill(' ')
+     << "\n";
 
-if (member != "-" && !member.empty())
-    struk << "Member : " << member << "\n";
-
-if (promo != "-" && !promo.empty())
-    struk << "Promo  : " << promo << "\n";
-
-struk << "------------------------------------------\n";
+cout << "------------------------------------------\n";
 
 struk << left
       << setw(32)
@@ -2590,6 +2586,7 @@ out += "              DI CFBEAUTY\n";
 out += "==========================================\n";
 
 break;
+    }
 
     fin.close();
 
@@ -3950,7 +3947,6 @@ bool checkoutCart(const string& curDate) {
 
     // persist transaction with details to the shared analytics file
   Transaksi transaksi;
-
 int trxId = transaksi.simpanTransaksi(
     curDate,
     total,
@@ -3962,102 +3958,113 @@ int trxId = transaksi.simpanTransaksi(
     appliedPromoCode
 );
 
-cout << "DEBUG currentUsername = [" << currentUsername << "]\n";
-
-cout << "\n";
-cout << "==================================================\n";
-cout << "                    CFBeauty\n";
-cout << "      Barang yang sudah dibeli tidak dapat\n";
-cout << "               dikembalikan\n";
-cout << "==================================================\n";
-
-cout << "              Sleman, DI Yogyakarta\n";
-cout << "                   Indonesia\n";
-cout << "             Telp. 081391391313\n";
-cout << "--------------------------------------------------\n";
-
-cout << left << setw(18) << "Tanggal"
-     << ": " << curDate << endl;
-
-cout << left << setw(18) << "Kasir"
-     << ": " << currentUsername << endl;
 
 stringstream noTrx;
+
 
 noTrx << "TRX"
       << setfill('0')
       << setw(6)
-      << right
-      << trxId;
+      << trxId
+      << setfill(' ');
 
-cout << left << setw(18)
-     << "No. Transaksi"
-     << ": "
-     << noTrx.str()
-     << endl;
-
-if (!member.empty())
-{
-    cout << left << setw(18) << "Member"
-         << ": " << member << endl;
-}
-
-if (!appliedPromoCode.empty())
-{
-    cout << left << setw(18) << "Promo"
-         << ": " << appliedPromoCode << endl;
-}
-
-cout << "--------------------------------------------------\n";
+cout << "\n";
+cout << "==========================================\n";
+cout << "                 CFBEAUTY\n";
+cout << "      Barang yang sudah dibeli tidak\n";
+cout << "          dapat dikembalikan\n";
+cout << "      Sleman Kabupaten, DI Yogyakarta\n";
+cout << "               Indonesia\n";
+cout << "           +6281391391313\n";
+cout << "\n";
 
 cout << left
-     << setw(6) << "Qty"
-     << setw(28) << "Nama Barang"
-     << right << setw(14) << "Subtotal"
+     << setw(30) << "Waktu Penjualan"
+     << "Kasir" << endl;
+
+cout << left
+     << setw(30) << curDate
+     << currentUsername << endl;
+
+cout << "\n";
+
+cout << "#" << noTrx.str() << endl;
+
+if (!member.empty())
+    cout << "Member : " << member << endl;
+
+if (!appliedPromoCode.empty())
+    cout << "Promo  : " << appliedPromoCode << endl;
+
+cout << "------------------------------------------\n";
+
+cout << left
+     << setw(30) << "Item"
+     << right
+     << setw(12) << "Jumlah"
      << endl;
 
-cout << "--------------------------------------------------\n";
+cout << "------------------------------------------\n";
 
 for (int i = 0; i < cartCount; i++)
 {
+    stringstream item;
+
+    item << cartQty[i]
+         << " x "
+         << cartName[i];
+
     cout << left
-         << setw(6) << cartQty[i]
-         << setw(28) << cartName[i]
+         << setw(30)
+         << item.str()
          << right
-         << setw(14) << formatRupiah((int)cartSubtotal[i])
+         << setw(12)
+         << formatRupiah((int)cartSubtotal[i])
          << endl;
 }
 
-cout << "--------------------------------------------------\n";
+cout << "------------------------------------------\n";
 
-cout << left << setw(22) << "Subtotal"
-     << right << setw(28)
+cout << left
+     << setw(24) << "Subtotal"
+     << right
+     << setw(18)
      << formatRupiah((int)total)
      << endl;
 
-cout << left << setw(22) << "Diskon"
-     << right << setw(28)
+cout << left
+     << setw(24) << "Diskon"
+     << right
+     << setw(18)
      << formatRupiah((int)totalDiscount)
      << endl;
 
-cout << left << setw(22) << "Grand Total"
-     << right << setw(28)
+cout << "------------------------------------------\n";
+
+cout << left
+     << setw(24) << "Grand Total"
+     << right
+     << setw(18)
      << formatRupiah((int)finalTotal)
      << endl;
 
-cout << left << setw(22) << "Tunai"
-     << right << setw(28)
+cout << left
+     << setw(24) << "Tunai"
+     << right
+     << setw(18)
      << formatRupiah((int)paid)
      << endl;
 
-cout << left << setw(22) << "Kembalian"
-     << right << setw(28)
+cout << left
+     << setw(24) << "Kembalian"
+     << right
+     << setw(18)
      << formatRupiah((int)change)
      << endl;
 
-cout << "==================================================\n";
-cout << "          TERIMA KASIH TELAH BERBELANJA\n";
-cout << "==================================================\n";
+cout << "==========================================\n";
+cout << "      TERIMA KASIH TELAH BERBELANJA\n";
+cout << "==========================================\n";
 
     krj.kosongkanKeranjang();
     return true;
@@ -4495,13 +4502,13 @@ void KeranjangMenu() {
 
         else if (ch == "5") {
 
-            string date = inputLine("Tanggal Transaksi (YYYY-MM-DD): ");
+    string date = getCurrentDateTime();
 
-            if (checkoutCart(date))
-                cout << "Transaksi berhasil disimpan.\n";
-            else
-                cout << "Checkout gagal.\n";
-        }
+    if (checkoutCart(date))
+        cout << "Transaksi berhasil disimpan.\n";
+    else
+        cout << "Checkout gagal.\n";
+}
 
         else if (ch == "6") {
 
