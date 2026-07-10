@@ -2,3 +2,4 @@ aulia|1234|kasir
 wawa|222|admin
 auliya|12345678|admin
 liya|liya1234|kasir
+nazwa|nazwa1234|kasir
