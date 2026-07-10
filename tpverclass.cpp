@@ -1751,25 +1751,6 @@ private:
     string password;
 
 public:
-
-    void transaksi() {
-    KeranjangMenu();
-    }
-
-    void inputMember() {
-    Member member;
-    member.daftarMember();
-    }
-
-    void pembayaran(Pembayaran &pembayaran, double total) {
-    pembayaran.setTotal(total);
-    pembayaran.validasiPembayaran();
-    }
-
-    void cetakStruk() {
-    Struk struk;
-    struk.cetakStruk();
-    }
     bool login() {
         string u = inputLine("Username: ");
         string p = inputLine("Password: ");
