@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <iomanip>
-#include <sstream>
+#include <iomanip> // Mengatur format tampilan output (setw, left, right, fixed, setprecision)
+#include <sstream>  // Mengolah string menggunakan stringstream untuk parsing data dari file
 
 using namespace std;
 
@@ -105,19 +105,16 @@ const string ATTENDANCE_FILE = "attendance.txt";
 // forward declarations
 string inputLine(const string& prompt);
 bool confirmAction(const string& prompt);
-void productMenu();
-void categoryMenu();
+void menuproduk();
+void kelolaKategori();
 void ensureDefaultCategories();
 
-// Cart / transaction forward decls
-void cartMenu();
+void KeranjangMenu();
 bool productCodeExists(const string& code);
 bool checkoutCart(const string& curDate);
 void saveTransactionToFile(const string& date, double total, const string& items, const string& member, double paid, double change, double discount, const string& promoCode);
-void addProduct();
-void editProduct();
-void deleteProduct();
-void addCategory();
+void editProduk();
+void tambahkankategori();
 void daftarKategori();
 string toLowerCase(string text);
 int jumlahHariBulan(int bulan, int tahun);
@@ -130,10 +127,10 @@ void tambahPromo();
 void editPromo();
 void hapusPromo();
 double applyPromo(const string& promoCode, const string& date, bool isMember, bool &valid, string &outPromoCode);
-void promoMenu();
-// shift & attendance forward declarations
+void kelolaPromo();
+// shift 
 void shiftMenu();
-void addShift();
+void tambahShift();
 void listShifts();
 void editShift();
 void deleteShift();
@@ -141,7 +138,7 @@ void attendanceMenuForUser(const string& username);
 void recordAttendance(const string& username);
 void listAttendance();
 void listAttendanceForEmployee(const string& username);
-// reports & analytics / financial analysis
+// laporan penjualan & analisis 
 void laporanPenjualanBulanan();
 void analisisProdukTerlaris();
 void hitungPenjualanHarian();
@@ -151,11 +148,11 @@ void analisisMarginKeuntungan();
 void analisisPenjualanMember();
 void menuDashboardKeuangan();
 void ensureDefaultData();
-// transaction history / receipt
+// riwayat transaksi
 void listTransactions();
 void viewTransactionDetails(int id);
 void searchTransactions(const string& q);
-// membership/search prototypes
+// membership
 bool memberExists(const string& uname);
 void searchProducts(const string& q);
 
@@ -482,13 +479,13 @@ void adminDashboard(const string& username) {
             }
 
         } else if (choice == "6") {
-            productMenu();
+            menuproduk();
 
         } else if (choice == "7") {
-            categoryMenu();
+            kelolaKategori();
 
         } else if (choice == "8") {
-            promoMenu();
+            kelolaPromo();
 
         } else if (choice == "9") {
             listTransactions();
@@ -671,13 +668,13 @@ void dashboardAdmin(const string& username) {
             }
 
         } else if (choice == "6") {
-            productMenu();
+            menuproduk();
 
         } else if (choice == "7") {
-            categoryMenu();
+            kelolaKategori();
 
         } else if (choice == "8") {
-            promoMenu();
+            kelolaPromo();
 
         } else if (choice == "9") {
             listTransactions();
@@ -917,7 +914,7 @@ void kelolaKategori() {
         string c = inputLine("Pilih Menu : ");
 
         if (c == "1") {
-            addCategory();
+            tambahkankategori();
         } else if (c == "2") {
             daftarKategori();
         } else if (c == "3") {
@@ -977,7 +974,7 @@ void kelolaPromo() {
         string c = inputLine("Pilih Menu : ");
 
         if (c == "1") {
-            addShift();
+            tambahShift();
         } else if (c == "2") {
             listShifts();
         } else if (c == "3") {
@@ -1314,70 +1311,6 @@ cout << left
     cout << "\nProduk berhasil ditambahkan.\n";
 }
 
-   void editProduk() {
-    string kode = inputLine("Masukkan kode produk yang akan diedit: ");
-
-    if (!productCodeExists(kode)) {
-        cout << "Kode tidak ditemukan.\n";
-        return;
-    }
-
-    ifstream fin(PRODUCTS_FILE.c_str());
-    if (!fin) {
-        cout << "File produk tidak ditemukan.\n";
-        return;
-    }
-
-    string all;
-    string line;
-    bool found = false;
-
-    while (getline(fin, line)) {
-        if (line.empty()) continue;
-
-        size_t p = line.find('|');
-        if (p == string::npos) continue;
-
-        string c = line.substr(0, p);
-
-        if (c == kode) {
-            found = true;
-
-            cout << "Mengedit produk: " << kode << "\n";
-
-            string nama = inputLine("Nama baru: ");
-            string kategori = inputLine("Kategori baru: ");
-            string hargaModal = inputLine("Harga modal baru: ");
-            string hargaJual = inputLine("Harga jual baru: ");
-            string stok = inputLine("Stok baru: ");
-            string expired = inputLine("Expired baru (YYYY-MM-DD): ");
-
-            all += kode + '|' + nama + '|' + kategori + '|' +
-                   hargaModal + '|' + hargaJual + '|' +
-                   stok + '|' + expired + '\n';
-
-        } else {
-            all += line + '\n';
-        }
-    }
-
-    fin.close();
-
-    ofstream fout(PRODUCTS_FILE.c_str(), ios::trunc);
-    if (!fout) {
-        cout << "Gagal menulis file produk.\n";
-        return;
-    }
-
-    fout << all;
-    fout.close();
-
-    if (found)
-        cout << "Produk berhasil diperbarui.\n";
-    else
-        cout << "Produk tidak ditemukan saat proses edit.\n";
-}
-
         void daftarKategori() {
             ifstream fin(CATEGORIES_FILE.c_str());
             if (!fin) { cout << "Belum ada kategori.\n"; return; }
@@ -1634,7 +1567,7 @@ bool productCodeExists(const string& code) {
     return false;
 }
 
-    void addCategory() {
+    void tambahkankategori() {
     string cat = inputLine("Nama kategori: ");
     if (cat.empty()) {
         cout << "Kategori tidak boleh kosong.\n";
@@ -1669,7 +1602,7 @@ bool categoryExists(const string& cat) {
     return false;
 }
 
-void editProduct() {
+void editProduk() {
     string kode = inputLine("Masukkan kode produk yang akan diedit: ");
     if (!productCodeExists(kode)) { 
     cout << "Kode tidak ditemukan.\n"; 
@@ -1857,7 +1790,7 @@ class Kasir{
                         else cout << "Gagal mengubah password.\n";
                     } else cout << "Konfirmasi tidak sama.\n";
                 } else if (choice == "3") {
-                    cartMenu();
+                    KeranjangMenu();
                 } else if (choice == "4") {
                     string q = inputLine("Masukkan kata kunci (nama/kode/kategori): ");
                     if (q.empty()) cout << "Kata kunci kosong.\n";
@@ -2447,46 +2380,436 @@ class LaporanPenjualan{
         int totalTransaksi;
         double totalPendapatan;
     public:
-        void hitungPenjualanHarian() {
+void hitungPenjualanHarian() {
+
     ifstream fin(TRANSACTIONS_FILE.c_str());
-    if (!fin) { cout<<"\nBelum ada data transaksi.\n"; return; }
+
+    if (!fin) {
+        cout << "\nBelum ada data transaksi.\n";
+        return;
+    }
+
+    string tanggal = inputLine("Masukkan Tanggal (YYYY-MM-DD): ");
+
     string line;
-    cout<<"\n========== LAPORAN PENJUALAN HARIAN ==========\n";
-    StringDoubleEntry dailyRevenue[MAX_ENTRIES];
-    int dailyRevenueSize = 0;
-    StringIntEntry dailyCount[MAX_ENTRIES];
-    int dailyCountSize = 0;
-    
-    while (getline(fin,line)) {
-        if (line.empty()) continue;
-        size_t p1=line.find('|'); size_t p2=line.find('|',p1+1); size_t p3=line.find('|',p2+1);
-        size_t p4=line.find('|',p3+1); size_t p5=line.find('|',p4+1);
-        if (p5==string::npos) continue;
-        string date=line.substr(p1+1,p2-p1-1);
-        int final=0; for (size_t i=p4+1;i<p5;++i) 
-            if (line[i]>='0'&&line[i]<='9') final=final*10+(line[i]-'0');
-        addStringDoubleEntry(dailyRevenue, dailyRevenueSize, date, final);
-        addStringIntEntry(dailyCount, dailyCountSize, date, 1);
+
+    double totalRevenue = 0;
+    double totalDiscount = 0;
+    int txCount = 0;
+
+    cout << "\n===================================================================================================\n";
+    cout << "                               LAPORAN PENJUALAN HARIAN\n";
+    cout << "===================================================================================================\n";
+
+    cout << left
+         << setw(8)  << "ID"
+         << setw(15) << "Tanggal"
+         << right
+         << setw(18) << "Total"
+         << setw(18) << "Diskon"
+         << setw(18) << "Final"
+         << "   Member"
+         << endl;
+
+    cout << "---------------------------------------------------------------------------------------------------\n";
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+        size_t p4 = line.find('|', p3 + 1);
+        size_t p5 = line.find('|', p4 + 1);
+        size_t p6 = line.find('|', p5 + 1);
+        size_t p7 = line.find('|', p6 + 1);
+        size_t p8 = line.find('|', p7 + 1);
+        size_t p9 = line.find('|', p8 + 1);
+
+        if (p1 == string::npos ||
+            p2 == string::npos ||
+            p3 == string::npos ||
+            p4 == string::npos ||
+            p5 == string::npos)
+            continue;
+
+        string id = line.substr(0, p1);
+
+        string date = line.substr(
+            p1 + 1,
+            p2 - p1 - 1
+        );
+
+        if (date != tanggal)
+            continue;
+
+        int total = 0;
+
+        for (size_t i = p2 + 1; i < p3; ++i) {
+            if (line[i] >= '0' && line[i] <= '9')
+                total = total * 10 + (line[i] - '0');
+        }
+
+        int diskon = 0;
+
+        for (size_t i = p3 + 1; i < p4; ++i) {
+            if (line[i] >= '0' && line[i] <= '9')
+                diskon = diskon * 10 + (line[i] - '0');
+        }
+
+        int final = 0;
+
+        for (size_t i = p4 + 1; i < p5; ++i) {
+            if (line[i] >= '0' && line[i] <= '9')
+                final = final * 10 + (line[i] - '0');
+        }
+
+        string member;
+
+        if (p8 != string::npos)
+            member = line.substr(p8 + 1, p9 - p8 - 1);
+        else
+            member = "Non-Member";
+
+        cout << left
+             << setw(8) << id
+             << setw(15) << date
+             << right
+             << setw(18) << formatRupiah(total)
+             << setw(18) << formatRupiah(diskon)
+             << setw(18) << formatRupiah(final)
+             << "   "
+             << member
+             << endl;
+
+        totalRevenue += final;
+        totalDiscount += diskon;
+        txCount++;
     }
+
     fin.close();
-    
-    cout<<"\nRingkasan Penjualan Per Hari:\n";
-    cout<<"-----------------------------------------------\n";
-    cout<<"Tanggal    | Jumlah Transaksi | Total Pendapatan\n";
-    cout<<"-----------------------------------------------\n";
-    
-    double totalAll=0;
-    for (int i = 0; i < dailyRevenueSize; ++i) {
-        cout<<dailyRevenue[i].key<<" | "<<getStringIntValue(dailyCount, dailyCountSize, dailyRevenue[i].key)<<" transaksi | Rp"<<(int)dailyRevenue[i].value<<"\n";
-        totalAll+=dailyRevenue[i].value;
-    }
-    cout<<"-----------------------------------------------\n";
-    cout<<"Total Keseluruhan: Rp"<<(int)totalAll<<"\n";
-    cout<<"========================================\n";
+
+    cout << "===================================================================================================\n";
+
+    cout << "\nRINGKASAN LAPORAN\n";
+    cout << "===================================================================================================\n";
+
+    cout << "Tanggal                 : " << tanggal << endl;
+
+    cout << "Total Transaksi         : " << txCount << endl;
+
+    cout << "Total Diskon            : "
+         << formatRupiah((int)totalDiscount)
+         << endl;
+
+    cout << "Total Pendapatan Bersih : "
+         << formatRupiah((int)totalRevenue)
+         << endl;
+
+    cout << "Rata-rata Transaksi     : "
+         << formatRupiah(txCount > 0 ? (int)(totalRevenue / txCount) : 0)
+         << endl;
+
+    cout << "===================================================================================================\n";
 }
-        void hitungPenjualanMingguan() { laporanPenjualanBulanan(); }
+    void hitungPenjualanMingguan() {
+
+    ifstream fin(TRANSACTIONS_FILE.c_str());
+
+    if (!fin) {
+        cout << "\nBelum ada data transaksi.\n";
+        return;
+    }
+
+cout << "\nCatatan: Tanggal awal minggu hanya dapat diisi dari tanggal 01-25.\n";
+
+string tanggalAwal = inputLine("Masukkan Tanggal Awal (YYYY-MM-DD): ");
+
+int hariAwal = stoi(tanggalAwal.substr(8,2));
+
+if (hariAwal < 1 || hariAwal > 25) {
+    cout << "\nTanggal awal harus berada pada rentang 01-25.\n";
+    fin.close();
+    return;
+}
+
+string tanggalAkhir = tanggalAwal;
+
+int hariAkhir = hariAwal + 6;
+
+if (hariAkhir < 10)
+    tanggalAkhir.replace(8,2,"0"+to_string(hariAkhir));
+else
+    tanggalAkhir.replace(8,2,to_string(hariAkhir));
+
+    string line;
+
+    double totalRevenue = 0;
+    double totalDiscount = 0;
+    int txCount = 0;
+
+    cout << "\n===================================================================================================\n";
+    cout << "                              LAPORAN PENJUALAN MINGGUAN\n";
+    cout << "===================================================================================================\n";
+
+    cout << left
+         << setw(8)  << "ID"
+         << setw(15) << "Tanggal"
+         << right
+         << setw(18) << "Total"
+         << setw(18) << "Diskon"
+         << setw(18) << "Final"
+         << "   Member"
+         << endl;
+
+    cout << "---------------------------------------------------------------------------------------------------\n";
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+        size_t p4 = line.find('|', p3 + 1);
+        size_t p5 = line.find('|', p4 + 1);
+        size_t p6 = line.find('|', p5 + 1);
+        size_t p7 = line.find('|', p6 + 1);
+        size_t p8 = line.find('|', p7 + 1);
+        size_t p9 = line.find('|', p8 + 1);
+
+        if (p1 == string::npos ||
+            p2 == string::npos ||
+            p3 == string::npos ||
+            p4 == string::npos ||
+            p5 == string::npos)
+            continue;
+
+        string id = line.substr(0, p1);
+
+        string date = line.substr(
+            p1 + 1,
+            p2 - p1 - 1
+        );
+
+        // Filter Mingguan
+        if (date < tanggalAwal || date > tanggalAkhir)
+            continue;
+
+        int total = 0;
+
+        for (size_t i = p2 + 1; i < p3; ++i) {
+            if (line[i] >= '0' && line[i] <= '9')
+                total = total * 10 + (line[i] - '0');
+        }
+
+        int diskon = 0;
+
+        for (size_t i = p3 + 1; i < p4; ++i) {
+            if (line[i] >= '0' && line[i] <= '9')
+                diskon = diskon * 10 + (line[i] - '0');
+        }
+
+        int final = 0;
+
+        for (size_t i = p4 + 1; i < p5; ++i) {
+            if (line[i] >= '0' && line[i] <= '9')
+                final = final * 10 + (line[i] - '0');
+        }
+
+        string member;
+
+        if (p8 != string::npos)
+            member = line.substr(p8 + 1, p9 - p8 - 1);
+        else
+            member = "Non-Member";
+
+        cout << left
+             << setw(8) << id
+             << setw(15) << date
+             << right
+             << setw(18) << formatRupiah(total)
+             << setw(18) << formatRupiah(diskon)
+             << setw(18) << formatRupiah(final)
+             << "   "
+             << member
+             << endl;
+
+        totalRevenue += final;
+        totalDiscount += diskon;
+        txCount++;
+    }
+
+    fin.close();
+
+        cout << "===================================================================================================\n";
+
+        cout << "\nRINGKASAN LAPORAN\n";
+        cout << "===================================================================================================\n";
+
+        cout << "Periode                 : "
+         << tanggalAwal
+         << " s/d "
+         << tanggalAkhir
+         << endl;
+
+        cout << "Total Transaksi         : "
+         << txCount
+         << endl;
+
+        cout << "Total Diskon            : "
+         << formatRupiah((int)totalDiscount)
+         << endl;
+
+        cout << "Total Pendapatan Bersih : "
+         << formatRupiah((int)totalRevenue)
+         << endl;
+
+        cout << "Rata-rata Transaksi     : "
+         << formatRupiah(txCount > 0 ? (int)(totalRevenue / txCount) : 0)
+         << endl;
+
+        cout << "===================================================================================================\n";
+}
         void hitungPenjualanBulanan() { laporanPenjualanBulanan(); }
-        void hitungPenjualanTahunan() { laporanPenjualanBulanan(); }
+        void hitungPenjualanTahunan() {
+
+    ifstream fin(TRANSACTIONS_FILE.c_str());
+
+    if (!fin) {
+        cout << "\nBelum ada data transaksi.\n";
+        return;
+    }
+
+    string tahun = inputLine("Masukkan Tahun (YYYY): ");
+
+    string line;
+
+    double totalRevenue = 0;
+    double totalDiscount = 0;
+    int txCount = 0;
+
+    cout << "\n===================================================================================================\n";
+    cout << "                              LAPORAN PENJUALAN TAHUNAN\n";
+    cout << "===================================================================================================\n";
+
+    cout << left
+         << setw(8)  << "ID"
+         << setw(15) << "Tanggal"
+         << right
+         << setw(18) << "Total"
+         << setw(18) << "Diskon"
+         << setw(18) << "Final"
+         << "   Member"
+         << endl;
+
+    cout << "---------------------------------------------------------------------------------------------------\n";
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+        size_t p4 = line.find('|', p3 + 1);
+        size_t p5 = line.find('|', p4 + 1);
+        size_t p6 = line.find('|', p5 + 1);
+        size_t p7 = line.find('|', p6 + 1);
+        size_t p8 = line.find('|', p7 + 1);
+        size_t p9 = line.find('|', p8 + 1);
+
+        if (p1 == string::npos ||
+            p2 == string::npos ||
+            p3 == string::npos ||
+            p4 == string::npos ||
+            p5 == string::npos)
+            continue;
+
+        string id = line.substr(0, p1);
+
+        string date = line.substr(
+            p1 + 1,
+            p2 - p1 - 1
+        );
+
+        // Filter Tahun
+        if (date.substr(0,4) != tahun)
+            continue;
+
+        int total = 0;
+
+        for (size_t i = p2 + 1; i < p3; ++i) {
+            if (line[i] >= '0' && line[i] <= '9')
+                total = total * 10 + (line[i] - '0');
+        }
+
+        int diskon = 0;
+
+        for (size_t i = p3 + 1; i < p4; ++i) {
+            if (line[i] >= '0' && line[i] <= '9')
+                diskon = diskon * 10 + (line[i] - '0');
+        }
+
+        int final = 0;
+
+        for (size_t i = p4 + 1; i < p5; ++i) {
+            if (line[i] >= '0' && line[i] <= '9')
+                final = final * 10 + (line[i] - '0');
+        }
+
+        string member;
+
+        if (p8 != string::npos)
+            member = line.substr(p8 + 1, p9 - p8 - 1);
+        else
+            member = "Non-Member";
+
+        cout << left
+             << setw(8) << id
+             << setw(15) << date
+             << right
+             << setw(18) << formatRupiah(total)
+             << setw(18) << formatRupiah(diskon)
+             << setw(18) << formatRupiah(final)
+             << "   "
+             << member
+             << endl;
+
+        totalRevenue += final;
+        totalDiscount += diskon;
+        txCount++;
+    }
+
+    fin.close();
+
+    cout << "===================================================================================================\n";
+
+    cout << "\nRINGKASAN LAPORAN\n";
+    cout << "===================================================================================================\n";
+
+    cout << "Tahun                    : " << tahun << endl;
+
+    cout << "Total Transaksi          : " << txCount << endl;
+
+    cout << "Total Diskon             : "
+         << formatRupiah((int)totalDiscount)
+         << endl;
+
+    cout << "Total Pendapatan Bersih  : "
+         << formatRupiah((int)totalRevenue)
+         << endl;
+
+    cout << "Rata-rata Transaksi      : "
+         << formatRupiah(txCount > 0 ? (int)(totalRevenue / txCount) : 0)
+         << endl;
+
+    cout << "===================================================================================================\n";
+}
         void tampilLaporan() { laporanPenjualanBulanan(); }
         void simpanLaporan() { laporanPenjualanBulanan(); }
 
@@ -2529,9 +2852,9 @@ void analisisMarginKeuntungan() {
     string produkUntungStokTerbesar = "-";
     string produkUntungStokTerkecil = "-";
 
-    cout << "\n=====================================================================================================================\n";
-    cout << "                                     ANALISIS KEUNTUNGAN DAN MARGIN PRODUKK\n";
-    cout << "=====================================================================================================================\n";
+    cout << "\n================================================================================================================================================\n";
+    cout << "                                                       ANALISIS KEUNTUNGAN DAN MARGIN PRODUKK\n";
+    cout << "=================================================================================================================================================\n";
     cout << left
         << setw(8)  << "Kode"
         << setw(25) << "Nama Produk"
@@ -2545,7 +2868,7 @@ void analisisMarginKeuntungan() {
         << setw(12) << "Margin %"
         << endl;
 
-    cout << "==============================================================================================================================\n";
+    cout << "=================================================================================================================================================\n";
     while (getline(fprod, line)) {
 
         if (line.empty())
@@ -2624,7 +2947,7 @@ void analisisMarginKeuntungan() {
         << endl;
     }
 
-    cout << "=====================================================================================================================\n";
+    cout << "=================================================================================================================================================\n";
 
     if (totalProduk > 0) {
 
@@ -2669,14 +2992,6 @@ void analisisMarginKeuntungan() {
 
 };
 
-// ===== WRAPPER SHIFT =====
-
-void addShift() {
-    Shift shift;
-    shift.tambahShift();
-}
-
-
 Keranjang krj;
 
 void kasirDashboard(const string& username) {
@@ -2703,7 +3018,7 @@ void kasirDashboard(const string& username) {
                 else cout << "Gagal mengubah password.\n";
             } else cout << "Konfirmasi tidak sama.\n";
         } else if (choice == "3") {
-            cartMenu();
+            KeranjangMenu();
         } else if (choice == "4") {
             string q = inputLine("Masukkan kata kunci (nama/kode/kategori): ");
             if (q.empty()) cout << "Kata kunci kosong.\n";
@@ -2913,8 +3228,6 @@ int main() {
 }
 
 // --- Product & Category management ---
-
-
 void ensureDefaultCategories() {
     ifstream fin(CATEGORIES_FILE.c_str());
     bool need = true;
@@ -2971,34 +3284,27 @@ void ensureDefaultData() {
     if (needProducts) {
         ofstream pf(PRODUCTS_FILE.c_str(), ios::app);
         if (pf) {
-    // several sample products across categories
+    // sample products across categories
         pf << "P0001|Lipstick Red|Wardah|Makeup|50000|75000|25|5|2028-12-31\n";
         pf << "P0002|Lipstick Pink|Implora|Makeup|52000|70000|30|5|2028-12-31\n";
         pf << "P0003|Mascara Black|Maybelline|Makeup|70000|90000|15|3|2028-12-31\n";
         pf << "P0004|Eyeliner Liquid|Pinkflash|Makeup|45000|65000|18|4|2028-12-31\n";
-
         pf << "P0005|Face Cleanser|Hanasui|Skincare|30000|45000|40|8|2028-12-31\n";
         pf << "P0006|Moisturizer|Skintific|Skincare|90000|120000|22|5|2028-12-31\n";
         pf << "P0007|Serum Vitamin C|Somethinc|Skincare|120000|150000|12|3|2028-12-31\n";
         pf << "P0008|Facial Toner|Avoskin|Skincare|35000|50000|45|8|2028-12-31\n";
-
         pf << "P0009|Body Lotion|Vaseline|Bodycare|45000|60000|35|7|2028-12-31\n";
         pf << "P0010|Hand Cream|Nivea|Bodycare|25000|40000|50|10|2028-12-31\n";
         pf << "P0011|Body Scrub|Purbasari|Bodycare|35000|48000|26|5|2028-12-31\n";
-
         pf << "P0012|Shampoo Repair|Pantene|Haircare|40000|58000|30|6|2028-12-31\n";
         pf << "P0013|Hair Serum|L'Oreal|Haircare|65000|90000|18|4|2028-12-31\n";
         pf << "P0014|Hair Mask|Makarizo|Haircare|55000|78000|20|5|2028-12-31\n";
-
         pf << "P0015|Perfume Floral|HMNS|Fragrance|150000|195000|10|2|2028-12-31\n";
         pf << "P0016|Body Mist Fresh|Victoria's Secret|Fragrance|90000|120000|24|5|2028-12-31\n";
-
         pf << "P0017|Facial Cotton|Selection|Beauty Tools|12000|18000|80|15|2028-12-31\n";
         pf << "P0018|Makeup Sponge|Real Techniques|Beauty Tools|35000|50000|32|6|2028-12-31\n";
-
         pf << "P0019|Sheet Mask Aloe|Nature Republic|Personal Care|18000|25000|60|10|2028-12-31\n";
         pf << "P0020|Wet Tissue|Dettol|Personal Care|10000|15000|70|15|2028-12-31\n";
-            // more entries to bulk up the file
            for (int i = 21; i <= 40; i++) {
 
             char code[8];
@@ -3084,7 +3390,7 @@ void ensureDefaultData() {
     ensureSampleTransactions();
 }
 
-void productMenu() {
+void menuproduk() {
     Produk produk;
     while (true) {
         cout << "\n--- Menu Produk ---\n";
@@ -3173,7 +3479,7 @@ void productMenu() {
     }
 }
 
-void categoryMenu() {
+void kelolaKategori() {
     Produk produk;
     while (true) {
         cout << "\n--- Menu Kategori ---\n";
@@ -3182,14 +3488,14 @@ void categoryMenu() {
         cout << "3. Kembali\n";
         cout << "Pilih: ";
         string c; getline(cin, c);
-        if (c == "1") produk.addCategory();
+        if (c == "1") produk.tambahkankategori();
         else if (c == "2") produk.daftarKategori();
         else if (c == "3") break;
         else cout << "Pilihan tidak dikenali.\n";
     }
 }
 
-void promoMenu() {
+void kelolaPromo() {
     Promo promo;
     while (true) {
         cout << "\n--- Menu Promo ---\n";
@@ -3737,7 +4043,7 @@ void searchTransactions(const string& q) {
     fin.close();
 }
 
-void cartMenu() {
+void KeranjangMenu() {
 
     Keranjang krj;
     Produk produk;
@@ -3872,8 +4178,7 @@ void cartMenu() {
     }
 }
 
-// shifts format: id|date|shift|employee
-
+// shifts
 void listShifts() {
 
     ifstream fin(SHIFTS_FILE.c_str());
@@ -3903,9 +4208,7 @@ void listShifts() {
         if (line.empty())
             continue;
 
-        // Format:
-        // id|date|shift|employee
-
+        // Format: id|date|shift|employee
         size_t p1 = line.find('|');
         size_t p2 = line.find('|', p1 + 1);
         size_t p3 = line.find('|', p2 + 1);
@@ -4446,6 +4749,8 @@ void laporanPenjualanBulanan() {
     }
 
     string line;
+    string tahun = inputLine("Masukkan Tahun (YYYY): ");
+    string bulan = inputLine("Masukkan Bulan (MM): ");
 
     double totalRevenue = 0;
     double totalDiscount = 0;
@@ -4495,6 +4800,13 @@ void laporanPenjualanBulanan() {
             p1 + 1,
             p2 - p1 - 1
         );
+
+        // Filter Bulan & Tahun
+        string tahunTransaksi = date.substr(0,4);
+        string bulanTransaksi = date.substr(5,2);
+
+        if (tahunTransaksi != tahun || bulanTransaksi != bulan)
+            continue;
 
         int total = 0;
 
@@ -4546,6 +4858,10 @@ void laporanPenjualanBulanan() {
 
     cout << "\nRINGKASAN LAPORAN\n";
     cout << "===================================================================================================\n";
+    
+    cout << "Periode                : "
+    << bulan << "-" << tahun 
+    << endl;
 
     cout << "Total Transaksi           : " << txCount << endl;
 
@@ -5488,48 +5804,62 @@ void analisisPenjualanMember() {
 }
 
 void menuDashboardKeuangan() {
-    LaporanPenjualan harian;
+
+    LaporanPenjualan laporan;
     AnalisisProduk analisis;
 
     while (true) {
 
-        cout << "\n==================================================\n";
-        cout << "         DASHBOARD ANALISIS KEUANGAN\n";
-        cout << "==================================================\n";
-        cout << "1. Laporan Penjualan Bulanan\n";
-        cout << "2. Analisis Barang Terlaris\n";
-        cout << "3. Laporan Penjualan Harian\n";
-        cout << "4. Analisis Penjualan Per Kategori\n";
+        cout << "\n============================================================\n";
+        cout << "        DASHBOARD LAPORAN & ANALISIS PENJUALAN\n";
+        cout << "============================================================\n";
+        cout << "                 MENU LAPORAN PENJUALAN\n";
+        cout << "------------------------------------------------------------\n";
+        cout << "1. Laporan Penjualan Harian\n";
+        cout << "2. Laporan Penjualan Mingguan\n";
+        cout << "3. Laporan Penjualan Bulanan\n";
+        cout << "4. Laporan Penjualan Tahunan\n";
         cout << "5. Laporan Pendapatan Per Periode\n";
-        cout << "6. Analisis Margin Keuntungan\n";
-        cout << "7. Analisis Penjualan Member\n";
-        cout << "8. Kembali\n";
-        cout << "==================================================\n";
+        cout << "------------------------------------------------------------\n";
+        cout << "                  MENU ANALISIS\n";
+        cout << "------------------------------------------------------------\n";
+        cout << "6. Analisis Barang Terlaris\n";
+        cout << "7. Analisis Penjualan Per Kategori\n";
+        cout << "8. Analisis Margin Keuntungan\n";
+        cout << "9. Analisis Penjualan Member\n";
+        cout << "0. Kembali\n";
+        cout << "============================================================\n";
 
-        string choice = inputLine("Pilih menu (1-8): ");
+        string choice = inputLine("Pilih menu (0-9): ");
 
         if (choice == "1") {
-            laporanPenjualanBulanan();
+            laporan.hitungPenjualanHarian();
         }
         else if (choice == "2") {
-            analisisProdukTerlaris();
+            laporan.hitungPenjualanMingguan();
         }
         else if (choice == "3") {
-            harian.hitungPenjualanHarian();
+            laporanPenjualanBulanan();
         }
         else if (choice == "4") {
-            analisisPenjualanPerKategori();
+            laporan.hitungPenjualanTahunan();
         }
         else if (choice == "5") {
             laporanPendapatanPerPeriode();
         }
         else if (choice == "6") {
-            analisis.analisisMarginKeuntungan();
+            analisisProdukTerlaris();
         }
         else if (choice == "7") {
-            analisisPenjualanMember();
+            analisisPenjualanPerKategori();
         }
         else if (choice == "8") {
+            analisis.analisisMarginKeuntungan();
+        }
+        else if (choice == "9") {
+            analisisPenjualanMember();
+        }
+        else if (choice == "0") {
             break;
         }
         else {
