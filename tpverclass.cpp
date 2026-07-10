@@ -521,7 +521,6 @@ string formatRupiah(int angka) {
 }
 
 // --- Cart & Transactions implementation ---
-
 const int MAX_CART = 200;
 
 string cartCode[MAX_CART];
@@ -577,7 +576,7 @@ void dashboardAdmin(const string& username) {
         string choice;
         getline(cin, choice);
 
-        if (choice == "1") {
+        if (choice == "1") { 
             break;
 
         } else if (choice == "2") {
@@ -2425,14 +2424,14 @@ class LaporanPenjualan{
         int totalTransaksi;
         double totalPendapatan;
     public:
-void hitungPenjualanHarian() {
+        void hitungPenjualanHarian() {
 
-    ifstream fin(TRANSACTIONS_FILE.c_str());
+        ifstream fin(TRANSACTIONS_FILE.c_str());
 
-    if (!fin) {
-        cout << "\nBelum ada data transaksi.\n";
-        return;
-    }
+        if (!fin) {
+            cout << "\nBelum ada data transaksi.\n";
+            return;
+        }
 
     string tanggal = inputLine("Masukkan Tanggal (YYYY-MM-DD): ");
 
@@ -2568,13 +2567,13 @@ void hitungPenjualanHarian() {
         return;
     }
 
-cout << "\nCatatan: Tanggal awal minggu hanya dapat diisi dari tanggal 01-25.\n";
+    cout << "\nCatatan: Tanggal awal minggu hanya dapat diisi dari tanggal 01-25.\n";
 
-string tanggalAwal = inputLine("Masukkan Tanggal Awal (YYYY-MM-DD): ");
+    string tanggalAwal = inputLine("Masukkan Tanggal Awal (YYYY-MM-DD): ");
 
-int hariAwal = stoi(tanggalAwal.substr(8,2));
+    int hariAwal = stoi(tanggalAwal.substr(8,2));
 
-if (hariAwal < 1 || hariAwal > 25) {
+    if (hariAwal < 1 || hariAwal > 25) {
     cout << "\nTanggal awal harus berada pada rentang 01-25.\n";
     fin.close();
     return;
