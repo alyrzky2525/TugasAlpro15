@@ -672,16 +672,15 @@ string formatRupiah(int angka)
 
 string getCurrentDateTime()
 {
-
     time_t now = time(0);
     tm *ltm = localtime(&now);
 
     stringstream ss;
 
-    ss << setfill('0')
-       << setw(2) << ltm->tm_mday << "-"
+    ss << ltm->tm_year + 1900 << "-"
+       << setfill('0')
        << setw(2) << ltm->tm_mon + 1 << "-"
-       << ltm->tm_year + 1900 << " "
+       << setw(2) << ltm->tm_mday << " "
        << setw(2) << ltm->tm_hour << ":"
        << setw(2) << ltm->tm_min;
 
@@ -2546,19 +2545,14 @@ public:
             string start = line.substr(p3 + 1, p4 - p3 - 1);
             string end = line.substr(p4 + 1, p5 - p4 - 1);
             string memberOnly = line.substr(p5 + 1);
+
+            cout << "File promo : [" << code << "]\n";
+            cout << "Input user : [" << promoCode << "]\n";
+            cout << "MemberOnly : [" << memberOnly << "]\n";
+
             if (code != promoCode)
                 continue;
-            // check date range
-            if (!start.empty() && date < start)
-            {
-                valid = false;
-                return 0.0;
-            }
-            if (!end.empty() && date > end)
-            {
-                valid = false;
-                return 0.0;
-            }
+
             if (memberOnly == "1" && !isMember)
             {
                 valid = false;

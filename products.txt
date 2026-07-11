@@ -1,13 +1,13 @@
 P0001|Lipstick Red|Wardah|Makeup|49998|75000|25|5|2028-12-31
-P0002|Lipstick Pink|Implora|Makeup|52000|70000|30|5|2028-12-31
+P0002|Lipstick Pink|Implora|Makeup|52000|69998|30|5|2028-12-31
 P0003|Mascara Black|Maybelline|Makeup|70000|90000|15|5|2028-12-31
 P0004|Eyeliner Liquid|Pinkflash|Makeup|45000|65000|18|5|2028-12-31
 P0005|Face Cleanser|Garnier|Skincare|29999|45000|40|10|2028-12-31
 P0006|Moisturizer|Skintific|Skincare|85000|120000|22|5|2028-12-31
 P0007|Body Lotion|Nivea|Body Care|42000|60000|35|8|2028-12-31
-P0008|Hand Cream|Vaseline|Body Care|24000|40000|50|10|2028-12-31
-P0009|Serum Vitamin C|Skintific|Skincare|95000|149992|12|5|2028-12-31
-P0010|Sunscreen SPF50|Azarine|Skincare|68000|95000|28|8|2028-12-31
+P0008|Hand Cream|Vaseline|Body Care|24000|39999|50|10|2028-12-31
+P0009|Serum Vitamin C|Skintific|Skincare|95000|149990|12|5|2028-12-31
+P0010|Sunscreen SPF50|Azarine|Skincare|68000|94998|28|8|2028-12-31
 P0011|Blush Peach|Emina|Makeup|36000|55000|20|5|2028-12-31
 P0012|BB Cream|Wardah|Makeup|72000|84986|14|5|2028-12-31
 P0013|Face Mask Clay|Whitelab|Skincare|18000|29998|60|10|2028-12-31
