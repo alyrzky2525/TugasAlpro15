@@ -3102,6 +3102,7 @@ else
 }
         void tampilLaporan() { laporanPenjualanBulanan(); }
         void simpanLaporan() { laporanPenjualanBulanan(); }
+        
 
 };
 
@@ -3114,6 +3115,135 @@ class AnalisisProduk{
     public:
         void hitungBarangTerlaris() { analisisProdukTerlaris(); }
         void rankingProduk() { analisisProdukTerlaris(); }
+        void analisisKebutuhanRestock() {
+
+    ifstream fin(PRODUCTS_FILE.c_str());
+
+    if (!fin) {
+        cout << "File produk tidak ditemukan.\n";
+        return;
+    }
+
+    string line;
+bool ada = false;
+
+int produkAman = 0;
+int produkRestock = 0;
+int produkHabis = 0;
+int totalProduk = 0;
+
+    cout << "\n===============================================================\n";
+    cout << "              ANALISIS KEBUTUHAN RESTOCK PRODUK\n";
+    cout << "===============================================================\n";
+
+    cout << left
+         << setw(10) << "Kode"
+         << setw(30) << "Nama Produk"
+         << right
+         << setw(8) << "Stok"
+         << setw(12) << "Minimal"
+         << setw(12) << "Tambah"
+         << setw(15) << "Status"
+         << endl;
+
+    cout << "===============================================================\n";
+
+    while (getline(fin, line)) {
+
+        if (line.empty())
+            continue;
+
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+        size_t p4 = line.find('|', p3 + 1);
+        size_t p5 = line.find('|', p4 + 1);
+        size_t p6 = line.find('|', p5 + 1);
+        size_t p7 = line.find('|', p6 + 1);
+        size_t p8 = line.find('|', p7 + 1);
+
+        if (p1==string::npos || p2==string::npos ||
+            p3==string::npos || p4==string::npos ||
+            p5==string::npos || p6==string::npos ||
+            p7==string::npos || p8==string::npos)
+            continue;
+
+        string kode = line.substr(0, p1);
+        string nama = line.substr(p1 + 1, p2 - p1 - 1);
+
+        string stokStr = line.substr(p6 + 1, p7 - p6 - 1);
+        string minStr  = line.substr(p7 + 1, p8 - p7 - 1);
+
+        int stok = atoi(stokStr.c_str());
+        int minimal = atoi(minStr.c_str());
+
+       string status;
+
+totalProduk++;
+
+if (stok == 0) {
+
+    status = "HABIS";
+    produkHabis++;
+
+    ada = true;
+
+    int saran = minimal;
+
+    cout << left
+         << setw(10) << kode
+         << setw(30) << nama
+         << right
+         << setw(8) << stok
+         << setw(12) << minimal
+         << setw(12) << saran
+         << setw(15) << status
+         << endl;
+}
+else if (stok <= minimal) {
+
+    status = "RESTOCK";
+    produkRestock++;
+
+    ada = true;
+
+    int saran = minimal - stok;
+
+    if (saran < 1)
+        saran = 1;
+
+    cout << left
+         << setw(10) << kode
+         << setw(30) << nama
+         << right
+         << setw(8) << stok
+         << setw(12) << minimal
+         << setw(12) << saran
+         << setw(15) << status
+         << endl;
+}
+else {
+
+    produkAman++;
+
+}
+    }
+
+cout << "===============================================================\n";
+
+cout << "\n===============================================================\n";
+cout << "                 RINGKASAN ANALISIS STOK\n";
+cout << "===============================================================\n";
+
+cout << "Total Produk          : " << totalProduk << endl;
+cout << "Produk Aman           : " << produkAman << endl;
+cout << "Perlu Restock         : " << produkRestock << endl;
+cout << "Stok Habis            : " << produkHabis << endl;
+
+cout << "===============================================================\n";
+
+fin.close();
+}
 
 void analisisMarginKeuntungan() {
 
@@ -6180,6 +6310,7 @@ void menuDashboardKeuangan() {
         cout << "7. Analisis Penjualan Per Kategori\n";
         cout << "8. Analisis Margin Keuntungan\n";
         cout << "9. Analisis Penjualan Member\n";
+        cout << "10. Analisis Kebutuhan Restock\n";
         cout << "0. Kembali\n";
         cout << "============================================================\n";
 
@@ -6211,6 +6342,9 @@ void menuDashboardKeuangan() {
         }
         else if (choice == "9") {
             analisisPenjualanMember();
+        }
+        else if(choice=="10") {
+            analisis.analisisKebutuhanRestock();    
         }
         else if (choice == "0") {
             break;

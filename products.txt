@@ -28,15 +28,15 @@ P0027|Lip Cream Matte|Wardah|Makeup|50000|60500|40|10|2028-12-31
 P0028|False Eyelashes|Implora|Beauty Tools|52000|62000|10|3|2028-12-31
 P0029|Facial Foam|Himalaya|Skincare|54000|63500|15|5|2028-12-31
 P0030|Body Butter|The Body Shop|Body Care|56000|65000|20|5|2028-12-31
-P0031|Brightening Serum|Azarine|Skincare|57000|66500|21|5|2028-12-31
+P0031|Brightening Serum|Azarine|Skincare|57000|66496|21|5|2028-12-31
 P0032|Lip Gloss Shine|Emina|Makeup|58000|67993|30|8|2028-12-31
 P0033|Mascara Waterproof|Maybelline|Makeup|60000|69500|35|8|2028-12-31
 P0034|Facial Essence|Hada Labo|Skincare|61000|71000|40|10|2028-12-31
 P0035|Body Mist Fresh|Victoria's Secret|Fragrance|62000|72500|10|3|2028-12-31
 P0036|Acne Serum|Skintific|Skincare|63000|74000|15|5|2028-12-31
 P0037|Compact Powder|Wardah|Makeup|65000|75500|20|5|2028-12-31
-P0038|Beauty Blender|Real Techniques|Beauty Tools|66000|77000|25|5|2028-12-31
+P0038|Beauty Blender|Real Techniques|Beauty Tools|66000|77000|4|5|2028-12-31
 P0039|Facial Sunscreen|Skin Aqua|Skincare|67000|78497|30|8|2028-12-31
-P0040|Eau de Parfum Bloom|HMNS|Fragrance|69000|80000|35|8|2028-12-31
-P0041|Perfect Bright Moisturizer|Wardah|Skincare|70000|100000|15|5|2026-07-22
-P0042|Lip Cream Matte|Emina|Makeup|17000|24998|13|5|2028-01-30
+P0040|Eau de Parfum Bloom|HMNS|Fragrance|69000|80000|0|8|2028-12-31
+P0041|Perfect Bright Moisturizer|Wardah|Skincare|70000|100000|5|5|2026-07-22
+P0042|Lip Cream Matte|Emina|Makeup|17000|24998|2|5|2028-01-30
